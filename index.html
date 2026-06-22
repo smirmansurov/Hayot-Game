@@ -186,6 +186,31 @@
   .dirbtn .dtxt span{font-size:12px;color:var(--muted);}
 
   /* ── «прилёт супергероев» (инвестиции) ── */
+  /* ── обучение (первый ход) ── */
+  .tut-mask{position:fixed;inset:0;background:rgba(16,24,32,.55);z-index:60;display:flex;align-items:flex-end;justify-content:center;padding:22px;}
+  .tut-card{background:#fff;border-radius:16px;padding:18px;max-width:440px;width:100%;box-shadow:0 20px 50px rgba(0,0,0,.3);text-align:center;animation:fadeUp .3s ease both;}
+  .tut-card .ic{font-size:30px;}
+  .tut-card h3{font-size:17px;font-weight:800;margin:6px 0 4px;color:var(--ink);}
+  .tut-card p{font-size:14px;color:var(--muted);line-height:1.5;margin-bottom:14px;}
+  .tut-dots{display:flex;gap:5px;justify-content:center;margin-bottom:12px;}
+  .tut-dots i{width:7px;height:7px;border-radius:50%;background:var(--line);}
+  .tut-dots i.on{background:var(--teal);}
+  .rc.hl{outline:3px solid var(--orange);outline-offset:2px;transform:translateY(-3px);box-shadow:0 10px 24px rgba(245,160,90,.45);position:relative;z-index:61;}
+  /* ── таймер срочного решения ── */
+  .timer-lab{font-size:12.5px;font-weight:700;color:var(--muted);text-align:center;margin:-2px 0 6px;}
+  .timer-lab b{color:var(--orange);}
+  .timer{height:8px;border-radius:5px;background:var(--line);overflow:hidden;margin:0 0 14px;}
+  .timer i{display:block;height:100%;width:100%;background:var(--teal);transition:width .1s linear;}
+  .timer.warn i{background:var(--orange);}
+  /* ── тап-вызов (инвестиции) ── */
+  .tap-wrap{text-align:center;}
+  .tap-raised{font-family:var(--sans);font-size:40px;font-weight:800;color:var(--teal);letter-spacing:-1px;}
+  .tap-btn{width:122px;height:122px;border-radius:50%;border:none;cursor:pointer;margin:8px auto;display:block;
+    background:radial-gradient(circle at 38% 32%,#F7B074,#E8743A);color:#3A1206;font-weight:800;font-size:19px;
+    box-shadow:0 10px 26px rgba(232,116,58,.45);transition:transform .05s;user-select:none;-webkit-user-select:none;}
+  .tap-btn:active{transform:scale(.9);}
+  .tap-bar{height:10px;border-radius:6px;background:var(--teal-light);overflow:hidden;max-width:280px;margin:12px auto 0;}
+  .tap-bar i{display:block;height:100%;width:100%;background:var(--orange);transition:width .1s linear;}
   .fund-stage{height:172px;border-radius:18px;position:relative;overflow:hidden;margin-bottom:16px;
     background:radial-gradient(120px 120px at 50% 42%,rgba(255,255,255,.35),transparent 70%),linear-gradient(135deg,#0F7A7A,#2F9E9B);}
   @keyframes rayspin{to{transform:rotate(360deg)}}
@@ -661,6 +686,8 @@ const SCENE_CAP = {
 };
 
 let S;
+let _timer=null;
+let TUTORIAL_DONE=false;
 function newGame(dir){
   S = {dir, month:0, money:CFG.startMoney, users:0, team:CFG.startTeam,
        flow:buildFlow(dir), funded:false, pivot:false, over:false};
@@ -683,24 +710,30 @@ function setVal(idV,idF,val,max,fmt){
 }
 
 function showCard(){
+  clearTimer();
   if(S.month>=CFG.months){return endGame(true);}
   const card = S.flow[S.month];
+  const timed = (card.sc==="bug" || card.sc==="race");
   const scr=document.getElementById("screen");
   scr.innerHTML = `<div class="card">
-    <div class="mlabel">Месяц ${S.month+1} из ${CFG.months}</div>
+    <div class="mlabel">Месяц ${S.month+1} из ${CFG.months}${timed?" · ⚡ срочно":""}</div>
     <div class="ctitle">${card.t}</div>
     <div class="cdesc">${card.d}</div>
     <div class="scene">${scene(card.sc)}</div>
     <div class="scene-cap">${SCENE_CAP[card.sc]||""}</div>
+    ${timed?`<div class="timer-lab" id="tlab">⏱ Решите быстро: <b>60</b> сек, иначе потери по всем показателям</div><div class="timer" id="tbar"><i id="tfill"></i></div>`:""}
     ${card.o.map((o,i)=>`<button class="opt" data-i="${i}">
       <span>${o.l}${o.note?`<br><span class="note">${o.note}</span>`:""}</span><span class="arr">→</span>
     </button>`).join("")}
   </div>`;
   scr.querySelectorAll(".opt").forEach(b=>b.addEventListener("click",()=>choose(card.o[+b.dataset.i])));
   renderHUD();
+  if(timed) startTimer();
+  if(S.month===0 && !TUTORIAL_DONE) setTimeout(tutorial, 280);
 }
 
 function choose(o){
+  clearTimer();
   let dm=o.m, du=o.u, dtm=o.tm;
   // спец-эффекты
   if(o.gamble){ if(Math.random()<0.5){dm=25;du=1800;dtm=-4;} else {dm=-6;du=-200;dtm=-6;} }
@@ -728,7 +761,7 @@ function choose(o){
   showOutcome(dMoney, dUsers, dTeam);
 }
 
-function showOutcome(dMoney, dUsers, dTeam){
+function showOutcome(dMoney, dUsers, dTeam, note){
   const last = S.month >= S.flow.length;
   const scr = document.getElementById("screen");
   scr.innerHTML = `<div class="card out-card">
@@ -745,7 +778,7 @@ function showOutcome(dMoney, dUsers, dTeam){
     scr.querySelectorAll(".delta").forEach(d=>d.classList.add("in"));
     scr.querySelectorAll(".num").forEach(n=>countTo(n, +n.dataset.to));
   });
-  document.getElementById("otext").textContent = narrative(dMoney, dUsers, dTeam);
+  document.getElementById("otext").textContent = note || narrative(dMoney, dUsers, dTeam);
   document.getElementById("cont").addEventListener("click", continueAfterOutcome);
 }
 function deltaCol(ic, v){
@@ -773,39 +806,93 @@ function continueAfterOutcome(){
 }
 
 function fundEvent(){
-  S.money += CFG.fundBonus;
   const T="#0F7A7A",A="#2F9E9B",O="#F5A05A",L="#D7E8E8";
   const PIN = `<polygon points="50,8 70,20 70,44 50,56 30,44 30,20" fill="#1F5B57"/><polygon points="92,50 92,74 72,86 52,74 52,50 72,38" fill="#F5A05A"/><polygon points="50,92 30,80 30,56 50,44 70,56 70,80" fill="#2E6E6A"/><polygon points="8,50 8,26 28,14 48,26 48,50 28,62" fill="#5FA8A4"/>`;
-  const rays = Array.from({length:12}).map((_,i)=>`<polygon points="0,-5 0,5 70,0" fill="rgba(255,255,255,.22)" transform="rotate(${i*30})"/>`).join("");
-  const confetti = [['#fff',30,2.2,0],[O,52,2.6,.3],[L,74,2.0,.6],['#fff',96,2.8,.15],[O,118,2.3,.45],[L,140,2.5,.1],['#fff',164,2.1,.7],[O,176,2.7,.5]]
+  const rays = Array.from({length:12}).map((_,i)=>`<polygon points="0,-5 0,5 64,0" fill="rgba(255,255,255,.22)" transform="rotate(${i*30})"/>`).join("");
+  const confetti = [['#fff',30,2.2,0],[O,60,2.6,.3],[L,92,2.0,.6],['#fff',128,2.8,.15],[O,160,2.3,.45],[L,176,2.5,.1]]
     .map(([c,x,d,dl])=>`<g transform="translate(${x},-6)"><g class="cf" style="animation-duration:${d}s;animation-delay:${dl}s"><rect x="-3" y="-3" width="6" height="6" rx="1.5" fill="${c}"/></g></g>`).join("");
-  const coinsRain = [44,100,156].map((x,i)=>`<g transform="translate(${x},-6)"><g class="cf" style="animation-duration:${2.4+i*0.2}s;animation-delay:${0.2+i*0.3}s"><circle r="6" fill="${O}"/><text y="3" font-size="8" font-weight="800" fill="#3A1D08" text-anchor="middle">$</text></g></g>`).join("");
-
+  const RAISE = t => Math.min(50, 12 + t);
+  let taps=0, left=60; // 6.0 сек
   const scr=document.getElementById("screen");
   scr.innerHTML = `<div class="card out-card">
-    <div class="fund-stage">
-      <svg viewBox="0 0 200 172" width="100%" height="172">
-        <g transform="translate(100,72)"><g class="rays">${rays}</g></g>
-        <circle class="glowp" cx="100" cy="72" r="36" fill="rgba(255,255,255,.45)"/>
-        <g transform="translate(100,40)"><g class="badgein"><g transform="scale(0.46) translate(-50,-50)">${PIN}</g></g></g>
-        ${confetti}${coinsRain}
-        <g transform="translate(64,128)"><g class="flyL"><g class="floaty">${hero()}</g></g></g>
-        <g transform="translate(136,128)"><g class="flyR"><g class="floaty" style="animation-delay:.3s">${hero()}</g></g></g>
-        <g transform="translate(100,124)"><g class="floaty" style="animation-delay:.6s">${fig()}
-           <rect x="-15" y="-7" width="5" height="13" rx="2.5" fill="${A}" transform="rotate(-42 -12 0)"/>
-           <rect x="10" y="-7" width="5" height="13" rx="2.5" fill="${A}" transform="rotate(42 12 0)"/></g></g>
-        <g transform="translate(100,80)"><g class="popbig">
-           <rect x="-34" y="-15" width="68" height="30" rx="9" fill="#fff"/>
-           <text y="6" font-size="22" font-weight="800" fill="${T}" text-anchor="middle">+$${CFG.fundBonus}K</text></g></g>
+    <div class="fund-stage" style="height:140px">
+      <svg viewBox="0 0 200 140" width="100%" height="140">
+        <g transform="translate(100,60)"><g class="rays">${rays}</g></g>
+        <circle class="glowp" cx="100" cy="60" r="32" fill="rgba(255,255,255,.45)"/>
+        <g transform="translate(100,34)"><g class="badgein"><g transform="scale(0.4) translate(-50,-50)">${PIN}</g></g></g>
+        ${confetti}
+        <g transform="translate(56,116)"><g class="flyL"><g class="floaty">${hero()}</g></g></g>
+        <g transform="translate(144,116)"><g class="flyR"><g class="floaty" style="animation-delay:.3s">${hero()}</g></g></g>
+        <g transform="translate(100,114)"><g class="floaty" style="animation-delay:.6s">${fig()}</g></g>
       </svg>
     </div>
-    <div class="mlabel">⬡ Hayot Ventures</div>
-    <div class="ctitle">Подкрепление прибыло!</div>
-    <div class="out-text">Ваш рост впечатлил фонд. Команда Hayot Ventures приходит на помощь и инвестирует <b>$${CFG.fundBonus}K</b> в развитие вашей компании.</div>
-    <button class="btn btn-coral" id="cont">Принять инвестиции →</button>
+    <div class="mlabel">⬡ Hayot Ventures приходит на помощь!</div>
+    <div class="tap-wrap">
+      <div class="tap-raised" id="raised">$12K</div>
+      <button class="tap-btn" id="tapbtn">ТАП!</button>
+      <div class="out-text" id="tapmsg">Тапайте как можно быстрее — чем больше тапов, тем крупнее инвестиции от фонда!</div>
+      <div class="tap-bar"><i id="tapfill"></i></div>
+    </div>
   </div>`;
   renderHUD();
-  document.getElementById("cont").addEventListener("click",()=>{flashBars();showCard();});
+  const btn=document.getElementById("tapbtn"), raised=document.getElementById("raised"), fill=document.getElementById("tapfill");
+  function tap(){ taps++; raised.textContent="$"+RAISE(taps)+"K"; raised.classList.remove("flash"); void raised.offsetWidth; raised.classList.add("flash");
+    try{const tg=window.Telegram&&window.Telegram.WebApp; tg&&tg.HapticFeedback&&tg.HapticFeedback.impactOccurred("light");}catch(e){} }
+  btn.addEventListener("click",tap);
+  const iv=setInterval(()=>{ left--; if(fill) fill.style.width=(left/60*100)+"%"; if(left<=0){ clearInterval(iv); finish(); } },100);
+  function finish(){
+    const r=RAISE(taps); S.money+=r; flashBars(); renderHUD();
+    document.querySelector(".tap-wrap").innerHTML=`<div class="tap-raised">+$${r}K</div>
+      <div class="out-text">Вы привлекли <b>$${r}K</b> инвестиций от Hayot Ventures!${taps>=28?" Отличный темп! 🔥":""}</div>
+      <button class="btn btn-coral" id="cont">Продолжить →</button>`;
+    document.getElementById("cont").addEventListener("click",()=>{flashBars();showCard();});
+  }
+}
+
+function startTimer(){
+  clearTimer();
+  let left=600; // 60.0 сек в десятых
+  const fill=document.getElementById("tfill"), lab=document.getElementById("tlab"), bar=document.getElementById("tbar");
+  _timer=setInterval(()=>{
+    left--;
+    const sec=Math.ceil(left/10);
+    if(fill) fill.style.width=(left/600*100)+"%";
+    if(lab) lab.innerHTML=`⏱ Решите быстро: <b>${sec}</b> сек, иначе потери по всем показателям`;
+    if(bar && sec<=15) bar.classList.add("warn");
+    if(left<=0){ clearTimer(); timeUp(); }
+  },100);
+}
+function clearTimer(){ if(_timer){ clearInterval(_timer); _timer=null; } }
+function timeUp(){
+  S.money-=8; S.users=Math.max(0,S.users-300); S.team=clamp(S.team-8,0,100);
+  const rev=Math.floor(S.users/CFG.fundFloor); S.money+=rev-CFG.burn;
+  const dMoney=-8+rev-CFG.burn, dUsers=-300, dTeam=-8;
+  S.month++; flashBars(); renderHUD();
+  if(S.money<0) return endGame(false,"bankrupt");
+  if(S.team<=0) return endGame(false,"burnout");
+  showOutcome(dMoney,dUsers,dTeam,"Время вышло — промедление ударило по всем показателям.");
+}
+function tutorial(){
+  TUTORIAL_DONE=true;
+  const steps=[
+    {sel:".rc.money",ic:"💰",h:"Капитал",p:"Деньги компании. Каждый месяц расходуются на работу. Если опустится ниже нуля — банкротство."},
+    {sel:".rc.users",ic:"👥",h:"Пользователи",p:"Чем их больше, тем выше выручка и итоговая оценка вашей компании."},
+    {sel:".rc.team",ic:"⚡",h:"Команда",p:"Мотивация команды. Если упадёт до нуля — развитие остановится."},
+    {ic:"🎯",h:"Что делать",p:"Каждое решение меняет эти три показателя. Удерживайте баланс, пройдите 12 шагов и дорастите идею до раунда Hayot Ventures. Иногда решения на время — не зевайте!"},
+  ];
+  let i=0;
+  const mask=document.createElement("div"); mask.className="tut-mask"; document.body.appendChild(mask);
+  function clearHl(){ document.querySelectorAll(".rc.hl").forEach(e=>e.classList.remove("hl")); }
+  function show(){
+    clearHl();
+    const st=steps[i];
+    if(st.sel){ const el=document.querySelector(st.sel); if(el) el.classList.add("hl"); }
+    mask.innerHTML=`<div class="tut-card"><div class="ic">${st.ic}</div><h3>${st.h}</h3><p>${st.p}</p>
+      <div class="tut-dots">${steps.map((_,k)=>`<i class="${k===i?'on':''}"></i>`).join("")}</div>
+      <button class="btn btn-primary" id="tnext">${i<steps.length-1?'Далее →':'Поехали!'}</button></div>`;
+    document.getElementById("tnext").onclick=()=>{ i++; if(i>=steps.length){ clearHl(); mask.remove(); } else show(); };
+  }
+  show();
 }
 
 function toast(dm,du,dtm,rev){
