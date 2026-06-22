@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Hayot Ventures — Путь основателя</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --teal:#0F7A7A; --teal-accent:#2F9E9B; --teal-light:#D7E8E8;
+    --orange:#F5A05A; --ink:#101820; --bg:#F5F6F7; --card:#FFFFFF;
+    --muted:#5E6E6E; --dim:#93A3A3; --line:#E4EBEB; --red:#C8552B;
+    --serif:"Playfair Display",Georgia,serif; --sans:"Manrope",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+  body{font-family:var(--sans);color:var(--ink);min-height:100vh;background:
+      radial-gradient(800px 420px at 85% -10%,rgba(245,160,90,.10),transparent 60%),
+      radial-gradient(900px 500px at 8% 0%,rgba(95,168,164,.14),transparent 55%),var(--bg);
+    padding:0 0 36px;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:560px;margin:0 auto;padding:0 18px;}
+  header{max-width:560px;margin:0 auto;padding:18px 18px 6px;display:flex;align-items:center;}
+  .logo{height:26px;width:auto;}
+  .tagline{margin-left:auto;font-size:11px;font-weight:700;letter-spacing:1.5px;color:var(--teal);text-transform:uppercase;}
+
+  /* resources */
+  .res{display:flex;gap:10px;margin:14px 0 16px;}
+  .rc{flex:1;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:11px 12px;box-shadow:0 8px 22px rgba(16,24,32,.05);}
+  .rc .top{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted);font-weight:700;}
+  .rc .val{font-size:21px;font-weight:800;letter-spacing:-.4px;margin-top:2px;transition:color .3s;}
+  .rc .bar{height:5px;border-radius:3px;background:var(--line);margin-top:7px;overflow:hidden;}
+  .rc .fill{height:100%;border-radius:3px;transition:width .5s cubic-bezier(.3,1,.4,1);}
+  .rc.money .fill{background:var(--teal);}
+  .rc.users .fill{background:var(--orange);}
+  .rc.team .fill{background:var(--teal-accent);}
+  .flash{animation:flash .5s;}
+  @keyframes flash{0%{transform:scale(1)}40%{transform:scale(1.15)}100%{transform:scale(1)}}
+
+  /* months progress */
+  .months{display:flex;gap:4px;justify-content:center;flex-wrap:wrap;margin-bottom:14px;}
+  .mh{width:12px;height:14px;clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%);background:var(--teal-light);transition:.3s;}
+  .mh.done{background:var(--teal-accent);}
+  .mh.cur{background:var(--orange);transform:scale(1.2);}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:24px 22px;
+    box-shadow:0 12px 34px rgba(16,24,32,.07);animation:rise .4s ease both;}
+  @keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+  .mlabel{font-size:11px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--teal-accent);}
+  .ctitle{font-family:var(--sans);font-size:24px;font-weight:800;letter-spacing:-.3px;margin:7px 0 6px;line-height:1.2;}
+  .cdesc{font-size:15px;color:var(--muted);line-height:1.55;margin-bottom:18px;}
+  .opt{width:100%;text-align:left;background:#fff;border:1.5px solid var(--line);border-radius:14px;
+    padding:14px 16px;font-size:15px;font-weight:700;font-family:var(--sans);color:var(--ink);cursor:pointer;
+    transition:.18s;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;gap:10px;}
+  .opt:hover{border-color:var(--teal-accent);}
+  .opt:active{transform:scale(.99);}
+  .opt .note{font-size:11px;color:var(--dim);font-weight:600;}
+  .opt .arr{color:var(--orange);font-size:18px;flex:none;}
+
+  /* toast of effects */
+  .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);opacity:0;
+    background:var(--ink);color:#fff;border-radius:14px;padding:12px 18px;font-size:14px;font-weight:700;
+    display:flex;gap:14px;transition:.3s;z-index:50;box-shadow:0 12px 30px rgba(0,0,0,.25);pointer-events:none;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+  .toast .up{color:#7FE0C0;} .toast .down{color:#F5A05A;}
+
+  /* start / end screens */
+  .hero{text-align:center;padding:8px 0;}
+  .hero .big{width:84px;height:84px;margin:14px auto 16px;animation:spin 12s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .hero h1{font-family:var(--sans);font-size:32px;font-weight:800;letter-spacing:-.5px;line-height:1.12;}
+  .hero h1 .em{font-style:italic;color:var(--teal);}
+  .hero p{color:var(--muted);font-size:15px;line-height:1.6;margin:12px 0 18px;}
+  .how{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px 18px;text-align:left;margin-bottom:20px;}
+  .how b{font-size:13px;}
+  .how div{font-size:13px;color:var(--muted);line-height:1.7;margin-top:6px;}
+  .btn{display:block;width:100%;border:none;border-radius:14px;padding:16px;font-size:16px;font-weight:800;
+    cursor:pointer;font-family:var(--sans);transition:.2s;text-decoration:none;text-align:center;}
+  .btn:active{transform:scale(.98);}
+  .btn-primary{background:var(--teal);color:#fff;box-shadow:0 10px 26px rgba(15,122,122,.32);}
+  .btn-coral{background:var(--orange);color:#3A1D08;box-shadow:0 10px 26px rgba(245,160,90,.34);}
+  .btn-ghost{background:#fff;color:var(--teal);border:1.5px solid var(--line);box-shadow:none;margin-top:10px;}
+
+  .score{font-family:var(--sans);font-size:54px;font-weight:800;color:var(--teal);letter-spacing:-1px;}
+  .rank{display:inline-block;font-size:16px;font-weight:800;background:var(--teal-light);color:var(--teal);
+    padding:8px 18px;border-radius:999px;margin:6px 0 14px;}
+  .recap{display:flex;gap:10px;margin:6px 0 20px;}
+  .recap .rc2{flex:1;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 8px;}
+  .recap .rc2 b{display:block;font-size:18px;font-weight:800;}
+  .recap .rc2 span{font-size:11px;color:var(--muted);font-weight:600;}
+  .footer{text-align:center;color:var(--dim);font-size:10.5px;margin-top:20px;letter-spacing:.4px;font-weight:600;}
+  .hidden{display:none;}
+
+  /* ── анимированная сцена-ролик под вопросом (пиксель-стиль) ── */
+  .scene{height:150px;border-radius:14px;margin-bottom:10px;overflow:hidden;border:1px solid var(--line);
+    background:linear-gradient(180deg,#E6F3F0 0%,#F5F6F7 72%);}
+  .scene svg{display:block;width:100%;height:100%;}
+  .scene-cap{font-size:13px;font-weight:700;color:var(--ink);text-align:center;margin-bottom:16px;line-height:1.4;}
+  .px{shape-rendering:crispEdges;}
+  .gnd{stroke:var(--teal-light);stroke-width:2;}
+  .obj{transition:.3s;}
+  /* rocket */
+  @keyframes rk{0%,100%{transform:translateY(4px)}50%{transform:translateY(-6px)}}
+  @keyframes flame{0%{transform:scaleY(.7);opacity:.7}100%{transform:scaleY(1.15);opacity:1}}
+  .rk{animation:rk 2.2s ease-in-out infinite;transform-origin:center;}
+  .fl{animation:flame .18s ease-in-out infinite alternate;transform-origin:top center;}
+  /* coins */
+  @keyframes drop{0%{transform:translateY(-40px);opacity:0}20%{opacity:1}100%{transform:translateY(46px);opacity:1}}
+  .cn{animation:drop 1.7s ease-in infinite;}
+  /* chart bars */
+  @keyframes grow{0%{transform:scaleY(.25)}100%{transform:scaleY(1)}}
+  .gb{transform-origin:bottom;animation:grow 1.6s ease-in-out infinite alternate;}
+  /* people pulse */
+  @keyframes pls{0%,100%{transform:scale(1);opacity:.85}50%{transform:scale(1.18);opacity:1}}
+  .pp{animation:pls 1.5s ease-in-out infinite;transform-origin:center;}
+  /* bug shake */
+  @keyframes shk{0%,100%{transform:translate(0,0) rotate(0)}25%{transform:translate(-3px,1px) rotate(-4deg)}75%{transform:translate(3px,-1px) rotate(4deg)}}
+  .bgx{animation:shk .35s ease-in-out infinite;transform-origin:center;}
+  /* race */
+  @keyframes race1{0%{transform:translateX(0)}100%{transform:translateX(46px)}}
+  @keyframes race2{0%{transform:translateX(0)}100%{transform:translateX(34px)}}
+  .rc1{animation:race1 1.6s ease-in-out infinite alternate;}
+  .rc2x{animation:race2 1.6s ease-in-out infinite alternate;}
+  /* handshake */
+  @keyframes hsl{0%,100%{transform:translateX(0)}50%{transform:translateX(10px)}}
+  @keyframes hsr{0%,100%{transform:translateX(0)}50%{transform:translateX(-10px)}}
+  .hsl{animation:hsl 1.8s ease-in-out infinite;}
+  .hsr{animation:hsr 1.8s ease-in-out infinite;}
+  /* pivot turn */
+  @keyframes turn{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
+  .pv{animation:turn 4s linear infinite;transform-origin:center;}
+
+  /* ── человечек Hayot Ventures: позы и сценки ── */
+  @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+  .bob{animation:bob 1.7s ease-in-out infinite;}
+  @keyframes pushp{0%,100%{transform:translateX(0) rotate(0)}50%{transform:translateX(5px) rotate(6deg)}}
+  .push{animation:pushp 1.5s ease-in-out infinite;transform-origin:bottom center;}
+  @keyframes liftup{0%{transform:translateY(8px)}55%{transform:translateY(0);opacity:1}100%{transform:translateY(-70px);opacity:0}}
+  .rk2{animation:liftup 2.8s ease-in infinite;}
+  @keyframes meetL{0%,100%{transform:translateX(0)}55%{transform:translateX(11px)}}
+  @keyframes meetR{0%,100%{transform:translateX(0)}55%{transform:translateX(-11px)}}
+  .meetL{animation:meetL 2s ease-in-out infinite;} .meetR{animation:meetR 2s ease-in-out infinite;}
+  @keyframes spk{0%,55%{transform:scale(0)}72%{transform:scale(1.5)}100%{transform:scale(0)}}
+  .spark{animation:spk 2s ease-in-out infinite;transform-origin:center;}
+  @keyframes runx{0%{transform:translateX(0)}100%{transform:translateX(96px)}}
+  .run{animation:runx 2.6s ease-in-out infinite alternate;}
+  .run2{animation:runx 2.6s ease-in-out infinite alternate;opacity:.6;}
+  @keyframes pointarm{0%,100%{transform:rotate(4deg)}50%{transform:rotate(-26deg)}}
+  .armpt{animation:pointarm 1.6s ease-in-out infinite;transform-origin:8px 8px;}
+  @keyframes droopy{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(4px) rotate(4deg)}}
+  .droop{animation:droopy 2.1s ease-in-out infinite;transform-origin:bottom center;}
+  @keyframes whackx{0%,100%{transform:rotate(-18deg)}50%{transform:rotate(40deg)}}
+  .whack{animation:whackx .55s ease-in-out infinite;transform-origin:6px 8px;}
+  @keyframes sweat{0%{transform:translateY(0);opacity:0}30%{opacity:.9}100%{transform:translateY(12px);opacity:0}}
+  .sweat{animation:sweat 1.7s ease-in infinite;}
+  @keyframes flip{0%,100%{transform:scaleX(1)}50%{transform:scaleX(-1)}}
+  .flip{animation:flip 3.2s ease-in-out infinite;transform-origin:center;}
+
+  /* ── детали сценок ── */
+  @keyframes smoke{0%{transform:translateY(0) scale(.5);opacity:.55}100%{transform:translateY(-24px) scale(1.4);opacity:0}}
+  .smoke{animation:smoke 1.4s ease-out infinite;}
+  @keyframes glint{0%,100%{opacity:.25}50%{opacity:1}}
+  .glint{animation:glint 1.2s ease-in-out infinite;}
+  @keyframes dust{0%{transform:translateX(0) scale(1);opacity:.5}100%{transform:translateX(-20px) scale(.3);opacity:0}}
+  .dust{animation:dust 0.7s ease-out infinite;}
+  @keyframes speed{to{stroke-dashoffset:-26}}
+  .speed{stroke-dasharray:10 8;animation:speed .5s linear infinite;}
+  @keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+  .floaty{animation:floaty 2.2s ease-in-out infinite;}
+  @keyframes zzz{0%{transform:translateY(0);opacity:0}25%{opacity:1}100%{transform:translateY(-12px);opacity:0}}
+  .zzz{animation:zzz 2.2s ease-in infinite;}
+  @keyframes blip{0%,100%{transform:scale(1)}50%{transform:scale(1.5)}}
+  .blip{animation:blip 1s ease-in-out infinite;transform-origin:center;}
+  @keyframes stamp{0%,40%{transform:scale(0) rotate(-12deg);opacity:0}55%{transform:scale(1.25) rotate(-12deg);opacity:1}70%,100%{transform:scale(1) rotate(-12deg);opacity:1}}
+  .stamp{animation:stamp 2s ease-out infinite;transform-origin:center;}
+  @keyframes bubble{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-3px) scale(1.04)}}
+  .bubble{animation:bubble 2s ease-in-out infinite;transform-origin:center;}
+
+  .dirs{display:flex;flex-direction:column;gap:10px;margin:6px 0 2px;}
+  .dirbtn{display:flex;align-items:center;gap:12px;text-align:left;background:#fff;border:1.5px solid var(--line);
+    border-radius:14px;padding:11px 13px;cursor:pointer;font-family:var(--sans);transition:.18s;width:100%;}
+  .dirbtn:hover{border-color:var(--teal-accent);} .dirbtn:active{transform:scale(.99);}
+  .dirbtn .dico{width:44px;height:44px;flex:none;background:#F0F8F8;border-radius:10px;display:flex;align-items:center;justify-content:center;}
+  .dirbtn .dtxt b{display:block;font-size:15px;font-weight:800;color:var(--ink);}
+  .dirbtn .dtxt span{font-size:12px;color:var(--muted);}
+
+  /* ── «прилёт супергероев» (инвестиции) ── */
+  .fund-stage{height:172px;border-radius:18px;position:relative;overflow:hidden;margin-bottom:16px;
+    background:radial-gradient(120px 120px at 50% 42%,rgba(255,255,255,.35),transparent 70%),linear-gradient(135deg,#0F7A7A,#2F9E9B);}
+  @keyframes rayspin{to{transform:rotate(360deg)}}
+  .rays{animation:rayspin 14s linear infinite;transform-origin:center;}
+  @keyframes flyL{0%{transform:translate(-130px,-46px) rotate(-22deg);opacity:0}65%{opacity:1}100%{transform:translate(0,0) rotate(0);opacity:1}}
+  @keyframes flyR{0%{transform:translate(130px,-46px) rotate(22deg);opacity:0}65%{opacity:1}100%{transform:translate(0,0) rotate(0);opacity:1}}
+  .flyL{animation:flyL 1s cubic-bezier(.2,1.3,.4,1) .15s both;}
+  .flyR{animation:flyR 1s cubic-bezier(.2,1.3,.4,1) .35s both;}
+  @keyframes cape{0%,100%{transform:skewX(0) scaleX(1)}50%{transform:skewX(-10deg) scaleX(1.06)}}
+  .cape{animation:cape 1.3s ease-in-out infinite;transform-origin:top center;}
+  @keyframes confetti{0%{transform:translateY(-30px) rotate(0);opacity:0}15%{opacity:1}100%{transform:translateY(150px) rotate(220deg);opacity:0}}
+  .cf{animation:confetti linear infinite;}
+  @keyframes popbig{0%{transform:scale(0);opacity:0}60%{transform:scale(1.15)}100%{transform:scale(1);opacity:1}}
+  .popbig{animation:popbig .6s cubic-bezier(.2,1.4,.4,1) .8s both;transform-origin:center;}
+  @keyframes glowp{0%,100%{opacity:.35;transform:scale(1)}50%{opacity:.7;transform:scale(1.12)}}
+  .glowp{animation:glowp 1.8s ease-in-out infinite;transform-origin:center;}
+  @keyframes badgespin{0%{transform:scale(0) rotate(-90deg);opacity:0}100%{transform:scale(1) rotate(0);opacity:1}}
+  .badgein{animation:badgespin .7s cubic-bezier(.2,1.4,.4,1) both;transform-origin:center;}
+
+  /* ── экран результата ── */
+  .out-card{text-align:center;}
+  .out-anim{height:96px;display:flex;align-items:center;justify-content:center;gap:18px;margin:6px 0 14px;}
+  .delta{display:flex;flex-direction:column;align-items:center;opacity:0;transform:translateY(12px);}
+  .delta.in{animation:popin .45s ease forwards;}
+  .delta:nth-child(2){animation-delay:.15s;} .delta:nth-child(3){animation-delay:.3s;}
+  @keyframes popin{to{opacity:1;transform:none}}
+  .delta .ic{font-size:26px;}
+  .delta .num{font-size:20px;font-weight:800;margin-top:2px;}
+  .delta .num.up{color:var(--teal);} .delta .num.down{color:var(--orange);}
+  .out-text{font-size:15px;color:var(--muted);line-height:1.5;margin-bottom:18px;min-height:22px;}
+  .fund-pop{background:linear-gradient(135deg,#0F7A7A,#2F9E9B);color:#fff;border:none;}
+  .fund-pop .ctitle,.fund-pop .mlabel{color:#fff;}
+  .fund-pop .cdesc{color:rgba(255,255,255,.9);}
+</style>
+</head>
+<body>
+<header>
+  <svg class="logo" viewBox="0 0 216 30" fill="none" aria-label="Hayot Ventures">
+    <path d="M50.1082 13.4964H41.6888V6.05044H37.9458V24.4584H41.6888V16.903H50.1082V24.4584H53.9049V6.05044H50.1082V13.4964Z" fill="#101820"/>
+    <path d="M65.5899 11.1785C64.6638 10.7113 63.5405 10.4777 62.2196 10.4777C60.8988 10.4777 59.8535 10.7016 58.9177 11.1518C57.982 11.6019 57.2534 12.2273 56.7294 13.0327C56.2054 13.8381 55.9447 14.7823 55.9447 15.8626V16.1644H59.522V15.8626C59.522 15.0743 59.7243 14.5292 60.1264 14.2274C60.5285 13.9257 61.1718 13.7748 62.0515 13.7748C62.9312 13.7748 63.5551 13.9038 64.0327 14.1593C64.5103 14.4173 64.7492 15.011 64.7492 15.9454V16.4247L59.9899 17.1256C59.0372 17.2544 58.2281 17.4832 57.5677 17.8117C56.9072 18.1426 56.4126 18.5709 56.0812 19.1039C55.7498 19.6342 55.5864 20.2572 55.5864 20.9725C55.5864 22.199 56.0032 23.1333 56.839 23.7758C57.6725 24.4181 58.6959 24.7369 59.9071 24.7369C60.7868 24.7369 61.5301 24.6274 62.1368 24.406C62.7411 24.187 63.2554 23.9023 63.677 23.5543C64.0984 23.2063 64.4469 22.8585 64.7223 22.5105H64.832V24.462H68.3533V16.3298C68.3533 15.1034 68.1241 14.0547 67.666 13.1836C67.2079 12.3149 66.5158 11.6457 65.5874 11.1785H65.5899ZM64.2008 20.7804C63.8328 21.1843 63.3747 21.4593 62.824 21.6053C62.2733 21.7512 61.7323 21.8242 61.2011 21.8242C60.5211 21.8242 60.0216 21.7366 59.7024 21.5639C59.3806 21.3911 59.2199 21.1015 59.2199 20.6977C59.2199 20.3692 59.3344 20.1161 59.5635 19.9433C59.7925 19.7706 60.1556 19.6465 60.6503 19.5735L64.7492 18.9554V18.9967C64.7492 19.7851 64.5664 20.3788 64.1984 20.7828L64.2008 20.7804Z" fill="#101820"/>
+    <path d="M79.6568 10.7573L77.5391 16.6094L76.6034 19.2739H76.3548L75.2266 16.6094L72.8336 10.7573H68.6519L74.4735 23.9458L74.1542 24.6344C73.935 25.1284 73.6913 25.4399 73.4257 25.5689C73.16 25.6978 72.7507 25.7611 72.2023 25.7611H70.0554V28.866C70.3113 28.939 70.6549 29.0022 71.0863 29.0582C71.5176 29.1142 71.9441 29.141 72.3656 29.141C73.2648 29.141 74.0251 29.0387 74.649 28.8392C75.2728 28.6372 75.8138 28.2771 76.2719 27.7539C76.73 27.2308 77.1516 26.5227 77.5367 25.6248L83.8385 10.7597H79.6568V10.7573Z" fill="#101820"/>
+    <path d="M94.2023 11.3562C93.1837 10.7697 91.9506 10.4777 90.5007 10.4777C89.0507 10.4777 87.8005 10.7697 86.7455 11.3562C85.6902 11.9426 84.8885 12.7699 84.3378 13.843C83.7871 14.9137 83.5117 16.1644 83.5117 17.5927C83.5117 19.0211 83.7871 20.2986 84.3378 21.3716C84.8885 22.4423 85.6902 23.2721 86.7455 23.8585C87.8005 24.4449 89.0531 24.7369 90.5007 24.7369C91.9481 24.7369 93.1837 24.4449 94.2023 23.8585C95.2208 23.2721 96.0079 22.4447 96.5684 21.3716C97.1289 20.3011 97.4068 19.0405 97.4068 17.5927C97.4068 16.1449 97.1265 14.9137 96.5684 13.843C96.0079 12.7723 95.2208 11.9426 94.2023 11.3562ZM93.0472 20.5614C92.5598 21.1283 91.7117 21.413 90.503 21.413C89.2944 21.413 88.461 21.1283 87.959 20.5614C87.4546 19.9944 87.2036 19.004 87.2036 17.5952C87.2036 16.1862 87.4546 15.2008 87.959 14.6412C88.4634 14.0814 89.3115 13.8041 90.503 13.8041C91.6947 13.8041 92.5622 14.0839 93.0472 14.6412C93.532 15.2008 93.7758 16.1839 93.7758 17.5952C93.7758 19.0065 93.532 19.9944 93.0472 20.5614Z" fill="#101820"/>
+    <path d="M103.605 7.42733H100.662L99.916 10.7512H97.5791V13.8561H99.8356V19.9832C99.8356 21.5965 100.272 22.745 101.142 23.4312C102.012 24.1174 103.311 24.4605 105.036 24.4605C105.494 24.4605 105.952 24.4338 106.413 24.3778C106.871 24.3218 107.266 24.2585 107.597 24.1855V21.0807H106.028C105.055 21.0807 104.41 20.9979 104.088 20.8324C103.766 20.6669 103.605 20.2654 103.605 19.6231V13.8537H107.595V10.7488H103.605V7.42489V7.42733Z" fill="#101820"/>
+    <path d="M8.04656 0.000120163L14.9332 6.87664L12.6498 12.6314L6.88661 14.9114L0 8.0349L2.27116 2.28986L8.04656 0.000120163Z" fill="#02676C"/>
+    <path d="M22.9762 14.9139L29.8628 21.7905L27.5795 27.5453L21.8163 29.8253L14.9297 22.9487L17.2008 17.2037L22.9762 14.9139Z" fill="#02676C"/>
+    <path d="M14.9297 6.87652L21.8163 0L27.5795 2.28001L29.8628 8.03478L22.9762 14.9113L17.2227 12.6434L14.9297 6.87652Z" fill="#FF7733"/>
+    <path d="M0 21.7905L6.88661 14.9139L12.6498 17.1916L14.9332 22.9487L8.04656 29.8253L2.2931 27.5574L0 21.7905Z" fill="#02676C"/>
+    <path d="M117.088 24.6754L110.663 6.05044H114.638L119.588 21.2254H118.788L123.738 6.05044H127.738L121.288 24.6754H117.088Z" fill="#101820"/>
+    <path d="M134.22 24.9754C132.803 24.9754 131.562 24.6588 130.495 24.0254C129.445 23.3754 128.628 22.5171 128.045 21.4504C127.462 20.3671 127.17 19.1588 127.17 17.8254C127.17 16.4754 127.47 15.2671 128.07 14.2004C128.67 13.1338 129.478 12.2921 130.495 11.6754C131.528 11.0588 132.695 10.7504 133.995 10.7504C135.062 10.7504 136.003 10.9254 136.82 11.2754C137.653 11.6088 138.353 12.0838 138.92 12.7004C139.487 13.3171 139.92 14.0338 140.22 14.8504C140.52 15.6504 140.67 16.5088 140.67 17.4254C140.67 17.6921 140.653 17.9504 140.62 18.2004C140.603 18.4504 140.562 18.6671 140.495 18.8504H130.145V16.2254H138.495L136.845 17.4504C137.012 16.7171 136.987 16.0588 136.77 15.4754C136.57 14.8921 136.228 14.4338 135.745 14.1004C135.262 13.7671 134.678 13.6004 133.995 13.6004C133.312 13.6004 132.72 13.7671 132.22 14.1004C131.737 14.4338 131.362 14.9171 131.095 15.5504C130.845 16.1838 130.745 16.9504 130.795 17.8504C130.728 18.6671 130.828 19.3838 131.095 20.0004C131.378 20.6004 131.787 21.0671 132.32 21.4004C132.87 21.7338 133.52 21.9004 134.27 21.9004C134.987 21.9004 135.587 21.7588 136.07 21.4754C136.57 21.1754 136.97 20.7838 137.27 20.3004L140.095 21.6504C139.828 22.3004 139.403 22.8754 138.82 23.3754C138.253 23.8754 137.578 24.2671 136.795 24.5504C136.012 24.8338 135.153 24.9754 134.22 24.9754Z" fill="#101820"/>
+    <path d="M142.528 24.6754V11.0504H145.828V13.7504L145.603 13.2004C145.919 12.3838 146.428 11.7754 147.128 11.3754C147.844 10.9588 148.686 10.7504 149.653 10.7504C150.669 10.7504 151.561 10.9671 152.328 11.4004C153.111 11.8338 153.719 12.4421 154.153 13.2254C154.586 13.9921 154.803 14.8921 154.803 15.9254V24.6754H151.278V16.7004C151.278 16.1338 151.169 15.6504 150.953 15.2504C150.736 14.8338 150.428 14.5171 150.028 14.3004C149.644 14.0671 149.194 13.9504 148.678 13.9504C148.161 13.9504 147.703 14.0671 147.303 14.3004C146.903 14.5171 146.586 14.8338 146.353 15.2504C146.136 15.6504 146.028 16.1338 146.028 16.7004V24.6754H142.528Z" fill="#101820"/>
+    <path d="M163.32 24.8254C161.72 24.8254 160.478 24.3921 159.595 23.5254C158.728 22.6588 158.295 21.4421 158.295 19.8754V14.1254H155.97V11.0504H156.145C156.828 11.0504 157.353 10.8754 157.72 10.5254C158.103 10.1754 158.295 9.65878 158.295 8.97544V7.95044H161.795V11.0504H164.97V14.1254H161.795V19.6504C161.795 20.1171 161.878 20.5088 162.045 20.8254C162.212 21.1421 162.47 21.3754 162.82 21.5254C163.17 21.6754 163.603 21.7504 164.12 21.7504C164.237 21.7504 164.37 21.7421 164.52 21.7254C164.67 21.7088 164.828 21.6921 164.995 21.6754V24.6754C164.762 24.7088 164.487 24.7421 164.17 24.7754C163.87 24.8088 163.587 24.8254 163.32 24.8254Z" fill="#101820"/>
+    <path d="M171.72 24.9754C170.637 24.9754 169.703 24.7421 168.92 24.2754C168.153 23.7921 167.57 23.1338 167.17 22.3004C166.77 21.4504 166.57 20.4671 166.57 19.3504V11.0504H170.07V19.0504C170.07 19.6004 170.178 20.0838 170.395 20.5004C170.628 20.9004 170.945 21.2171 171.345 21.4504C171.745 21.6671 172.195 21.7754 172.695 21.7754C173.228 21.7754 173.687 21.6671 174.07 21.4504C174.47 21.2171 174.778 20.8921 174.995 20.4754C175.212 20.0588 175.32 19.5754 175.32 19.0254V11.0504H178.845V24.6754H175.545V21.9754L175.77 22.5254C175.453 23.3421 174.937 23.9588 174.22 24.3754C173.503 24.7754 172.67 24.9754 171.72 24.9754Z" fill="#101820"/>
+    <path d="M181.238 24.6754V11.0504H184.537V14.2004L184.287 13.7504C184.587 12.6504 185.079 11.9004 185.762 11.5004C186.446 11.1004 187.262 10.9004 188.212 10.9004H189.012V13.9754H187.837C186.921 13.9754 186.171 14.2588 185.587 14.8254C185.021 15.3921 184.738 16.1838 184.738 17.2004V24.6754H181.238Z" fill="#101820"/>
+    <path d="M196.735 24.9754C195.318 24.9754 194.076 24.6588 193.01 24.0254C191.96 23.3754 191.143 22.5171 190.56 21.4504C189.976 20.3671 189.685 19.1588 189.685 17.8254C189.685 16.4754 189.985 15.2671 190.585 14.2004C191.185 13.1338 191.993 12.2921 193.01 11.6754C194.043 11.0588 195.21 10.7504 196.51 10.7504C197.576 10.7504 198.518 10.9254 199.335 11.2754C200.168 11.6088 200.868 12.0838 201.435 12.7004C202.001 13.3171 202.435 14.0338 202.735 14.8504C203.035 15.6504 203.185 16.5088 203.185 17.4254C203.185 17.6921 203.168 17.9504 203.135 18.2004C203.118 18.4504 203.076 18.6671 203.01 18.8504H192.66V16.2254H201.01L199.36 17.4504C199.526 16.7171 199.501 16.0588 199.285 15.4754C199.085 14.8921 198.743 14.4338 198.26 14.1004C197.776 13.7671 197.193 13.6004 196.51 13.6004C195.826 13.6004 195.235 13.7671 194.735 14.1004C194.251 14.4338 193.876 14.9171 193.61 15.5504C193.36 16.1838 193.26 16.9504 193.31 17.8504C193.243 18.6671 193.343 19.3838 193.61 20.0004C193.893 20.6004 194.301 21.0671 194.835 21.4004C195.385 21.7338 196.035 21.9004 196.785 21.9004C197.501 21.9004 198.101 21.7588 198.585 21.4754C199.085 21.1754 199.485 20.7838 199.785 20.3004L202.61 21.6504C202.343 22.3004 201.918 22.8754 201.335 23.3754C200.768 23.8754 200.093 24.2671 199.31 24.5504C198.526 24.8338 197.668 24.9754 196.735 24.9754Z" fill="#101820"/>
+    <path d="M210.292 24.9754C208.826 24.9754 207.542 24.6254 206.442 23.9254C205.359 23.2254 204.617 22.2754 204.217 21.0754L206.817 19.8504C207.167 20.6004 207.651 21.1921 208.267 21.6254C208.884 22.0421 209.559 22.2504 210.292 22.2504C210.859 22.2504 211.301 22.1338 211.617 21.9004C211.934 21.6504 212.092 21.3171 212.092 20.9004C212.092 20.6671 212.034 20.4754 211.917 20.3254C211.801 20.1588 211.634 20.0171 211.417 19.9004C211.201 19.7838 210.942 19.6838 210.642 19.6004L208.367 18.9504C207.234 18.6338 206.367 18.1254 205.767 17.4254C205.184 16.7254 204.892 15.9004 204.892 14.9504C204.892 14.1171 205.101 13.3921 205.517 12.7754C205.951 12.1421 206.551 11.6504 207.317 11.3004C208.101 10.9338 208.984 10.7504 209.967 10.7504C211.284 10.7504 212.442 11.0671 213.442 11.7004C214.442 12.3171 215.142 13.1838 215.542 14.3004L212.917 15.5254C212.701 14.9421 212.326 14.4754 211.792 14.1254C211.259 13.7754 210.651 13.6004 209.967 13.6004C209.451 13.6004 209.042 13.7088 208.742 13.9254C208.442 14.1421 208.292 14.4421 208.292 14.8254C208.292 15.0421 208.351 15.2338 208.467 15.4004C208.584 15.5671 208.759 15.7088 208.992 15.8254C209.242 15.9421 209.526 16.0504 209.842 16.1504L212.017 16.8004C213.151 17.1338 214.017 17.6421 214.617 18.3254C215.217 18.9921 215.517 19.8088 215.517 20.7754C215.517 21.6088 215.292 22.3421 214.842 22.9754C214.409 23.5921 213.801 24.0838 213.017 24.4504C212.251 24.8004 211.342 24.9754 210.292 24.9754Z" fill="#101820"/>
+  </svg>
+  <div class="tagline">Путь основателя</div>
+</header>
+
+<div class="wrap">
+  <div id="hud" class="hidden">
+    <div class="res">
+      <div class="rc money"><div class="top">💰 Деньги</div><div class="val" id="vMoney">0</div><div class="bar"><div class="fill" id="fMoney"></div></div></div>
+      <div class="rc users"><div class="top">👥 Юзеры</div><div class="val" id="vUsers">0</div><div class="bar"><div class="fill" id="fUsers"></div></div></div>
+      <div class="rc team"><div class="top">⚡ Команда</div><div class="val" id="vTeam">0</div><div class="bar"><div class="fill" id="fTeam"></div></div></div>
+    </div>
+    <div class="months" id="months"></div>
+  </div>
+  <div id="screen"></div>
+  <div class="footer">⬡ HAYOT VENTURES · UZBEKISTAN</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const CFG = {months:12, startMoney:62, startTeam:72, burn:7, fundAt:1400, fundBonus:35, fundFloor:950};
+const APPLY_URL = "https://t.me/hayotvcbot?start=game";
+const LOGO = `<svg viewBox="0 0 100 100" width="84" height="84"><polygon points="50,8 70,20 70,44 50,56 30,44 30,20" fill="#1F5B57"/><polygon points="92,50 92,74 72,86 52,74 52,50 72,38" fill="#F5A05A"/><polygon points="50,92 30,80 30,56 50,44 70,56 70,80" fill="#2E6E6A"/><polygon points="8,50 8,26 28,14 48,26 48,50 28,62" fill="#5FA8A4"/></svg>`;
+
+// Направления стартапа — выбор на старте
+const DIRS = [
+  {id:"fintech", name:"Финтех",      d:"Платежи, кошельки, кредитование"},
+  {id:"ai",      name:"AI / SaaS",   d:"Искусственный интеллект и облачные сервисы"},
+  {id:"market",  name:"Маркетплейс", d:"Торговая площадка и e-commerce"},
+  {id:"health",  name:"HealthTech",  d:"Цифровое здоровье и медтех"},
+];
+
+// Логические стадии стартапа — пулы вариантов (на каждой стадии случайный вариант,
+// поэтому одно направление можно проходить много раз с разными вопросами).
+const STAGE = {
+ concept:[
+  {sc:"idea",t:"Концепция продукта",d:"С чего начать работу над идеей?",o:[
+    {l:"Сразу собрать минимальную версию",note:"Быстрая проверка гипотезы",m:-4,u:300,tm:-3},
+    {l:"Сначала исследовать рынок",note:"Меньше риска, медленнее старт",m:-6,u:120,tm:5}]},
+  {sc:"idea",t:"Фокус гипотезы",d:"Как сформулировать продукт?",o:[
+    {l:"Глубоко решить одну боль",note:"Узко, но сильно",m:-3,u:250,tm:5},
+    {l:"Охватить широкую аудиторию",note:"Шире рынок, выше расходы",m:-6,u:450,tm:-4}]},
+  {sc:"idea",t:"Команда основателей",d:"Запускаться одному или с партнёром?",o:[
+    {l:"Найти со-основателя",note:"Сильнее команда, доля делится",m:-2,u:200,tm:10},
+    {l:"Идти соло",note:"Полный контроль, выше нагрузка",m:0,u:250,tm:-8}]},
+ ],
+ prototype:[
+  {sc:"build",t:"Первый прототип",d:"Прототип готов. Как его выпустить?",o:[
+    {l:"Минимально жизнеспособная версия",note:"Быстро, с ограничениями",m:-5,u:600,tm:-5},
+    {l:"Довести до высокого качества",note:"Дольше, надёжнее",m:-12,u:950,tm:-9}]},
+  {sc:"build",t:"Технологический выбор",d:"На чём строить продукт?",o:[
+    {l:"Готовые ноукод-инструменты",note:"Быстро, есть ограничения",m:-3,u:500,tm:-2},
+    {l:"Собственная разработка",note:"Дольше, гибче",m:-10,u:850,tm:-6}]},
+  {sc:"build",t:"Закрытый бета-тест",d:"Как провести первый запуск?",o:[
+    {l:"Закрытая бета для отзывов",note:"Качество важнее охвата",m:-4,u:350,tm:4},
+    {l:"Сразу открытый запуск",note:"Больше юзеров, больше багов",m:-6,u:800,tm:-6}]},
+ ],
+ users:[
+  {sc:"signup",t:"Первые пользователи",d:"Как привлечь первых пользователей?",o:[
+    {l:"Запуск среди знакомых и сообществ",note:"Дёшево, ограниченно",m:-2,u:400,tm:2},
+    {l:"Небольшая платная кампания",note:"Дороже, шире охват",m:-7,u:800,tm:-2}]},
+  {sc:"signup",t:"Первый канал привлечения",d:"Где искать аудиторию?",o:[
+    {l:"Профильные сообщества",m:-2,u:450,tm:1},
+    {l:"Реклама в соцсетях",m:-7,u:800,tm:-2}]},
+  {sc:"signup",t:"Реферальная программа",d:"Запустить рост через рекомендации?",o:[
+    {l:"Запустить реферальную программу",note:"Дешёвый рост",m:-4,u:700,tm:0},
+    {l:"Сфокусироваться на качестве продукта",m:-2,u:300,tm:4}]},
+ ],
+ team:[
+  {sc:"people",t:"Первый наём",d:"Пора расширять команду.",o:[
+    {l:"Нанять сильного инженера",note:"Дорого, ускоряет продукт",m:-14,u:550,tm:10},
+    {l:"Нанять специалиста по продажам",m:-10,u:800,tm:3},
+    {l:"Пока остаться вдвоём",note:"Экономия, но перегрузка",m:0,u:150,tm:-8}]},
+  {sc:"people",t:"Кого нанять первым?",d:"Бюджет на один ключевой наём.",o:[
+    {l:"Разработчик",m:-13,u:550,tm:8},
+    {l:"Маркетолог",m:-10,u:850,tm:0},
+    {l:"Отложить наём",note:"Экономия, перегрузка",m:0,u:120,tm:-8}]},
+  {sc:"people",t:"Формат команды",d:"Как организовать работу?",o:[
+    {l:"Удалённая команда",note:"Дешевле, сложнее координация",m:-6,u:400,tm:2},
+    {l:"Команда в офисе",note:"Дороже, выше сплочённость",m:-12,u:500,tm:8}]},
+ ],
+ revenue:[
+  {sc:"revenue",t:"Первая выручка",d:"Как зарабатывать на продукте?",o:[
+    {l:"Подписка",note:"Стабильный доход",m:-3,u:200,tm:0},
+    {l:"Комиссия с операций",m:-2,u:350,tm:-2},
+    {l:"Freemium",note:"Рост аудитории, медленные деньги",m:-4,u:600,tm:0}]},
+  {sc:"revenue",t:"Ценообразование",d:"Как назначить цену?",o:[
+    {l:"Низкая цена для роста",m:-2,u:600,tm:-1},
+    {l:"Премиальная цена",note:"Меньше клиентов, выше маржа",m:4,u:150,tm:0}]},
+  {sc:"revenue",t:"Первый платящий клиент",d:"Появился готовый платить клиент.",o:[
+    {l:"Закрыть сделку доработками",note:"Под клиента",m:-6,u:400,tm:-3},
+    {l:"Продать стандартный продукт",m:3,u:250,tm:2}]},
+ ],
+ investor:[
+  {sc:"coins",t:"Подготовка к раунду",d:"Вас приглашают на питч-сессию.",o:[
+    {l:"Тщательно подготовиться",note:"Нагрузка на команду",m:-3,u:0,tm:-12,raise:true},
+    {l:"Выступить по текущим материалам",m:0,u:0,tm:0}]},
+  {sc:"coins",t:"Выбор инвестора",d:"Двое готовы вложиться.",o:[
+    {l:"Умные деньги с экспертизой",note:"Меньше сумма, больше пользы",m:8,u:300,tm:5},
+    {l:"Максимальная сумма",m:16,u:0,tm:-2}]},
+  {sc:"coins",t:"Условия сделки",d:"Инвестор предложил термшит.",o:[
+    {l:"Согласиться на условия",m:14,u:0,tm:-2},
+    {l:"Торговаться за оценку",note:"Риск сорвать сделку",m:0,u:0,tm:-6,raise:true}]},
+ ],
+ growth:[
+  {sc:"chart",t:"Масштабирование маркетинга",d:"Куда вложить в рост?",o:[
+    {l:"Платные каналы",m:-10,u:1400,tm:-3},
+    {l:"Контент и органика",note:"Медленнее, экономичнее",m:-3,u:600,tm:1}]},
+  {sc:"chart",t:"Вирусная публикация",d:"О вас написали в медиа.",o:[
+    {l:"Усилить платным продвижением",m:-10,u:1500,tm:-3},
+    {l:"Ловить органический охват",m:0,u:700,tm:2}]},
+  {sc:"chart",t:"Выход на новый рынок",d:"Пора расширять географию?",o:[
+    {l:"Запуск в новом регионе",note:"Дорого, рост аудитории",m:-12,u:1300,tm:-4},
+    {l:"Углубиться в текущем рынке",m:-3,u:500,tm:2}]},
+ ],
+ competitor:[
+  {sc:"race",t:"Выход конкурента",d:"На рынок вышел сильный конкурент.",o:[
+    {l:"Снизить цену",m:-6,u:550,tm:-3},
+    {l:"Усилить продукт",m:-10,u:800,tm:-5},
+    {l:"Сфокусироваться на нише",note:"Меньше рынок, выше лояльность",m:0,u:200,tm:5}]},
+  {sc:"race",t:"Конкурент копирует вас",d:"Крупный игрок повторил вашу идею.",o:[
+    {l:"Ускорить инновации",m:-9,u:700,tm:-4},
+    {l:"Усилить бренд и лояльность",m:-5,u:400,tm:3}]},
+  {sc:"race",t:"Ценовая война",d:"Конкурент демпингует.",o:[
+    {l:"Снизить цены в ответ",m:-8,u:600,tm:-3},
+    {l:"Держать цену, добавить ценность",m:-4,u:300,tm:2}]},
+ ],
+ crisis:[
+  {sc:"bug",t:"Критическая нагрузка",d:"Рост вызвал сбои в продукте.",o:[
+    {l:"Срочно укрепить инфраструктуру",m:-9,u:0,tm:-4},
+    {l:"Временное решение",note:"Часть пользователей уйдёт",m:-2,u:-400,tm:-2}]},
+  {sc:"bug",t:"Критическая ошибка",d:"Часть пользователей столкнулась со сбоями.",o:[
+    {l:"Устранить немедленно",m:-5,u:0,tm:-6},
+    {l:"Выпустить временное решение",note:"Часть уйдёт",m:-1,u:-350,tm:-2}]},
+  {sc:"people",t:"Выгорание команды",d:"Команда вымотана нагрузкой.",o:[
+    {l:"Дать команде отдых",m:-4,u:0,tm:20},
+    {l:"Поднажать ради сроков",note:"Рискованно",m:0,u:500,tm:-20}]},
+ ],
+ final:[
+  {sc:"stage",t:"Demo Day",d:"Финальная презентация перед инвесторами.",o:[
+    {l:"Сделать смелую ставку",note:"Высокий риск и отдача",m:0,u:0,tm:0,gamble:true},
+    {l:"Выступить сдержанно и убедительно",m:0,u:500,tm:0}]},
+  {sc:"stage",t:"Финальный раунд",d:"Крупный инвестор готов войти.",o:[
+    {l:"Закрыть крупный раунд",m:20,u:300,tm:2},
+    {l:"Сделать ставку на прибыльность",m:8,u:600,tm:0}]},
+  {sc:"stage",t:"Стратегический выбор",d:"Финал года: куда направить силы?",o:[
+    {l:"Агрессивный рост",note:"Ва-банк",m:0,u:0,tm:0,gamble:true},
+    {l:"Устойчивое развитие",m:4,u:500,tm:2}]},
+ ],
+};
+
+// Сектор-специфичные стадии — тоже пулы вариантов
+const SECTOR = {
+ fintech:{challenge:[
+   {sc:"fintech",t:"Регуляторные требования",d:"Нужны лицензия и соответствие требованиям регулятора.",o:[
+     {l:"Пройти лицензирование",note:"Дорого, открывает рынок",m:-12,u:500,tm:-3},
+     {l:"Работать через партнёра с лицензией",note:"Быстрее, делиться маржой",m:-4,u:300,tm:0}]},
+   {sc:"fintech",t:"Безопасность и анти-фрод",d:"Финтеху критична защита данных и платежей.",o:[
+     {l:"Внедрить серьёзную защиту",note:"Дорого, рост доверия",m:-10,u:450,tm:-2},
+     {l:"Минимально необходимое",note:"Риск инцидента",m:-3,u:250,tm:0}]}],
+  scale:[
+   {sc:"handshake",t:"Партнёрство с банком",d:"Крупный банк предлагает интеграцию.",o:[
+     {l:"Заключить интеграцию",m:-8,u:1400,tm:-4},
+     {l:"Сохранить независимость",m:0,u:200,tm:5}]},
+   {sc:"handshake",t:"Платёжная система",d:"Крупная платёжная система зовёт в партнёры.",o:[
+     {l:"Интегрироваться",m:-7,u:1300,tm:-3},
+     {l:"Развивать свой процессинг",m:-13,u:700,tm:-5}]}]},
+ ai:{challenge:[
+   {sc:"ai",t:"Качество данных",d:"Моделям нужны качественные размеченные данные.",o:[
+     {l:"Собрать и разметить свой датасет",note:"Дорого, преимущество",m:-11,u:600,tm:-4},
+     {l:"Использовать открытые данные",note:"Быстро, слабее точность",m:-3,u:250,tm:0}]},
+   {sc:"ai",t:"Стоимость вычислений",d:"Обучение моделей обходится дорого.",o:[
+     {l:"Своя инфраструктура",note:"Дорого, контроль",m:-12,u:500,tm:-3},
+     {l:"Облачные мощности",note:"Гибко, дороже за объём",m:-6,u:350,tm:0}]}],
+  scale:[
+   {sc:"handshake",t:"Корпоративный клиент",d:"Крупная компания готова внедрить ваш AI.",o:[
+     {l:"Заключить enterprise-контракт",m:-6,u:1300,tm:-3},
+     {l:"Сфокусироваться на малом бизнесе",m:-2,u:600,tm:2}]},
+   {sc:"handshake",t:"Облачный партнёр",d:"Облачный провайдер предлагает дистрибуцию.",o:[
+     {l:"Войти в маркетплейс провайдера",m:-5,u:1300,tm:-2},
+     {l:"Прямые продажи",m:-2,u:600,tm:1}]}]},
+ market:{challenge:[
+   {sc:"market",t:"Спрос и предложение",d:"Нужно одновременно набрать продавцов и покупателей.",o:[
+     {l:"Сначала наполнить витрину продавцами",m:-6,u:500,tm:-2},
+     {l:"Субсидировать первых покупателей",note:"Дорого, быстрый спрос",m:-10,u:900,tm:-3}]},
+   {sc:"market",t:"Доверие на площадке",d:"Покупатели опасаются мошенничества.",o:[
+     {l:"Гарантии и защита сделок",note:"Дорого, растёт доверие",m:-9,u:700,tm:-2},
+     {l:"Базовая модерация",note:"Дёшево, риск репутации",m:-3,u:300,tm:0}]}],
+  scale:[
+   {sc:"handshake",t:"Логистический партнёр",d:"Для роста нужно наладить доставку.",o:[
+     {l:"Подключить доставку партнёра",m:-8,u:1300,tm:-3},
+     {l:"Строить свою логистику",note:"Дорого, контроль",m:-14,u:700,tm:-5}]},
+   {sc:"handshake",t:"Эксклюзивные продавцы",d:"Крупные бренды готовы зайти к вам.",o:[
+     {l:"Привлечь крупные бренды",m:-8,u:1300,tm:-3},
+     {l:"Ставка на нишевых продавцов",m:-3,u:600,tm:2}]}]},
+ health:{challenge:[
+   {sc:"health",t:"Доверие и валидация",d:"Критичны доверие и клиническая проверка.",o:[
+     {l:"Провести клиническую валидацию",note:"Дорого, авторитет",m:-12,u:450,tm:-2},
+     {l:"Пилот с клиникой",note:"Быстрее, ограниченный охват",m:-5,u:350,tm:2}]},
+   {sc:"health",t:"Защита медданных",d:"Медицинские данные требуют строгой защиты.",o:[
+     {l:"Сертифицировать защиту данных",note:"Дорого, доверие",m:-11,u:450,tm:-2},
+     {l:"Минимальное соответствие",note:"Риск",m:-4,u:250,tm:0}]}],
+  scale:[
+   {sc:"handshake",t:"Партнёрство со страховой",d:"Страховая готова покрывать ваш сервис.",o:[
+     {l:"Интеграция со страховой",m:-7,u:1300,tm:-3},
+     {l:"Прямые продажи клиникам",m:-3,u:600,tm:1}]},
+   {sc:"handshake",t:"Сеть клиник",d:"Сеть клиник готова внедрить ваш сервис.",o:[
+     {l:"Контракт с сетью клиник",m:-7,u:1300,tm:-3},
+     {l:"Прямые продажи пациентам",m:-3,u:600,tm:1}]}]},
+};
+
+function pick(a){return a[Math.random()*a.length|0];}
+function buildFlow(dir){
+  const x=SECTOR[dir];
+  return [pick(STAGE.concept),pick(STAGE.prototype),pick(STAGE.users),pick(x.challenge),
+          pick(STAGE.team),pick(STAGE.revenue),pick(STAGE.investor),pick(STAGE.growth),
+          pick(STAGE.competitor),pick(STAGE.crisis),pick(x.scale),pick(STAGE.final)];
+}
+
+// мини-эмблема направления для кнопок выбора
+function dirIcon(id){
+  const w='viewBox="0 0 44 44" class="px" width="36" height="36"';
+  if(id==="fintech") return `<svg ${w}><polygon points="6,18 38,18 22,8" fill="#2F9E9B"/><rect x="8" y="18" width="28" height="18" fill="#0F7A7A"/>${[0,1,2,3].map(i=>`<rect x="${11+i*7}" y="20" width="3" height="14" fill="#fff"/>`).join("")}</svg>`;
+  if(id==="ai") return `<svg ${w}><rect x="12" y="8" width="20" height="28" fill="#101820"/>${[0,1,2].map(i=>`<rect x="15" y="${12+i*8}" width="14" height="4" fill="#2F9E9B"/>`).join("")}<rect x="26" y="13" width="3" height="3" fill="#F5A05A"/></svg>`;
+  if(id==="market") return `<svg ${w}><rect x="8" y="20" width="28" height="16" fill="#fff" stroke="#D7E8E8"/>${[0,1,2,3].map(i=>`<rect x="${8+i*8}" y="14" width="8" height="6" fill="${i%2?'#F5A05A':'#2F9E9B'}"/>`).join("")}</svg>`;
+  return `<svg ${w}><rect x="18" y="8" width="8" height="28" fill="#F5A05A"/><rect x="8" y="18" width="28" height="8" fill="#F5A05A"/></svg>`;
+}
+// Блочный человечек в стиле Minecraft, в цветах Hayot Ventures.
+// Центр в (0,0): голова сверху (y ~ -26), ступни внизу (y ~ +24).
+function fig(grey){
+  const skin="#E7C9A1", skinD="#CFA877", hair="#101820";
+  const shirt = grey?"#9AA8A8":"#0F7A7A";
+  const collar= grey?"#B7C1C1":"#2F9E9B";
+  const sleeve= grey?"#8A9999":"#0C6B6B";
+  const pants = grey?"#6E7C7C":"#1F5B57";
+  const badge = grey?'':'<rect class="px" x="-2.5" y="-2.5" width="5" height="5" fill="#F5A05A"/>';
+  return `
+   <ellipse cx="0" cy="26" rx="13" ry="3.4" fill="rgba(16,24,32,.12)"/>
+   <g class="px">
+   <rect x="-8.5" y="8" width="8" height="16" fill="${pants}"/>
+   <rect x="0.5" y="8" width="8" height="16" fill="${pants}"/>
+   <rect x="-8.5" y="20" width="8" height="4" fill="#101820"/>
+   <rect x="0.5" y="20" width="8" height="4" fill="#101820"/>
+   <rect x="-14.5" y="-8" width="5.5" height="15" fill="${sleeve}"/>
+   <rect x="9" y="-8" width="5.5" height="15" fill="${sleeve}"/>
+   <rect x="-14.5" y="3" width="5.5" height="4" fill="${skin}"/>
+   <rect x="9" y="3" width="5.5" height="4" fill="${skin}"/>
+   <rect x="-9" y="-8" width="18" height="16" fill="${shirt}"/>
+   <rect x="-9" y="-8" width="18" height="3.5" fill="${collar}"/>
+   ${badge}
+   <rect x="-9" y="-26" width="18" height="18" fill="${skin}"/>
+   <rect x="-9" y="-26" width="18" height="5" fill="${hair}"/>
+   <rect x="-9" y="-26" width="3" height="10" fill="${hair}"/>
+   <rect x="6" y="-26" width="3" height="10" fill="${hair}"/>
+   <rect x="-6" y="-18" width="4" height="4" fill="#fff"/>
+   <rect x="-5" y="-18" width="2" height="4" fill="#0F7A7A"/>
+   <rect x="2" y="-18" width="4" height="4" fill="#fff"/>
+   <rect x="3" y="-18" width="2" height="4" fill="#0F7A7A"/>
+   <rect x="-1" y="-13" width="2" height="2" fill="${skinD}"/>
+   <rect x="-3" y="-11" width="6" height="2" fill="${skinD}"/>
+   </g>
+  `;
+}
+
+// Герой Hayot Ventures: блочный человечек с плащом и маской (сцена инвестиций)
+function hero(){
+  return `
+   <g class="cape px"><rect x="-11" y="-7" width="22" height="22" fill="#F5A05A"/><rect x="-11" y="15" width="7" height="7" fill="#F5A05A"/><rect x="4" y="15" width="7" height="7" fill="#F5A05A"/></g>
+   ${fig()}
+   <g class="px"><rect x="-9" y="-19" width="18" height="5" fill="#0F7A7A"/>
+   <rect x="-6" y="-18" width="4" height="3" fill="#fff"/><rect x="2" y="-18" width="4" height="3" fill="#fff"/></g>
+  `;
+}
+
+function scene(name){
+  const T="#0F7A7A",A="#2F9E9B",O="#F5A05A",L="#D7E8E8";
+  const W='viewBox="0 0 200 120" preserveAspectRatio="xMidYMid meet"';
+  const ground = `<line class="gnd" x1="20" y1="104" x2="180" y2="104"/>`;
+  const V='viewBox="0 0 220 150" class="px"';
+  const GR = Array.from({length:11}).map((_,i)=>`<rect x="${i*20}" y="132" width="20" height="18" fill="${i%2?'#CFE6E1':'#D7E8E8'}"/>`).join("");
+  switch(name){
+   // Запуск: пиксельная ракета взлетает, основатель толкает её
+   case "rocket": return `<svg ${V}>${GR}
+     ${[124,116].map((x,i)=>`<g transform="translate(${x},126)"><g class="smoke" style="animation-delay:${i*0.5}s"><rect x="-4" y="-4" width="9" height="9" fill="#D7E8E8"/></g></g>`).join("")}
+     <g transform="translate(150,72)"><g class="rk2">
+        <rect x="-3" y="-34" width="6" height="6" fill="#F5A05A"/><rect x="-6" y="-28" width="12" height="8" fill="#F5A05A"/>
+        <rect x="-9" y="-20" width="18" height="34" fill="#0F7A7A"/><rect x="-9" y="-20" width="18" height="6" fill="#2F9E9B"/>
+        <rect x="-6" y="-6" width="12" height="8" fill="#D7E8E8"/>
+        <rect x="-15" y="6" width="6" height="12" fill="#1F5B57"/><rect x="9" y="6" width="6" height="12" fill="#1F5B57"/>
+        <g class="fl"><rect x="-7" y="14" width="14" height="9" fill="#F5A05A"/><rect x="-4" y="23" width="8" height="7" fill="#FFD27A"/></g>
+     </g></g>
+     <g transform="translate(60,108)"><g class="push">${fig()}</g></g></svg>`;
+
+   // Инвестор: основатель указывает на доску с растущей выручкой, монеты падают в сундук
+   case "coins": return `<svg ${V}>${GR}
+     <rect x="108" y="22" width="88" height="54" fill="#fff" stroke="#D7E8E8" stroke-width="2"/>
+     ${[0,1,2,3].map(i=>`<rect class="gb" style="animation-delay:${i*0.2}s" x="${116+i*17}" y="${64-i*9}" width="12" height="${10+i*9}" fill="${i===3?'#F5A05A':'#2F9E9B'}"/>`).join("")}
+     ${[150,166,158].map((x,i)=>`<g transform="translate(${x},66)"><g class="cn" style="animation-delay:${i*0.55}s"><rect x="-6" y="-6" width="12" height="12" fill="#F5A05A"/><text y="3.5" font-size="9" font-weight="800" fill="#3A1D08" text-anchor="middle">$</text></g></g>`).join("")}
+     <rect x="148" y="112" width="30" height="16" fill="#2F9E9B"/><rect x="148" y="112" width="30" height="5" fill="#1F5B57"/>
+     <g transform="translate(56,108)"><g class="bob">${fig()}</g><g class="armpt"><rect x="9" y="-2" width="24" height="6" fill="#0C6B6B"/></g></g></svg>`;
+
+   // Рост: оси, растущие столбцы и линия, всплывающий «+240%»
+   case "chart": return `<svg ${V}>${GR}
+     <rect x="92" y="28" width="3" height="98" fill="#D7E8E8"/><rect x="92" y="123" width="104" height="3" fill="#D7E8E8"/>
+     ${[0,1,2,3].map(i=>`<rect class="gb" style="animation-delay:${i*0.18}s" x="${104+i*24}" y="${116-i*18}" width="16" height="${7+i*18}" fill="${i===3?'#F5A05A':'#2F9E9B'}"/>`).join("")}
+     <g transform="translate(172,30)"><g class="bubble"><rect x="-19" y="-11" width="38" height="18" rx="3" fill="#fff" stroke="#D7E8E8"/><text y="2" font-size="10" font-weight="800" fill="#F5A05A" text-anchor="middle">+240%</text></g></g>
+     <g transform="translate(180,42)"><g class="blip"><rect x="-4" y="-4" width="8" height="8" fill="#F5A05A"/></g></g>
+     <g transform="translate(56,108)"><g class="bob">${fig()}</g><g class="armpt"><rect x="9" y="-3" width="26" height="5" fill="#0C6B6B"/></g></g></svg>`;
+
+   // Команда: рабочие места, вы подбадриваете, коллега устал (Z-z-z)
+   case "people": return `<svg ${V}>${GR}
+     ${[58,110,162].map(x=>`<rect x="${x-16}" y="118" width="32" height="6" fill="#CFE6E1"/>`).join("")}
+     <g transform="translate(58,108)"><g class="bob">${fig()}</g><g class="armpt" style="transform-origin:9px -4px"><rect x="9" y="-7" width="16" height="5" fill="#0C6B6B"/></g></g>
+     <g transform="translate(110,108)"><g class="bob" style="animation-delay:.4s">${fig()}</g></g>
+     <g transform="translate(162,108)"><g class="droop">${fig(true)}</g></g>
+     ${[0,1].map(i=>`<text class="zzz" style="animation-delay:${i*0.7}s" x="${172+i*6}" y="${96-i*6}" font-size="${11+i*4}" font-weight="800" fill="#9AA8A8">Z</text>`).join("")}</svg>`;
+
+   // Баг: консоль с ошибкой, основатель чинит ключом, печать FIXED
+   case "bug": return `<svg ${V}>${GR}
+     <rect x="150" y="22" width="48" height="34" fill="#101820"/>
+     ${[0,1,2].map(i=>`<rect x="156" y="${30+i*7}" width="${30-i*7}" height="3" fill="${i===0?'#F5A05A':'#3a4a4a'}"/>`).join("")}
+     <g transform="translate(132,74)"><g class="bgx">
+        <rect x="-16" y="-14" width="32" height="26" fill="#F5A05A"/>
+        <rect x="-10" y="-8" width="6" height="6" fill="#fff"/><rect x="4" y="-8" width="6" height="6" fill="#fff"/>
+        <rect x="-8" y="-6" width="2" height="3" fill="#101820"/><rect x="6" y="-6" width="2" height="3" fill="#101820"/>
+        <rect x="-22" y="-9" width="6" height="3" fill="#1F5B57"/><rect x="16" y="-9" width="6" height="3" fill="#1F5B57"/>
+        <rect x="-22" y="6" width="6" height="3" fill="#1F5B57"/><rect x="16" y="6" width="6" height="3" fill="#1F5B57"/></g></g>
+     <g transform="translate(132,42)"><g class="stamp"><rect x="-22" y="-10" width="44" height="20" fill="none" stroke="#0F7A7A" stroke-width="2.5"/><text y="4" font-size="11" font-weight="800" fill="#0F7A7A" text-anchor="middle">FIXED</text></g></g>
+     <g transform="translate(64,108)"><g class="bob">${fig()}</g><g class="whack"><rect x="9" y="-3" width="14" height="5" fill="#0C6B6B"/><rect x="21" y="-8" width="7" height="13" fill="#2F9E9B"/></g></g></svg>`;
+
+   // Конкурент: дорожка, финишный флаг, два бегуна, пыль
+   case "race": return `<svg ${V}>${GR}
+     <rect x="186" y="40" width="4" height="92" fill="#9AA8A8"/>
+     ${[0,1,2,3].map(i=>`<rect x="190" y="${40+i*8}" width="8" height="8" fill="${i%2?'#101820':'#fff'}"/>`).join("")}
+     <g class="run2"><g transform="translate(30,116) scale(.85)">${fig(true)}</g></g>
+     <g class="run"><g transform="translate(34,108)"><g class="push">${fig()}</g></g>
+        <g transform="translate(18,134)"><g class="dust"><rect x="-4" y="-3" width="8" height="6" fill="#D7E8E8"/></g></g></g></svg>`;
+
+   // Партнёрство: договор с печатью, рукопожатие, вспышка
+   case "handshake": return `<svg ${V}>${GR}
+     <g transform="translate(110,30)"><g class="floaty"><rect x="-14" y="-14" width="28" height="26" fill="#fff" stroke="#D7E8E8" stroke-width="2"/>${[0,1,2].map(i=>`<rect x="-9" y="${-8+i*6}" width="18" height="2.5" fill="#D7E8E8"/>`).join("")}<rect x="4" y="4" width="8" height="8" fill="#F5A05A"/></g></g>
+     <g transform="translate(74,108)"><g class="meetL">${fig()}</g></g>
+     <g transform="translate(146,108)"><g class="meetR">${fig(true)}</g></g>
+     <g transform="translate(110,98)"><g class="spark"><polygon points="0,-10 3,-3 10,0 3,3 0,10 -3,3 -10,0 -3,-3" fill="#F5A05A"/></g></g></svg>`;
+
+   // Пивот: вращающаяся стрелка, указатель на два пути, основатель разворачивается
+   case "pivot": return `<svg ${V}>${GR}
+     <g transform="translate(100,56)"><g class="pv" style="transform-origin:0 0"><path d="M0 -26 A26 26 0 1 1 -26 0" fill="none" stroke="#D7E8E8" stroke-width="6" stroke-linecap="round"/><polygon points="0,-34 0,-18 13,-26" fill="#F5A05A"/></g></g>
+     <rect x="158" y="70" width="4" height="50" fill="#CFE6E1"/><polygon points="162,74 184,74 178,82 184,90 162,90" fill="#2F9E9B"/><polygon points="158,96 136,96 142,104 136,112 158,112" fill="#F5A05A"/>
+     <g transform="translate(80,108)"><g class="flip">${fig()}</g></g></svg>`;
+
+   case "idea": return `<svg ${V}>${GR}
+     <g transform="translate(142,60)"><g class="floaty"><rect x="-11" y="-16" width="22" height="20" fill="#FFE08A"/><rect x="-7" y="-20" width="14" height="6" fill="#FFE08A"/><rect x="-3" y="-12" width="6" height="12" fill="#F5A05A"/><rect x="-6" y="4" width="12" height="5" fill="#9AA8A8"/><rect x="-6" y="9" width="12" height="3" fill="#6E7C7C"/></g></g>
+     <g transform="translate(168,40)"><g class="blip"><rect x="-3" y="-3" width="6" height="6" fill="#F5A05A"/></g></g>
+     <g transform="translate(60,108)"><g class="bob">${fig()}</g><g class="armpt"><rect x="9" y="-7" width="16" height="5" fill="#0C6B6B"/></g></g></svg>`;
+   case "build": return `<svg ${V}>${GR}
+     ${[0,1,2].map(i=>`<rect class="gb" style="animation-delay:${i*0.25}s" x="128" y="${116-i*16}" width="30" height="15" fill="${i%2?'#2F9E9B':'#0F7A7A'}"/>`).join("")}
+     <g transform="translate(64,108)"><g class="bob">${fig()}</g><g class="whack"><rect x="9" y="-3" width="13" height="5" fill="#0C6B6B"/><rect x="20" y="-9" width="9" height="9" fill="#9AA8A8"/></g></g></svg>`;
+   case "signup": return `<svg ${V}>${GR}
+     <rect x="132" y="42" width="40" height="74" rx="4" fill="#101820"/><rect x="136" y="48" width="32" height="62" fill="#fff"/>
+     ${[0,1,2].map(i=>`<rect class="gb" style="animation-delay:${i*0.2}s" x="${140+i*9}" y="${100-i*9}" width="6" height="${10+i*9}" fill="#2F9E9B"/>`).join("")}
+     <g transform="translate(152,40)"><g class="cn"><rect x="-8" y="-5" width="16" height="10" fill="#F5A05A"/><text y="3.5" font-size="8" font-weight="800" fill="#3A1D08" text-anchor="middle">+1</text></g></g>
+     <g transform="translate(60,108)"><g class="bob">${fig()}</g><g class="armpt"><rect x="9" y="-7" width="16" height="5" fill="#0C6B6B"/></g></g></svg>`;
+   case "revenue": return `<svg ${V}>${GR}
+     <rect x="126" y="80" width="46" height="30" fill="#2F9E9B"/><rect x="126" y="72" width="46" height="8" fill="#1F5B57"/>
+     <rect x="138" y="60" width="22" height="13" fill="#fff"/><text x="149" y="70" font-size="9" font-weight="800" fill="#0F7A7A" text-anchor="middle">$</text>
+     <g transform="translate(150,34)"><g class="cn"><rect x="-7" y="-7" width="14" height="14" fill="#F5A05A"/><text y="3.5" font-size="9" font-weight="800" fill="#3A1D08" text-anchor="middle">$</text></g></g>
+     <g transform="translate(60,108)"><g class="bob">${fig()}</g><g class="armpt"><rect x="9" y="-3" width="20" height="6" fill="#0C6B6B"/></g></g></svg>`;
+   case "fintech": return `<svg ${V}>${GR}
+     <polygon points="118,58 174,58 146,44" fill="#2F9E9B"/><rect x="120" y="58" width="52" height="44" fill="#fff" stroke="#D7E8E8" stroke-width="2"/>
+     ${[0,1,2,3].map(i=>`<rect x="${126+i*12}" y="62" width="6" height="36" fill="#0F7A7A"/>`).join("")}<rect x="120" y="100" width="52" height="4" fill="#1F5B57"/>
+     <g transform="translate(168,44)"><g class="floaty"><polygon points="0,-12 11,-7 11,4 0,12 -11,4 -11,-7" fill="#F5A05A"/><path d="M-5,0 l3,4 l6,-7" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round"/></g></g>
+     <g transform="translate(58,108)"><g class="bob">${fig()}</g></g></svg>`;
+   case "ai": return `<svg ${V}>${GR}
+     <rect x="128" y="50" width="36" height="62" fill="#101820"/>
+     ${[0,1,2,3].map(i=>`<rect x="132" y="${56+i*14}" width="28" height="9" fill="#1F5B57"/><rect class="blip" style="animation-delay:${i*0.2}s" x="152" y="${58+i*14}" width="5" height="5" fill="#2F9E9B"/>`).join("")}
+     <g transform="translate(182,44)"><g class="floaty"><circle r="4" fill="#F5A05A"/><circle cx="-12" cy="9" r="3" fill="#2F9E9B"/><circle cx="12" cy="9" r="3" fill="#2F9E9B"/><line x1="0" y1="0" x2="-12" y2="9" stroke="#9AA8A8" stroke-width="1.5"/><line x1="0" y1="0" x2="12" y2="9" stroke="#9AA8A8" stroke-width="1.5"/></g></g>
+     <g transform="translate(58,108)"><g class="bob">${fig()}</g></g></svg>`;
+   case "market": return `<svg ${V}>${GR}
+     <rect x="120" y="80" width="56" height="30" fill="#fff" stroke="#D7E8E8" stroke-width="2"/>
+     ${[0,1,2,3,4].map(i=>`<rect x="${118+i*12}" y="70" width="12" height="10" fill="${i%2?'#F5A05A':'#2F9E9B'}"/>`).join("")}
+     <rect x="128" y="92" width="10" height="10" fill="#0F7A7A"/><rect x="144" y="92" width="10" height="10" fill="#1F5B57"/><rect x="160" y="92" width="8" height="10" fill="#2F9E9B"/>
+     <g transform="translate(98,108)"><g class="bob" style="animation-delay:.4s">${fig(true)}</g></g>
+     <g transform="translate(60,108)"><g class="bob">${fig()}</g></g></svg>`;
+   case "health": return `<svg ${V}>${GR}
+     <rect x="120" y="46" width="64" height="42" fill="#101820"/><rect x="124" y="50" width="56" height="34" fill="#0C1414"/>
+     <polyline class="speed" points="126,68 138,68 144,56 150,80 156,68 182,68" fill="none" stroke="#2F9E9B" stroke-width="2.5"/>
+     <g transform="translate(170,38)"><g class="floaty"><rect x="-4" y="-10" width="8" height="20" fill="#F5A05A"/><rect x="-10" y="-4" width="20" height="8" fill="#F5A05A"/></g></g>
+     <g transform="translate(58,108)"><g class="bob">${fig()}</g></g></svg>`;
+   case "stage": return `<svg ${V}>${GR}
+     <polygon points="70,0 96,0 84,72" fill="rgba(245,160,90,.16)"/><polygon points="150,0 124,0 136,72" fill="rgba(245,160,90,.16)"/>
+     <rect x="150" y="62" width="4" height="40" fill="#9AA8A8"/><rect x="146" y="56" width="12" height="7" rx="3" fill="#101820"/>
+     <rect x="92" y="120" width="56" height="8" fill="#1F5B57"/>
+     <g transform="translate(110,108)"><g class="bob">${fig()}</g><g class="armpt"><rect x="9" y="-3" width="18" height="5" fill="#0C6B6B"/></g></g></svg>`;
+   default: return `<svg ${V}>${GR}<g transform="translate(110,108)"><g class="bob">${fig()}</g></g></svg>`;
+  }
+}
+
+// Понятная подпись к каждой сцене
+const SCENE_CAP = {
+  idea:"Вы формируете концепцию продукта",
+  build:"Вы собираете первый прототип",
+  signup:"Вы привлекаете первых пользователей",
+  people:"Вы расширяете команду",
+  revenue:"Вы выбираете модель заработка",
+  coins:"Вы готовитесь к инвестиционному раунду",
+  chart:"Метрики растут — масштабируете маркетинг",
+  race:"Вы реагируете на выход конкурента",
+  bug:"Вы справляетесь с критической нагрузкой",
+  handshake:"Вы заключаете стратегическое партнёрство",
+  stage:"Вы выступаете на Demo Day",
+  fintech:"Вы проходите регуляторные требования",
+  ai:"Вы добиваетесь качества данных",
+  market:"Вы балансируете спрос и предложение",
+  health:"Вы добиваетесь доверия и валидации",
+  rocket:"Вы выводите продукт на рынок",
+  pivot:"Вы выбираете новое направление",
+};
+
+let S;
+function newGame(dir){
+  S = {dir, month:0, money:CFG.startMoney, users:0, team:CFG.startTeam,
+       flow:buildFlow(dir), funded:false, pivot:false, over:false};
+}
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]];}return a;}
+function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
+
+function renderHUD(){
+  document.getElementById("hud").classList.remove("hidden");
+  setVal("vMoney","fMoney",S.money,100,false);
+  setVal("vUsers","fUsers",S.users,6000,true);
+  setVal("vTeam","fTeam",S.team,100,false);
+  const m=document.getElementById("months"); m.innerHTML="";
+  for(let i=0;i<CFG.months;i++){const h=document.createElement("div");
+    h.className="mh"+(i<S.month?" done":"")+(i===S.month?" cur":""); m.appendChild(h);}
+}
+function setVal(idV,idF,val,max,fmt){
+  document.getElementById(idV).textContent = fmt? Math.round(val).toLocaleString("ru") : Math.round(val);
+  document.getElementById(idF).style.width = clamp(val/max*100,0,100)+"%";
+}
+
+function showCard(){
+  if(S.month>=CFG.months){return endGame(true);}
+  const card = S.flow[S.month];
+  const scr=document.getElementById("screen");
+  scr.innerHTML = `<div class="card">
+    <div class="mlabel">Месяц ${S.month+1} из ${CFG.months}</div>
+    <div class="ctitle">${card.t}</div>
+    <div class="cdesc">${card.d}</div>
+    <div class="scene">${scene(card.sc)}</div>
+    <div class="scene-cap">${SCENE_CAP[card.sc]||""}</div>
+    ${card.o.map((o,i)=>`<button class="opt" data-i="${i}">
+      <span>${o.l}${o.note?`<br><span class="note">${o.note}</span>`:""}</span><span class="arr">→</span>
+    </button>`).join("")}
+  </div>`;
+  scr.querySelectorAll(".opt").forEach(b=>b.addEventListener("click",()=>choose(card.o[+b.dataset.i])));
+  renderHUD();
+}
+
+function choose(o){
+  let dm=o.m, du=o.u, dtm=o.tm;
+  // спец-эффекты
+  if(o.gamble){ if(Math.random()<0.5){dm=25;du=1800;dtm=-4;} else {dm=-6;du=-200;dtm=-6;} }
+  if(o.raise){ if(Math.random()<0.6){dm+=30;} }
+  const pivotActive = S.pivot || !!o.pivot;
+  if(o.pivot){ S.pivot=true; }
+
+  // применяем
+  S.money += dm; S.users = Math.max(0, S.users+du); S.team = clamp(S.team+dtm,0,100);
+  const rev = Math.floor(S.users/CFG.fundFloor);
+  S.money += rev - CFG.burn;
+  if(S.pivot) S.users += 250;
+
+  // что показать в «результате» (совпадает с изменением шкал)
+  const dMoney = dm + rev - CFG.burn;
+  const dUsers = du + (pivotActive ? 250 : 0);
+  const dTeam = dtm;
+
+  S.month++;
+  flashBars(); renderHUD();
+
+  if(S.money<0) return endGame(false,"bankrupt");
+  if(S.team<=0) return endGame(false,"burnout");
+
+  showOutcome(dMoney, dUsers, dTeam);
+}
+
+function showOutcome(dMoney, dUsers, dTeam){
+  const last = S.month >= S.flow.length;
+  const scr = document.getElementById("screen");
+  scr.innerHTML = `<div class="card out-card">
+    <div class="mlabel">Что произошло</div>
+    <div class="out-anim">
+      ${deltaCol("💰", dMoney)}
+      ${deltaCol("👥", dUsers)}
+      ${deltaCol("⚡", dTeam)}
+    </div>
+    <div class="out-text" id="otext"></div>
+    <button class="btn btn-primary" id="cont">${last ? "Подвести итог →" : "Следующий месяц →"}</button>
+  </div>`;
+  requestAnimationFrame(()=>{
+    scr.querySelectorAll(".delta").forEach(d=>d.classList.add("in"));
+    scr.querySelectorAll(".num").forEach(n=>countTo(n, +n.dataset.to));
+  });
+  document.getElementById("otext").textContent = narrative(dMoney, dUsers, dTeam);
+  document.getElementById("cont").addEventListener("click", continueAfterOutcome);
+}
+function deltaCol(ic, v){
+  const cls = v>0?"up":(v<0?"down":"");
+  const s = v>0?"+":"";
+  return `<div class="delta"><div class="ic">${ic}</div><div class="num ${cls}" data-to="${v}">${s}0</div></div>`;
+}
+function countTo(el, to){
+  const sign = to<0?"-":(to>0?"+":""); const abs=Math.abs(to); let t0=null; const dur=700;
+  function step(ts){ if(!t0)t0=ts; const p=Math.min(1,(ts-t0)/dur);
+    el.textContent = sign + Math.round(abs*p).toLocaleString("ru"); if(p<1) requestAnimationFrame(step); }
+  requestAnimationFrame(step);
+}
+function narrative(m,u,t){
+  const cap=s=>s.charAt(0).toUpperCase()+s.slice(1);
+  const p=[];
+  if(u>0)p.push("пользовательская база выросла"); else if(u<0)p.push("часть пользователей отписалась");
+  if(t>0)p.push("мотивация команды повысилась"); else if(t<0)p.push("мотивация команды снизилась");
+  if(m>0)p.push("капитал увеличился"); else if(m<0)p.push("запас средств сократился");
+  return p.length? cap(p.join(", "))+"." : "Существенных изменений не произошло.";
+}
+function continueAfterOutcome(){
+  if(!S.funded && S.users>=CFG.fundAt){ S.funded=true; return fundEvent(); }
+  showCard();
+}
+
+function fundEvent(){
+  S.money += CFG.fundBonus;
+  const T="#0F7A7A",A="#2F9E9B",O="#F5A05A",L="#D7E8E8";
+  const PIN = `<polygon points="50,8 70,20 70,44 50,56 30,44 30,20" fill="#1F5B57"/><polygon points="92,50 92,74 72,86 52,74 52,50 72,38" fill="#F5A05A"/><polygon points="50,92 30,80 30,56 50,44 70,56 70,80" fill="#2E6E6A"/><polygon points="8,50 8,26 28,14 48,26 48,50 28,62" fill="#5FA8A4"/>`;
+  const rays = Array.from({length:12}).map((_,i)=>`<polygon points="0,-5 0,5 70,0" fill="rgba(255,255,255,.22)" transform="rotate(${i*30})"/>`).join("");
+  const confetti = [['#fff',30,2.2,0],[O,52,2.6,.3],[L,74,2.0,.6],['#fff',96,2.8,.15],[O,118,2.3,.45],[L,140,2.5,.1],['#fff',164,2.1,.7],[O,176,2.7,.5]]
+    .map(([c,x,d,dl])=>`<g transform="translate(${x},-6)"><g class="cf" style="animation-duration:${d}s;animation-delay:${dl}s"><rect x="-3" y="-3" width="6" height="6" rx="1.5" fill="${c}"/></g></g>`).join("");
+  const coinsRain = [44,100,156].map((x,i)=>`<g transform="translate(${x},-6)"><g class="cf" style="animation-duration:${2.4+i*0.2}s;animation-delay:${0.2+i*0.3}s"><circle r="6" fill="${O}"/><text y="3" font-size="8" font-weight="800" fill="#3A1D08" text-anchor="middle">$</text></g></g>`).join("");
+
+  const scr=document.getElementById("screen");
+  scr.innerHTML = `<div class="card out-card">
+    <div class="fund-stage">
+      <svg viewBox="0 0 200 172" width="100%" height="172">
+        <g transform="translate(100,72)"><g class="rays">${rays}</g></g>
+        <circle class="glowp" cx="100" cy="72" r="36" fill="rgba(255,255,255,.45)"/>
+        <g transform="translate(100,40)"><g class="badgein"><g transform="scale(0.46) translate(-50,-50)">${PIN}</g></g></g>
+        ${confetti}${coinsRain}
+        <g transform="translate(64,128)"><g class="flyL"><g class="floaty">${hero()}</g></g></g>
+        <g transform="translate(136,128)"><g class="flyR"><g class="floaty" style="animation-delay:.3s">${hero()}</g></g></g>
+        <g transform="translate(100,124)"><g class="floaty" style="animation-delay:.6s">${fig()}
+           <rect x="-15" y="-7" width="5" height="13" rx="2.5" fill="${A}" transform="rotate(-42 -12 0)"/>
+           <rect x="10" y="-7" width="5" height="13" rx="2.5" fill="${A}" transform="rotate(42 12 0)"/></g></g>
+        <g transform="translate(100,80)"><g class="popbig">
+           <rect x="-34" y="-15" width="68" height="30" rx="9" fill="#fff"/>
+           <text y="6" font-size="22" font-weight="800" fill="${T}" text-anchor="middle">+$${CFG.fundBonus}K</text></g></g>
+      </svg>
+    </div>
+    <div class="mlabel">⬡ Hayot Ventures</div>
+    <div class="ctitle">Подкрепление прибыло!</div>
+    <div class="out-text">Ваш рост впечатлил фонд. Команда Hayot Ventures приходит на помощь и инвестирует <b>$${CFG.fundBonus}K</b> в развитие вашей компании.</div>
+    <button class="btn btn-coral" id="cont">Принять инвестиции →</button>
+  </div>`;
+  renderHUD();
+  document.getElementById("cont").addEventListener("click",()=>{flashBars();showCard();});
+}
+
+function toast(dm,du,dtm,rev){
+  const parts=[];
+  const money=dm+rev-CFG.burn;
+  parts.push(span(money,"💰"));
+  if(du) parts.push(span(du,"👥"));
+  if(dtm) parts.push(span(dtm,"⚡"));
+  const t=document.getElementById("toast");
+  t.innerHTML=parts.join(""); t.classList.add("show");
+  clearTimeout(window._tt); window._tt=setTimeout(()=>t.classList.remove("show"),1500);
+}
+function span(v,ic){const cls=v>=0?"up":"down";const s=v>=0?"+":"";return `<span class="${cls}">${ic} ${s}${Math.round(v).toLocaleString("ru")}</span>`;}
+function flashBars(){document.querySelectorAll(".rc .val").forEach(e=>{e.classList.remove("flash");void e.offsetWidth;e.classList.add("flash");});}
+
+function endGame(survived, reason){
+  S.over=true;
+  const scr=document.getElementById("screen");
+  document.getElementById("hud").classList.add("hidden");
+  if(!survived){
+    const txt = reason==="bankrupt"
+      ? {h:"Банкротство", p:"Капитал исчерпан раньше, чем проект вышел на устойчивый рост. Управление запасом средств — ключевая задача основателя."}
+      : {h:"Выгорание команды", p:"Команда не выдержала нагрузки. Без устойчивой команды развитие компании невозможно."};
+    scr.innerHTML = `<div class="hero">
+      <div style="font-size:54px;margin:14px 0 4px;">${reason==="bankrupt"?"💸":"😮‍💨"}</div>
+      <h1>${txt.h}</h1><p>${txt.p}</p>
+      <div class="recap">${stat("💰",S.money)}${stat("👥",S.users,true)}${stat("⚡",S.team)}</div>
+      <button class="btn btn-primary" onclick="showDirs()">Сыграть снова</button>
+      <a class="btn btn-coral" href="${APPLY_URL}" style="margin-top:10px;">⬡ У вас есть проект? Подать заявку →</a>
+    </div>`;
+    return;
+  }
+  const val = Math.round(S.users/15 + S.money*3 + S.team*3);
+  let rank;
+  if(val<300) rank="Низкая динамика";
+  else if(val<550) rank="Устойчивый бизнес";
+  else if(val<850) rank="Быстрорастущая компания";
+  else rank="Высокий потенциал · кандидат в единороги";
+  scr.innerHTML = `<div class="hero">
+    ${LOGO}
+    <div class="mlabel" style="text-align:center;">Оценка вашей компании</div>
+    <div class="score">$${val}K</div>
+    <div class="rank">${rank}</div>
+    <p>Вы прошли 12 месяцев и довели идею до компании. ${S.funded?"Hayot Ventures поддержал ваш проект на этом пути.":"Представьте, какого результата можно достичь при поддержке фонда."}</p>
+    <div class="recap">${stat("💰",S.money)}${stat("👥",S.users,true)}${stat("⚡",S.team)}</div>
+    <a class="btn btn-coral" href="${APPLY_URL}">⬡ Подать заявку в Hayot Ventures →</a>
+    <button class="btn btn-ghost" onclick="showDirs()">Сыграть снова</button>
+  </div>`;
+}
+function stat(ic,v,fmt){return `<div class="rc2"><b>${ic} ${fmt?Math.round(v).toLocaleString("ru"):Math.round(v)}</b><span>${ic=="💰"?"тыс. $":ic=="👥"?"юзеров":"мораль"}</span></div>`;}
+
+function welcome(){
+  document.getElementById("hud").classList.add("hidden");
+  document.getElementById("screen").innerHTML = `<div class="hero">
+    ${LOGO}
+    <h1>Путь <span class="em">основателя</span></h1>
+    <p>Симулятор стартапа от Hayot Ventures. Выберите направление и за 12 шагов проведите компанию от идеи до инвестиционного раунда. Каждое решение влияет на капитал, пользователей и команду.</p>
+    <div class="how">
+      <b>Правила</b>
+      <div>💰 <b>Капитал</b> — при исчерпании наступает банкротство.<br>👥 <b>Пользователи</b> — определяют выручку и оценку компании.<br>⚡ <b>Команда</b> — при нулевой мотивации развитие останавливается.<br>При устойчивом росте Hayot Ventures предложит инвестиции.</div>
+    </div>
+    <button class="btn btn-primary" onclick="showDirs()">🚀 Начать</button>
+  </div>`;
+}
+function showDirs(){
+  document.getElementById("hud").classList.add("hidden");
+  document.getElementById("screen").innerHTML = `<div class="hero">
+    ${LOGO}
+    <h1>Выберите <span class="em">направление</span></h1>
+    <p>Каждое направление — свой путь и свои вызовы. Дальше вас ждёт логическая цепочка решений: от идеи и прототипа до выручки, конкуренции и раунда.</p>
+    <div class="dirs">
+      ${DIRS.map(x=>`<button class="dirbtn" data-d="${x.id}"><span class="dico">${dirIcon(x.id)}</span><span class="dtxt"><b>${x.name}</b><span>${x.d}</span></span></button>`).join("")}
+    </div>
+  </div>`;
+  document.querySelectorAll(".dirbtn").forEach(b=>b.addEventListener("click",()=>start(b.dataset.d)));
+}
+function start(dir){ newGame(dir); showCard(); }
+
+try{const tg=window.Telegram&&window.Telegram.WebApp;if(tg){tg.ready();tg.expand();tg.setHeaderColor&&tg.setHeaderColor("#F5F6F7");tg.setBackgroundColor&&tg.setBackgroundColor("#F5F6F7");}}catch(e){}
+welcome();
+</script>
+</body>
+</html>
