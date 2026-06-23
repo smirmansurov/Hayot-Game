@@ -723,6 +723,7 @@ function dirIcon(id){
 // Блочный человечек в стиле Minecraft, в цветах Hayot Ventures.
 // Центр в (0,0): голова сверху (y ~ -26), ступни внизу (y ~ +24).
 function fig(grey){
+  if(IMG.founder) return '<image href="'+AB+'founder_smart.png" x="-23" y="-34" width="46" height="60" preserveAspectRatio="xMidYMid meet"'+(grey?' opacity="0.5"':'')+'/>';
   const skin="#E7C9A1", skinD="#CFA877", hair="#101820";
   const shirt = grey?"#9AA8A8":"#0F7A7A";
   const collar= grey?"#B7C1C1":"#2F9E9B";
@@ -759,6 +760,7 @@ function fig(grey){
 
 // Герой Hayot Ventures: блочный человечек с плащом и маской (сцена инвестиций)
 function hero(){
+  if(IMG.hero) return '<image href="'+AB+'hero_3d.png" x="-26" y="-34" width="52" height="58" preserveAspectRatio="xMidYMid meet"/>';
   return `
    <g class="cape px"><rect x="-11" y="-7" width="22" height="22" fill="#F5A05A"/><rect x="-11" y="15" width="7" height="7" fill="#F5A05A"/><rect x="4" y="15" width="7" height="7" fill="#F5A05A"/></g>
    ${fig()}
@@ -1715,7 +1717,7 @@ function welcome(){
     <h1>Путь <span class="em">основателя</span></h1>
     <p>Симулятор стартапа от <b>Hayot Ventures</b>. Пройдите 12 решений и финальный полёт бизнеса. Побеждает тот, кто наберёт больше очков.</p>
 
-    ${IMG.founder?('<div class="welcome-founder"><img src="'+AB+'founder_smart.png" alt="Hayot Ventures"></div>'):""}
+    <div class="welcome-founder"><img src="${AB}founder_smart.png" alt="Hayot Ventures" onerror="this.remove()"></div>
     <div class="wbanner" id="wbanner">${welcomeBanner()}<div class="wtag">📈 Превратите идею в растущий бизнес</div></div>
 
     <div class="about-hv">
