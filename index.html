@@ -97,7 +97,9 @@
   .scene{height:150px;border-radius:14px;margin-bottom:10px;overflow:hidden;border:1px solid var(--line);
     background:linear-gradient(180deg,#E6F3F0 0%,#F5F6F7 72%);}
   .scene svg{display:block;width:100%;height:100%;}
-  .scene-img{display:block;width:100%;height:100%;object-fit:cover;animation:sceneKen 9s ease-in-out infinite alternate;}
+  .scene-img{display:block;width:100%;height:100%;object-fit:contain;animation:sceneKen 9s ease-in-out infinite alternate;}
+  html,body{touch-action:manipulation;}
+  .tap-btn,.fly-wrap,#fly,.opt,.btn{touch-action:manipulation;}
   @keyframes sceneKen{from{transform:scale(1.0)}to{transform:scale(1.06)}}
   .scene-cap{font-size:13px;font-weight:700;color:var(--ink);text-align:center;margin-bottom:16px;line-height:1.4;}
   .px{shape-rendering:crispEdges;}
@@ -383,32 +385,40 @@
 
 <script>
 const CFG = {months:12, startMoney:72, startTeam:72, burn:6, fundAt:1400, fundBonus:35, fundFloor:700};
-// === AI-ассеты Gemini (с авто-обрезкой фона и фолбэком на векторную отрисовку) ===
+// === AI-ассеты Gemini: универсальный хромакей (магента→прозрачность) + dataURL ===
 const AB="https://gemini-mcp-production-bdc4.up.railway.app/img/";
-const IMG={};
+const IMG={}, IMGU={};
+const PX="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==";
+function assetSrc(k){ return IMGU[k] || PX; }
+function _swap(k,url){ document.querySelectorAll('[data-asset="'+k+'"]').forEach(function(el){ if(el.tagName.toLowerCase()==="img") el.src=url; else el.setAttribute("href",url); }); }
 function _cut(img){
   try{
     const c=document.createElement("canvas"); c.width=img.naturalWidth||img.width; c.height=img.naturalHeight||img.height;
     const x=c.getContext("2d"); x.drawImage(img,0,0);
     const d=x.getImageData(0,0,c.width,c.height), p=d.data;
-    if(p[3]<12) return c;
-    const r=p[0],g=p[1],b=p[2];
-    for(let i=0;i<p.length;i+=4){
-      if(Math.abs(p[i]-r)<28 && Math.abs(p[i+1]-g)<28 && Math.abs(p[i+2]-b)<28) p[i+3]=0;
+    if(p[3]>=12){ const r=p[0],g=p[1],b=p[2];
+      for(let i=0;i<p.length;i+=4){ if(Math.abs(p[i]-r)<45 && Math.abs(p[i+1]-g)<45 && Math.abs(p[i+2]-b)<45) p[i+3]=0; }
+      x.putImageData(d,0,0);
     }
-    x.putImageData(d,0,0); return c;
-  }catch(e){ return img; }
+    return c;
+  }catch(e){ return null; }
 }
-function _load(key,file,cut){ const im=new Image(); im.crossOrigin="anonymous";
-  im.onload=()=>{ IMG[key]= cut ? _cut(im) : im; }; im.onerror=()=>{}; im.src=AB+file; }
+function _load(key,file,cut){
+  const im=new Image(); im.crossOrigin="anonymous";
+  im.onload=function(){
+    if(cut){ const c=_cut(im); if(c){ IMG[key]=c; try{IMGU[key]=c.toDataURL("image/png");}catch(e){IMGU[key]=AB+file;} } else { IMG[key]=im; IMGU[key]=AB+file; } }
+    else { IMG[key]=im; IMGU[key]=AB+file; }
+    _swap(key, IMGU[key]);
+  };
+  im.onerror=function(){};
+  im.src=AB+file;
+}
+["founder","hero","scammer","plane","bank"].forEach(k=>_load(k, (k==="founder"?"founder_smart":k==="hero"?"hero_3d":k==="scammer"?"scammer_3d":k==="plane"?"plane_3d":"bank_3d")+".png", true));
+["fintech","ai","market","health","edtech","agro","logi","robo","food"].forEach(k=>_load("ic_"+k,"icon_"+k+".png",true));
 _load("sky","sky_bg.png",false);
-_load("plane","plane_3d.png",true);
-_load("scammer","scammer_3d.png",true);
-_load("founder","founder_smart.png",false);
-_load("bank","bank_3d.png",false);
-_load("hero","hero_3d.png",false);
-["fintech","ai","market","health","edtech","agro","logi","robo","food"].forEach(k=>_load("ic_"+k,"icon_"+k+".png",false));
 ["idea","build","signup","people","revenue","coins","chart","race","bug","handshake","stage","fintech","ai","market","health","edtech","agro","logi","robo","food"].forEach(k=>_load("sc_"+k,"scene_"+k+".png",false));
+document.addEventListener("gesturestart",function(e){e.preventDefault();},{passive:false});  // запрет pinch/двойного тапа на iOS
+document.addEventListener("dblclick",function(e){e.preventDefault();},{passive:false});
 const APPLY_URL = "https://t.me/hayotvcbot?start=apply";
 function goApply(){
   const url=APPLY_URL;
@@ -726,7 +736,7 @@ function dirIcon(id){
 // Блочный человечек в стиле Minecraft, в цветах Hayot Ventures.
 // Центр в (0,0): голова сверху (y ~ -26), ступни внизу (y ~ +24).
 function fig(grey){
-  if(IMG.founder) return '<image href="'+AB+'founder_smart.png" x="-23" y="-34" width="46" height="60" preserveAspectRatio="xMidYMid meet"'+(grey?' opacity="0.5"':'')+'/>';
+  return '<image data-asset="founder" href="'+assetSrc("founder")+'" x="-24" y="-36" width="48" height="62" preserveAspectRatio="xMidYMid meet"'+(grey?' opacity="0.55"':'')+'/>';
   const skin="#E7C9A1", skinD="#CFA877", hair="#101820";
   const shirt = grey?"#9AA8A8":"#0F7A7A";
   const collar= grey?"#B7C1C1":"#2F9E9B";
@@ -763,7 +773,7 @@ function fig(grey){
 
 // Герой Hayot Ventures: блочный человечек с плащом и маской (сцена инвестиций)
 function hero(){
-  if(IMG.hero) return '<image href="'+AB+'hero_3d.png" x="-26" y="-34" width="52" height="58" preserveAspectRatio="xMidYMid meet"/>';
+  return '<image data-asset="hero" href="'+assetSrc("hero")+'" x="-27" y="-36" width="54" height="60" preserveAspectRatio="xMidYMid meet"/>';
   return `
    <g class="cape px"><rect x="-11" y="-7" width="22" height="22" fill="#F5A05A"/><rect x="-11" y="15" width="7" height="7" fill="#F5A05A"/><rect x="4" y="15" width="7" height="7" fill="#F5A05A"/></g>
    ${fig()}
@@ -785,7 +795,7 @@ function miniPlane(){
 }
 // ролик: Hayot Group спешит на помощь
 function rescueScene(){
-  if(IMG.hero) return `<div class="rescue-stage" style="background:linear-gradient(180deg,#8FC9E6,#E8F4F2);display:flex;align-items:center;justify-content:center;padding:6px"><img src="${AB}hero_3d.png" alt="Hayot Group" style="height:150px;width:auto;object-fit:contain"></div>`;
+  return `<div class="rescue-stage" style="background:linear-gradient(180deg,#8FC9E6,#E8F4F2);display:flex;align-items:center;justify-content:center;padding:6px"><img data-asset="hero" src="${assetSrc('hero')}" alt="Hayot Group" style="max-height:152px;max-width:92%;object-fit:contain;animation:wfloat 3.2s ease-in-out infinite"></div>`;
   const speed = Array.from({length:6}).map((_,i)=>`<line x1="-30" y1="${20+i*20}" x2="24" y2="${20+i*20}" stroke="rgba(15,122,122,.45)" stroke-width="3" stroke-linecap="round" style="animation-delay:${(i*0.12).toFixed(2)}s"/>`).join("");
   const sparks = [[208,38,0],[238,66,.4],[200,92,.8],[252,50,.2],[224,108,.6]]
     .map(([x,y,d])=>`<g transform="translate(${x},${y})"><g class="spark" style="animation-delay:${d}s"><polygon points="0,-7 2,-2 7,0 2,2 0,7 -2,2 -7,0 -2,-2" fill="#F5A05A"/></g></g>`).join("");
@@ -1245,7 +1255,7 @@ function tapStage(){
 }
 // ролик: Hayot Bank приходит на помощь
 function bankScene(){
-  if(IMG.bank) return `<div class="fund-stage" style="height:150px;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,#D7E8E8,#F5F6F7)"><img src="${AB}bank_3d.png" alt="Hayot Bank" style="height:144px;width:auto;object-fit:contain"></div>`;
+  return `<div class="fund-stage" style="height:152px;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,#D7E8E8,#F5F6F7)"><img data-asset="bank" src="${assetSrc('bank')}" alt="Hayot Bank" style="max-height:150px;max-width:92%;object-fit:contain;animation:wfloat 3.6s ease-in-out infinite"></div>`;
   const coins = [[78,18,0],[96,12,.25],[114,20,.5],[132,14,.15],[150,22,.4],[120,30,.6]]
     .map(([x,y,d])=>`<g transform="translate(${x},${y})"><g class="cn" style="animation-delay:${d}s"><circle r="6" fill="#F5A05A" stroke="#D9852F" stroke-width="1.3"/><text y="3.2" text-anchor="middle" font-size="8" font-weight="800" fill="#7A4A12" font-family="Arial">$</text></g></g>`).join("");
   const sparks=[[150,40,0],[58,48,.5],[176,72,.8],[40,80,.3]]
@@ -1721,7 +1731,7 @@ function welcome(){
     <h1>Путь <span class="em">основателя</span></h1>
     <p>Симулятор стартапа от <b>Hayot Ventures</b>. Пройдите 12 решений и финальный полёт бизнеса. Побеждает тот, кто наберёт больше очков.</p>
 
-    <div class="welcome-founder"><img src="${AB}founder_smart.png" alt="Hayot Ventures" onerror="this.remove()"></div>
+    <div class="welcome-founder"><img data-asset="founder" src="${assetSrc('founder')}" alt="Hayot Ventures"></div>
     <div class="wbanner" id="wbanner">${welcomeBanner()}<div class="wtag">📈 Превратите идею в растущий бизнес</div></div>
 
     <div class="about-hv">
@@ -1764,7 +1774,7 @@ function showDirs(){
     <h1>Выберите <span class="em">направление</span></h1>
     <p>Каждое направление — свой путь и свои вызовы. Дальше вас ждёт логическая цепочка решений: от идеи и прототипа до выручки, конкуренции и раунда.</p>
     <div class="dirs">
-      ${DIRS.map(x=>`<button class="dirbtn" data-d="${x.id}"><span class="dico">${IMG["ic_"+x.id]?('<img class="dicoimg" src="'+AB+'icon_'+x.id+'.png" alt="">'):dirIcon(x.id)}</span><span class="dtxt"><b>${x.name}</b><span>${x.d}</span></span></button>`).join("")}
+      ${DIRS.map(x=>`<button class="dirbtn" data-d="${x.id}"><span class="dico"><img class="dicoimg" data-asset="ic_${x.id}" src="${assetSrc('ic_'+x.id)}" alt=""></span><span class="dtxt"><b>${x.name}</b><span>${x.d}</span></span></button>`).join("")}
     </div>
   </div>`;
   document.querySelectorAll(".dirbtn").forEach(b=>b.addEventListener("click",()=>start(b.dataset.d)));
