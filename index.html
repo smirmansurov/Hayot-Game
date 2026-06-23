@@ -228,12 +228,22 @@
   .fly-wrap{position:relative;border-radius:14px;overflow:hidden;border:1px solid var(--line);background:linear-gradient(180deg,#8FC9E6 0%,#BBE0EA 38%,#E8F4F2 100%);}
   #fly{display:block;width:100%;height:auto;touch-action:manipulation;}
   .fly-score{position:absolute;top:8px;left:0;right:0;text-align:center;font-family:var(--sans);font-size:26px;font-weight:800;color:var(--teal);text-shadow:0 1px 0 #fff;pointer-events:none;}
-  .fly-start{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--teal-deep);font-size:16px;background:rgba(245,246,247,.5);text-align:center;padding:18px;pointer-events:none;line-height:1.5;}
-  .fly-over{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(16,24,32,.5);padding:16px;}
-  .fly-card{background:#fff;border-radius:14px;padding:16px;text-align:center;width:100%;max-width:280px;box-shadow:0 14px 34px rgba(0,0,0,.3);}
+  .fly-start{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--teal-deep);font-size:16px;background:rgba(245,246,247,.42);text-align:center;padding:18px;pointer-events:none;line-height:1.5;}
+  .fly-start .fs-inner{animation:fsPulse 1.2s ease-in-out infinite;}
+  .fly-start .fs-inner span{display:block;font-size:12.5px;font-weight:700;color:var(--muted);margin-top:5px;}
+  @keyframes fsPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+  .fly-over{position:absolute;inset:0;display:flex;align-items:flex-start;justify-content:center;background:rgba(16,24,32,.5);padding:14px;overflow-y:auto;}
+  .fly-card{background:#fff;border-radius:14px;padding:16px;text-align:center;width:100%;max-width:280px;margin:auto;box-shadow:0 14px 34px rgba(0,0,0,.3);}
   .fly-big{font-family:var(--sans);font-size:20px;font-weight:800;color:var(--ink);}
   .fly-sub{font-size:14px;color:var(--muted);margin:6px 0 12px;}
   .fly-card .btn{margin-top:8px;font-size:14px;padding:12px;}
+  .cd-mask{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(16,24,32,.5);z-index:200;-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px);}
+  .cd-num{font-family:var(--sans);font-weight:800;font-size:120px;line-height:1;color:#fff;text-shadow:0 10px 34px rgba(0,0,0,.35);animation:cdpop .8s ease both;}
+  .cd-num.cd-go{font-size:58px;color:#F5A05A;}
+  @keyframes cdpop{0%{transform:scale(.3);opacity:0}28%{transform:scale(1.12);opacity:1}72%{transform:scale(1);opacity:1}100%{transform:scale(.55);opacity:0}}
+  .confetti-layer{position:fixed;inset:0;pointer-events:none;z-index:215;overflow:hidden;}
+  .confetti-layer i{position:absolute;border-radius:2px;opacity:0;animation-name:confburst;animation-timing-function:cubic-bezier(.2,.7,.3,1);animation-fill-mode:forwards;}
+  @keyframes confburst{0%{opacity:1;transform:translate(0,0) rotate(0)}100%{opacity:0;transform:translate(var(--dx),130px) rotate(var(--rot))}}
   .att{display:flex;align-items:center;justify-content:center;gap:6px;font-size:13px;font-weight:700;color:var(--muted);margin:14px 0 4px;flex-wrap:wrap;}
   .att b{color:var(--teal);font-size:15px;}
   .invite{background:#F0F8F8;border:1.5px dashed var(--teal-accent);color:var(--teal);border-radius:13px;padding:12px;font-weight:800;font-size:14px;width:100%;cursor:pointer;font-family:var(--sans);}
@@ -259,6 +269,7 @@
   /* ── таймер срочного решения ── */
   .timer-lab{font-size:12.5px;font-weight:700;color:var(--muted);text-align:center;margin:-2px 0 6px;}
   .timer-lab b{color:var(--orange);}
+  .qmark{font-size:12px;font-weight:800;color:var(--muted);letter-spacing:.4px;text-transform:uppercase;margin:8px 0 10px;}
   .timer{height:8px;border-radius:5px;background:var(--line);overflow:hidden;margin:0 0 14px;}
   .timer i{display:block;height:100%;width:100%;background:var(--teal);transition:width .1s linear;}
   .timer.warn i{background:var(--orange);}
@@ -372,12 +383,20 @@ const DIRS = [
   {id:"ai",      name:"AI / SaaS",   d:"Искусственный интеллект и облачные сервисы"},
   {id:"market",  name:"Маркетплейс", d:"Торговая площадка и e-commerce"},
   {id:"health",  name:"HealthTech",  d:"Цифровое здоровье и медтех"},
+  {id:"edtech",  name:"EdTech",      d:"Образование и онлайн-обучение"},
+  {id:"agro",    name:"AgroTech",    d:"Технологии для сельского хозяйства"},
+  {id:"logi",    name:"Логистика",   d:"Доставка, склады и перевозки"},
+  {id:"robo",    name:"Робототехника", d:"Роботы и промышленная автоматизация"},
+  {id:"food",    name:"FoodTech",    d:"Еда, доставка и сервисы питания"},
 ];
 
 // Логические стадии стартапа — пулы вариантов (на каждой стадии случайный вариант,
 // поэтому одно направление можно проходить много раз с разными вопросами).
 const STAGE = {
  concept:[
+  {sc:"idea",t:"Имя и позиционирование",d:"Как заявить о себе рынку?",o:[
+    {l:"Чёткое нишевое позиционирование",good:true,note:"Узнаваемость в нише",m:-3,u:300,tm:3,why:"Вы заняли чёткую нишу в позиционировании — вас стали узнавать, пришло {u} пользователей; затраты {mc}."},
+    {l:"Универсальный бренд «для всех»",note:"Размытое сообщение",m:-5,u:200,tm:-2,why:"Вы выбрали бренд «для всех» — сообщение размылось, пользователей {u}, расходы {mc}."}]},
   {sc:"idea",theme:"mkt",t:"Концепция продукта",d:"С чего начать? По подходу Lean Startup гипотезу дешевле проверить минимальной версией (MVP), чем долгим исследованием.",o:[
     {l:"Сразу собрать минимальную версию",good:true,note:"Быстрая проверка гипотезы",m:-4,u:300,tm:-3,why:"Вы за пару недель собрали черновую версию и показали её первым людям — это дало {u} пользователей, но стоило {mc} и слегка измотало команду ({t})."},
     {l:"Сначала исследовать рынок",note:"Меньше риска, медленнее старт",m:-6,u:120,tm:5,why:"Вы провели исследование рынка и интервью с клиентами: уверенности у команды прибавилось ({t}), пользователей пока немного ({u}), на ресёрч ушло {mc}."}]},
@@ -389,6 +408,9 @@ const STAGE = {
     {l:"Идти соло",note:"Полный контроль, выше нагрузка",m:0,u:250,tm:-8,why:"Вы решили идти в одиночку: полный контроль и {u} пользователей, но вся нагрузка легла на вас ({t})."}]},
  ],
  prototype:[
+  {sc:"build",t:"Обратная связь",d:"Как учитывать мнение первых пользователей?",o:[
+    {l:"Регулярные интервью с пользователями",good:true,note:"Точнее продукт",m:-4,u:450,tm:3,why:"Вы наладили регулярные интервью с пользователями — продукт стал точнее и привёл {u} человек; стоило {mc}."},
+    {l:"Полагаться на интуицию",note:"Быстрее, рискованнее",m:-2,u:300,tm:-2,why:"Вы положились на интуицию — быстрее и {u} пользователей, но без проверки гипотез ({mc})."}]},
   {sc:"build",theme:"mkt",t:"Первый прототип",d:"Прототип готов. Ранний запуск MVP даёт обратную связь и приближает product-market fit — соответствие продукта рынку.",o:[
     {l:"Минимально жизнеспособная версия",good:true,note:"Быстро, с ограничениями",m:-5,u:600,tm:-5,why:"Вы выпустили MVP как есть — он быстро привёл {u} пользователей, но из-за сырости команда устала ({t}); расходы {mc}."},
     {l:"Довести до высокого качества",note:"Дольше, надёжнее",m:-12,u:950,tm:-9,why:"Вы вложились в качество продукта — это привлекло {u} пользователей, заняло время и {mc}, команда подустала ({t})."}]},
@@ -400,6 +422,9 @@ const STAGE = {
     {l:"Сразу открытый запуск",note:"Больше юзеров, больше багов",m:-6,u:800,tm:-6,why:"Вы открыли доступ всем сразу — наплыв {u} пользователей, но баги перегрузили команду ({t}); расходы {mc}."}]},
  ],
  users:[
+  {sc:"signup",t:"Контент-маркетинг",d:"Строить аудиторию через полезный контент?",o:[
+    {l:"Завести блог и соцсети",good:true,note:"Медленно, но дёшево",m:-3,u:500,tm:1,why:"Вы завели блог и соцсети с полезным контентом — органика дала {u} пользователей почти даром ({mc})."},
+    {l:"Реклама у инфлюенсеров",note:"Быстрый, дорогой охват",m:-9,u:900,tm:-2,why:"Вы закупили рекламу у инфлюенсеров — быстрый охват и {u} пользователей, но дорого ({mc})."}]},
   {sc:"signup",theme:"mkt",t:"Первые пользователи",d:"Пора привлекать первых пользователей. Следите за CAC — стоимостью привлечения одного клиента: дешёвые каналы берегут бюджет, платные ускоряют рост.",o:[
     {l:"Запуск среди знакомых и сообществ",good:true,note:"Дёшево, ограниченно",m:-2,u:400,tm:2,why:"Вы рассказали о продукте знакомым и в тематических сообществах — пришло {u} пользователей почти бесплатно ({mc}), команда воодушевилась ({t})."},
     {l:"Небольшая платная кампания",note:"Дороже, шире охват",m:-7,u:800,tm:-2,why:"Вы оплатили блогерам серию роликов — они сняли видео о продукте и привели {u} новых пользователей; на кампанию ушло {mc}."}]},
@@ -411,19 +436,25 @@ const STAGE = {
     {l:"Сфокусироваться на качестве продукта",m:-2,u:300,tm:4,why:"Вместо рекламы вы улучшили продукт — органический рост на {u} и довольная команда ({t})."}]},
  ],
  team:[
-  {sc:"people",theme:"hr",t:"Первый наём",d:"Найм усиливает продукт, но повышает burn rate — скорость, с которой вы тратите деньги. Кого взять?",o:[
+  {sc:"people",t:"Культура компании",d:"Что заложить в основу команды?",o:[
+    {l:"Сильная культура и ценности",good:true,note:"Дольше найм, крепче команда",m:-5,u:300,tm:9,why:"Вы выстроили сильную культуру и ценности — команда сплотилась ({t}) и помогла привлечь {u} пользователей; затраты {mc}."},
+    {l:"Нанимать как можно быстрее",note:"Скорость важнее",m:-8,u:500,tm:-6,why:"Вы нанимали как можно быстрее — рук прибавилось и {u} пользователей, но культура размылась ({t}); расходы {mc}."}]},
+  {sc:"people",theme:"hr",t:"Первый найм сотрудников",d:"Найм усиливает продукт, но повышает burn rate — скорость, с которой вы тратите деньги. Кого взять?",o:[
     {l:"Нанять сильного инженера",good:true,note:"Дорого, ускоряет продукт",m:-14,u:550,tm:10,why:"Вы наняли сильного инженера — продукт ускорился, что дало {u} пользователей и подняло боевой дух ({t}); зарплата стоила {mc}."},
     {l:"Нанять специалиста по продажам",m:-10,u:800,tm:3,why:"Вы взяли менеджера по продажам — он закрыл первые сделки и привёл {u} пользователей; найм обошёлся в {mc}."},
     {l:"Пока остаться вдвоём",note:"Экономия, но перегрузка",m:0,u:150,tm:-8,why:"Вы решили пока не нанимать — сэкономили деньги, но вдвоём тянуть всё тяжело ({t}); пользователей {u}."}]},
-  {sc:"people",theme:"hr",t:"Кого нанять первым?",d:"Бюджет на один ключевой наём.",o:[
+  {sc:"people",theme:"hr",t:"Кого нанять первым?",d:"Бюджет на один ключевой найм.",o:[
     {l:"Разработчик",good:true,m:-13,u:550,tm:8,why:"Первым вы наняли разработчика — релизы пошли быстрее, это дало {u} пользователей и заряд команды ({t}); затраты {mc}."},
     {l:"Маркетолог",m:-10,u:850,tm:0,why:"Первым вы наняли маркетолога — он раскрутил каналы и привёл {u} пользователей за {mc}."},
-    {l:"Отложить наём",note:"Экономия, перегрузка",m:0,u:120,tm:-8,why:"Вы отложили найм — сэкономили, но перегрузка растёт ({t}); пользователей {u}."}]},
+    {l:"Отложить найм",note:"Экономия, перегрузка",m:0,u:120,tm:-8,why:"Вы отложили найм — сэкономили, но перегрузка растёт ({t}); пользователей {u}."}]},
   {sc:"people",theme:"hr",t:"Формат команды",d:"Как организовать работу?",o:[
     {l:"Удалённая команда",good:true,note:"Дешевле, сложнее координация",m:-6,u:400,tm:2,why:"Вы собрали удалённую команду — дешевле ({mc}) и {u} пользователей, но координация чуть сложнее ({t})."},
     {l:"Команда в офисе",note:"Дороже, выше сплочённость",m:-12,u:500,tm:8,why:"Вы посадили команду в офис — сплочённость выросла ({t}) и {u} пользователей; аренда и зарплаты обошлись в {mc}."}]},
  ],
  revenue:[
+  {sc:"revenue",t:"Допродажи и тарифы",d:"Как увеличить выручку с одного клиента?",o:[
+    {l:"Допродажи и старшие тарифы",good:true,note:"Рост LTV",m:5,u:150,tm:0,why:"Вы внедрили допродажи и старшие тарифы — выручка с клиента выросла ({m}), пользователей {u}."},
+    {l:"Снизить цену ради объёма",note:"Тоньше маржа",m:-3,u:500,tm:-1,why:"Вы снизили цену ради объёма — пользователей больше ({u}), но маржа тоньше ({mc})."}]},
   {sc:"revenue",theme:"fin",t:"Первая выручка",d:"Пора зарабатывать. Модель монетизации задаёт unit-экономику и LTV — сколько денег приносит клиент за всё время.",o:[
     {l:"Подписка",good:true,note:"Стабильный доход",m:-3,u:200,tm:0,why:"Вы ввели подписку — появился стабильный доход и {u} пользователей; на внедрение ушло {mc}."},
     {l:"Комиссия с операций",m:-2,u:350,tm:-2,why:"Вы стали брать комиссию с каждой операции — это привлекло {u} пользователей; настройка стоила {mc}."},
@@ -447,6 +478,9 @@ const STAGE = {
     {l:"Торговаться за оценку",good:true,note:"Риск сорвать сделку",m:0,u:0,tm:-6,raise:true,why:"Вы стали торговаться за лучшую оценку — нервно для команды ({t}), но потенциально выгоднее по сумме раунда."}]},
  ],
  growth:[
+  {sc:"chart",t:"Удержание и отток",d:"Расти за счёт новых или удерживать текущих?",o:[
+    {l:"Снизить отток (retention)",good:true,note:"Прочный рост",m:-4,u:600,tm:2,why:"Вы взялись за удержание и снизили отток — база растёт устойчиво на {u}; стоило {mc}."},
+    {l:"Лить бюджет в новых",note:"Дорого, «дырявое ведро»",m:-11,u:1200,tm:-3,why:"Вы залили бюджет в новых пользователей — приток {u}, но без удержания это дорого ({mc})."}]},
   {sc:"chart",theme:"mkt",t:"Масштабирование маркетинга",d:"Масштабировать рост разумно при положительной unit-экономике (клиент приносит больше, чем стоит). Куда вложить?",o:[
     {l:"Платные каналы",m:-10,u:1400,tm:-3,why:"Вы залили бюджет в платные каналы — это дало резкий приток {u} пользователей за {mc}."},
     {l:"Контент и органика",good:true,note:"Медленнее, экономичнее",m:-3,u:600,tm:1,why:"Вы сделали ставку на контент и органику — рост медленнее ({u}), зато дёшево ({mc})."}]},
@@ -458,6 +492,9 @@ const STAGE = {
     {l:"Углубиться в текущем рынке",good:true,m:-3,u:500,tm:2,why:"Вы углубились в текущем рынке — устойчивые {u} пользователей и спокойная команда ({t})."}]},
  ],
  competitor:[
+  {sc:"race",t:"Конкурент давит бюджетом",d:"Крупный игрок давит ценой и рекламным бюджетом.",o:[
+    {l:"Уйти в сервис и заботу о клиенте",good:true,note:"Лояльность вместо цены",m:-5,u:400,tm:3,why:"Вы ответили заботой о клиенте и сервисом — лояльность выросла ({t}) и дала {u} пользователей; затраты {mc}."},
+    {l:"Ввязаться в гонку бюджетов",note:"Истощает ресурсы",m:-12,u:900,tm:-4,why:"Вы ввязались в гонку бюджетов — {u} пользователей, но это истощает ресурсы ({mc}) и команду ({t})."}]},
   {sc:"race",theme:"mkt",t:"Выход конкурента",d:"На рынок вышел сильный конкурент. Конкурировать можно ценой, продуктом или дифференциацией — уходом в нишу.",o:[
     {l:"Снизить цену",m:-6,u:550,tm:-3,why:"Вы снизили цену в ответ конкуренту — удержали и привлекли {u} пользователей, но потеряли в марже ({mc})."},
     {l:"Усилить продукт",m:-10,u:800,tm:-5,why:"Вы ответили улучшением продукта — это дало {u} пользователей за {mc}, команда поднажала ({t})."},
@@ -470,6 +507,9 @@ const STAGE = {
     {l:"Держать цену, добавить ценность",good:true,m:-4,u:300,tm:2,why:"Вы держали цену и добавили ценность продукту — {u} пользователей и спокойная команда ({t})."}]},
  ],
  crisis:[
+  {sc:"bug",t:"Утечка данных",d:"Произошёл инцидент с безопасностью данных.",o:[
+    {l:"Открыто признать и устранить",good:true,note:"Дорого, спасает доверие",m:-8,u:-100,tm:-4,why:"Вы открыто признали инцидент и быстро устранили его — доверие в основном сохранили; пользователей {u}, расходы {mc}."},
+    {l:"Замолчать проблему",note:"Риск репутации",m:-2,u:-600,tm:-5,why:"Вы попытались замолчать проблему — сэкономили ({mc}), но утечка всплыла и ударила по базе ({u}) и команде ({t})."}]},
   {sc:"bug",theme:"fin",t:"Критическая нагрузка",d:"Быстрый рост обнажил технический долг: инфраструктура не выдерживает нагрузку.",o:[
     {l:"Срочно укрепить инфраструктуру",good:true,m:-9,u:0,tm:-4,why:"Рост вызвал сбои — вы срочно укрепили инфраструктуру за {mc}; команда поднапряглась ({t}), но пользователей удержали."},
     {l:"Временное решение",note:"Часть пользователей уйдёт",m:-2,u:-400,tm:-2,why:"Вы выкатили временную заплатку — дёшево ({mc}), но часть пользователей всё же ушла ({u})."}]},
@@ -494,6 +534,76 @@ const STAGE = {
 };
 
 const SECTOR = {
+ robo:{challenge:[
+   {sc:"robo",t:"Железо и прототип",d:"Робототехнике нужно дорогое железо и работающий прототип.",o:[
+     {l:"Собрать собственный прототип",good:true,note:"Дорого, своя технология",m:-13,u:450,tm:-3,why:"Вы собрали собственный прототип робота — рабочая демонстрация привлекла {u} клиентов и интерес инвесторов; стоило {mc}, команда выложилась ({t})."},
+     {l:"Собрать из готовых модулей",note:"Быстрее, менее уникально",m:-5,u:300,tm:0,why:"Вы собрали робота из готовых модулей — быстро и {u} клиентов за {mc}, но уникальности меньше."}]},
+   {sc:"robo",t:"Серийное производство",d:"От прототипа к серии — главный барьер аппаратных стартапов.",o:[
+     {l:"Найти контрактного производителя",good:true,note:"Масштаб без своего завода",m:-10,u:600,tm:-2,why:"Вы нашли контрактного производителя — серия пошла и дала {u} клиентов; контракт стоил {mc}."},
+     {l:"Производить мелкими партиями",note:"Высокая себестоимость",m:-6,u:300,tm:-1,why:"Вы делаете мелкие партии — гибко и {u} клиентов, но себестоимость единицы высокая ({mc})."}]}],
+  scale:[
+   {sc:"handshake",t:"Контракт с заводом",d:"Крупный завод хочет автоматизировать линию вашими роботами.",o:[
+     {l:"Заключить промышленный контракт",good:true,m:-9,u:1300,tm:-3,why:"Вы заключили промышленный контракт — внедрение на заводе дало {u} клиентов; запуск стоил {mc}."},
+     {l:"Продавать малому бизнесу",m:-3,u:600,tm:1,why:"Вы продаёте роботов малому бизнесу — {u} клиентов и спокойная команда ({t})."}]},
+   {sc:"handshake",t:"Робот как услуга (RaaS)",d:"Клиенты не хотят покупать роботов — хотят арендовать.",o:[
+     {l:"Перейти на аренду (RaaS)",good:true,m:-7,u:1200,tm:-2,why:"Вы перешли на модель «робот как услуга» — низкий порог входа привёл {u} клиентов; перестройка стоила {mc}."},
+     {l:"Только продажа оборудования",m:-3,u:600,tm:1,why:"Вы остались на продаже оборудования — {u} клиентов и привычная модель ({t})."}]}]},
+ food:{challenge:[
+   {sc:"food",t:"Качество и свежесть",d:"FoodTech завязан на свежесть продукта и сроки доставки.",o:[
+     {l:"Своя кухня и контроль качества",good:true,note:"Дорого, выше доверие",m:-11,u:550,tm:-3,why:"Вы открыли свою кухню с контролем качества — доверие выросло и дало {u} клиентов; стоило {mc}."},
+     {l:"Партнёрские кухни",note:"Быстрее, делите маржу",m:-4,u:350,tm:0,why:"Вы стартовали на партнёрских кухнях — быстро и {u} клиентов за {mc}, но маржу делите."}]},
+   {sc:"food",t:"Последняя миля",d:"Доставка еды — это битва за последнюю милю.",o:[
+     {l:"Своя служба курьеров",good:true,note:"Дорого, контроль сервиса",m:-10,u:600,tm:-3,why:"Вы запустили свою службу курьеров — сервис стал стабильнее и привлёк {u} клиентов; стоило {mc}."},
+     {l:"Агрегатор доставки",note:"Дешевле, меньше контроля",m:-4,u:400,tm:0,why:"Вы отдали доставку агрегатору — дешевле ({mc}) и {u} клиентов, но контроль сервиса ниже."}]}],
+  scale:[
+   {sc:"handshake",t:"Сеть ресторанов",d:"Сеть ресторанов готова подключиться к вашей платформе.",o:[
+     {l:"Подключить сеть ресторанов",good:true,m:-8,u:1300,tm:-3,why:"Вы подключили сеть ресторанов — их аудитория дала {u} клиентов; интеграция стоила {mc}."},
+     {l:"Фокус на локальных заведениях",m:-3,u:600,tm:1,why:"Вы сделали ставку на локальные заведения — {u} клиентов и довольная команда ({t})."}]},
+   {sc:"handshake",t:"Подписка на питание",d:"Можно перейти на регулярные заказы по подписке.",o:[
+     {l:"Запустить подписку на питание",good:true,m:-6,u:1200,tm:-2,why:"Вы запустили подписку на питание — постоянные заказы дали {u} клиентов; настройка стоила {mc}."},
+     {l:"Только разовые заказы",m:-3,u:600,tm:1,why:"Вы остались на разовых заказах — {u} клиентов, но без стабильности подписки ({t})."}]}]},
+ edtech:{challenge:[
+   {sc:"edtech",t:"Контент и методология",d:"Образовательному продукту нужен сильный контент и методология.",o:[
+     {l:"Нанять методистов и экспертов",good:true,note:"Дорого, выше качество",m:-10,u:600,tm:-2,why:"Вы пригласили методистов и экспертов — качество курсов выросло и привлекло {u} учеников; стоило {mc}."},
+     {l:"Запартнёриться с авторами курсов",note:"Быстрее, делите доход",m:-4,u:350,tm:0,why:"Вы привлекли сторонних авторов курсов — быстрый старт и {u} учеников за {mc}, но доход делите с ними."}]},
+   {sc:"edtech",t:"Доходимость до конца",d:"Главная боль EdTech — ученики бросают курсы на полпути.",o:[
+     {l:"Геймификация и наставники",good:true,note:"Дороже, выше вовлечённость",m:-9,u:550,tm:-2,why:"Вы добавили геймификацию и наставников — доходимость выросла и дала {u} учеников; стоило {mc}."},
+     {l:"Только видеоуроки",note:"Дёшево, ниже вовлечённость",m:-3,u:250,tm:0,why:"Вы ограничились видеоуроками — дёшево ({mc}) и {u} учеников, но вовлечённость ниже."}]}],
+  scale:[
+   {sc:"handshake",t:"Партнёрство со школами",d:"Сеть школ готова внедрить вашу платформу.",o:[
+     {l:"Контракт со школами",good:true,m:-8,u:1300,tm:-3,why:"Вы заключили контракт со школами — их ученики дали {u} пользователей; внедрение стоило {mc}."},
+     {l:"Продажи напрямую ученикам",m:-3,u:600,tm:1,why:"Вы продаёте напрямую ученикам — {u} пользователей и дешевле ({mc})."}]},
+   {sc:"handshake",t:"Корпоративное обучение",d:"Компании хотят обучать сотрудников на вашей платформе.",o:[
+     {l:"Выйти в B2B-обучение",good:true,m:-6,u:1200,tm:-2,why:"Вы вышли в корпоративное обучение — компании привели {u} пользователей за {mc}."},
+     {l:"Остаться в рознице (B2C)",m:-3,u:600,tm:1,why:"Вы остались в B2C — {u} пользователей и спокойная команда ({t})."}]}]},
+ agro:{challenge:[
+   {sc:"agro",t:"Полевые испытания",d:"Агротеху нужно доказать эффективность в реальных полях.",o:[
+     {l:"Провести полевые испытания",good:true,note:"Дорого, доказанный результат",m:-11,u:500,tm:-3,why:"Вы провели полевые испытания — доказанный результат убедил фермеров и дал {u} клиентов; стоило {mc}."},
+     {l:"Опираться на лабораторные данные",note:"Дешевле, меньше доверия",m:-4,u:250,tm:0,why:"Вы опёрлись на лабораторные данные — дёшево ({mc}) и {u} клиентов, но доверия в поле меньше."}]},
+   {sc:"agro",t:"Сезонность спроса",d:"Спрос в агро завязан на сезон — деньги нужны заранее.",o:[
+     {l:"Сезонная подписка на обслуживание",good:true,m:-6,u:500,tm:-1,why:"Вы ввели сезонную подписку — выровняли доход и привлекли {u} клиентов; настройка {mc}."},
+     {l:"Разовые продажи в сезон",note:"Пики и провалы",m:-3,u:400,tm:-2,why:"Вы продаёте разово в сезон — {u} клиентов, но доход скачет от пиков к провалам ({mc})."}]}],
+  scale:[
+   {sc:"handshake",t:"Партнёрство с агрохолдингом",d:"Крупный агрохолдинг готов внедрить ваше решение.",o:[
+     {l:"Контракт с агрохолдингом",good:true,m:-8,u:1300,tm:-3,why:"Вы заключили контракт с агрохолдингом — его хозяйства дали {u} клиентов; внедрение стоило {mc}."},
+     {l:"Работать с фермерами напрямую",m:-3,u:600,tm:1,why:"Вы работаете с фермерами напрямую — {u} клиентов и дешевле ({mc})."}]},
+   {sc:"handshake",t:"Дистрибьютор техники",d:"Дистрибьютор сельхозтехники зовёт в партнёры.",o:[
+     {l:"Через сеть дистрибьютора",good:true,m:-7,u:1200,tm:-2,why:"Вы вышли через сеть дистрибьютора — охват дал {u} клиентов за {mc}."},
+     {l:"Своя сеть продаж",note:"Дорого, контроль",m:-12,u:700,tm:-4,why:"Вы строите свою сеть продаж — контроль ваш, но дорого ({mc}) и тяжело ({t}); клиентов {u}."}]}]},
+ logi:{challenge:[
+   {sc:"logi",t:"Склады и первая миля",d:"Логистике нужны склады и отлаженная первая миля.",o:[
+     {l:"Арендовать склады и подрядчиков",good:true,note:"Гибко, операционные расходы",m:-9,u:550,tm:-2,why:"Вы арендовали склады и подрядчиков — гибкий старт привёл {u} клиентов; стоило {mc}."},
+     {l:"Строить свою инфраструктуру",note:"Дорого, контроль",m:-14,u:700,tm:-4,why:"Вы строите собственную инфраструктуру — контроль и {u} клиентов, но дорого ({mc}) и тяжело ({t})."}]},
+   {sc:"logi",t:"Оптимизация маршрутов",d:"Маржа в логистике — в эффективности маршрутов.",o:[
+     {l:"Внедрить умную маршрутизацию",good:true,note:"Дорого, экономит на масштабе",m:-8,u:500,tm:-2,why:"Вы внедрили умную маршрутизацию — расходы на доставку упали, а сервис привлёк {u} клиентов; стоило {mc}."},
+     {l:"Ручное планирование",note:"Дёшево, не масштабируется",m:-3,u:250,tm:-1,why:"Вы планируете маршруты вручную — дёшево ({mc}) и {u} клиентов, но на росте начнёт буксовать."}]}],
+  scale:[
+   {sc:"handshake",t:"Контракт с ритейлером",d:"Крупный ритейлер ищет логистического партнёра.",o:[
+     {l:"Заключить контракт с ритейлером",good:true,m:-8,u:1400,tm:-3,why:"Вы заключили контракт с ритейлером — его объёмы дали {u} клиентов; запуск стоил {mc}."},
+     {l:"Работать с малым бизнесом",m:-3,u:600,tm:1,why:"Вы сфокусировались на малом бизнесе — {u} клиентов и спокойная команда ({t})."}]},
+   {sc:"handshake",t:"Фулфилмент маркетплейса",d:"Маркетплейс предлагает отдать вам фулфилмент.",o:[
+     {l:"Взять фулфилмент маркетплейса",good:true,m:-9,u:1300,tm:-3,why:"Вы взяли фулфилмент маркетплейса — поток заказов дал {u} клиентов; стоило {mc}."},
+     {l:"Развивать свой канал",m:-3,u:600,tm:1,why:"Вы развиваете свой канал — {u} клиентов и дешевле ({mc})."}]}]},
  fintech:{challenge:[
    {sc:"fintech",theme:"fin",t:"Регуляторные требования",d:"Нужны лицензия и соответствие требованиям регулятора.",o:[
      {l:"Пройти лицензирование",good:true,note:"Дорого, открывает рынок",m:-12,u:500,tm:-3,why:"Вы прошли лицензирование у регулятора — это открыло рынок и дало {u} пользователей, но обошлось в {mc}."},
@@ -566,6 +676,11 @@ function dirIcon(id){
   if(id==="fintech") return `<svg ${w}><polygon points="6,18 38,18 22,8" fill="#2F9E9B"/><rect x="8" y="18" width="28" height="18" fill="#0F7A7A"/>${[0,1,2,3].map(i=>`<rect x="${11+i*7}" y="20" width="3" height="14" fill="#fff"/>`).join("")}</svg>`;
   if(id==="ai") return `<svg ${w}><rect x="12" y="8" width="20" height="28" fill="#101820"/>${[0,1,2].map(i=>`<rect x="15" y="${12+i*8}" width="14" height="4" fill="#2F9E9B"/>`).join("")}<rect x="26" y="13" width="3" height="3" fill="#F5A05A"/></svg>`;
   if(id==="market") return `<svg ${w}><rect x="8" y="20" width="28" height="16" fill="#fff" stroke="#D7E8E8"/>${[0,1,2,3].map(i=>`<rect x="${8+i*8}" y="14" width="8" height="6" fill="${i%2?'#F5A05A':'#2F9E9B'}"/>`).join("")}</svg>`;
+  if(id==="robo") return `<svg ${w}><rect x="12" y="12" width="20" height="18" fill="#0F7A7A"/><rect x="16" y="17" width="5" height="5" fill="#CFEAE5"/><rect x="23" y="17" width="5" height="5" fill="#CFEAE5"/><rect x="20" y="6" width="4" height="6" fill="#9AA8A8"/><circle cx="22" cy="6" r="2" fill="#F5A05A"/><rect x="16" y="30" width="12" height="3" fill="#1F5B57"/></svg>`;
+  if(id==="food") return `<svg ${w}><polygon points="12,18 32,18 29,36 15,36" fill="#0F7A7A"/><rect x="11" y="14" width="22" height="5" fill="#2F9E9B"/><rect x="20" y="6" width="3" height="8" fill="#F5A05A"/></svg>`;
+  if(id==="edtech") return `<svg ${w}><polygon points="6,18 38,18 22,11" fill="#2F9E9B"/><polygon points="13,20 31,20 22,26" fill="#0F7A7A"/><rect x="33" y="18" width="2" height="11" fill="#F5A05A"/><rect x="31" y="28" width="6" height="3" fill="#F5A05A"/></svg>`;
+  if(id==="agro") return `<svg ${w}><rect x="20" y="22" width="4" height="16" fill="#2E6E6A"/><polygon points="22,24 7,16 20,30" fill="#2F9E9B"/><polygon points="22,20 37,12 24,26" fill="#0F7A7A"/><circle cx="34" cy="10" r="4" fill="#F5A05A"/></svg>`;
+  if(id==="logi") return `<svg ${w}><rect x="6" y="18" width="20" height="14" fill="#0F7A7A"/><rect x="26" y="22" width="10" height="10" fill="#2F9E9B"/><rect x="9" y="21" width="14" height="3" fill="#F5A05A"/><circle cx="14" cy="34" r="3" fill="#101820"/><circle cx="31" cy="34" r="3" fill="#101820"/></svg>`;
   return `<svg ${w}><rect x="18" y="8" width="8" height="28" fill="#F5A05A"/><rect x="8" y="18" width="28" height="8" fill="#F5A05A"/></svg>`;
 }
 // Блочный человечек в стиле Minecraft, в цветах Hayot Ventures.
@@ -766,6 +881,28 @@ function scene(name){
      <rect x="150" y="62" width="4" height="40" fill="#9AA8A8"/><rect x="146" y="56" width="12" height="7" rx="3" fill="#101820"/>
      <rect x="92" y="120" width="56" height="8" fill="#1F5B57"/>
      <g transform="translate(110,108)"><g class="bob">${fig()}</g><g class="armpt"><rect x="9" y="-3" width="18" height="5" fill="#0C6B6B"/></g></g></svg>`;
+   case "edtech": return `<svg ${V}>${GR}
+     <g transform="translate(150,46)"><g class="floaty"><polygon points="0,-7 24,2 0,11 -24,2" fill="#101820"/><rect x="-3" y="3" width="6" height="9" fill="#101820"/><rect x="12" y="6" width="3" height="11" fill="#F5A05A"/><rect x="11" y="16" width="5" height="3" fill="#F5A05A"/></g></g>
+     <rect x="118" y="74" width="58" height="34" fill="#fff" stroke="#D7E8E8" stroke-width="2"/><rect x="146" y="74" width="2" height="34" fill="#D7E8E8"/>
+     ${[0,1,2].map(i=>`<rect x="123" y="${80+i*8}" width="20" height="3" fill="#D7E8E8"/><rect x="151" y="${80+i*8}" width="20" height="3" fill="#D7E8E8"/>`).join("")}
+     <g transform="translate(58,108)"><g class="bob">${fig()}</g><g class="armpt"><rect x="9" y="-7" width="16" height="5" fill="#0C6B6B"/></g></g></svg>`;
+   case "agro": return `<svg ${V}>${GR}
+     <g transform="translate(172,38)"><g class="floaty"><circle r="11" fill="#F5A05A"/>${[0,1,2,3,4,5].map(i=>`<rect x="-1.5" y="-19" width="3" height="6" fill="#F5A05A" transform="rotate(${i*60})"/>`).join("")}</g></g>
+     <g transform="translate(132,104)"><g class="floaty"><rect x="-2" y="-38" width="4" height="38" fill="#2E6E6A"/><polygon points="0,-28 -18,-36 -2,-22" fill="#2F9E9B"/><polygon points="0,-20 18,-28 2,-14" fill="#0F7A7A"/><polygon points="0,-38 -8,-46 0,-40" fill="#5FA8A4"/><polygon points="0,-38 8,-46 0,-40" fill="#5FA8A4"/></g></g>
+     <g transform="translate(60,108)"><g class="bob">${fig()}</g></g></svg>`;
+   case "logi": return `<svg ${V}>${GR}
+     <g transform="translate(150,98)"><g class="bob"><rect x="-36" y="-24" width="38" height="24" fill="#0F7A7A"/><rect x="2" y="-15" width="20" height="15" fill="#2F9E9B"/><rect x="-32" y="-20" width="15" height="10" fill="#CFEAE5"/><rect x="-30" y="-12" width="28" height="3" fill="#F5A05A"/><circle cx="-24" cy="4" r="5" fill="#101820"/><circle cx="12" cy="4" r="5" fill="#101820"/><circle cx="-24" cy="4" r="2" fill="#9AA8A8"/><circle cx="12" cy="4" r="2" fill="#9AA8A8"/></g></g>
+     <rect x="96" y="94" width="14" height="14" fill="#E0A064"/><rect x="96" y="94" width="14" height="3" fill="#C8853F"/><rect x="103" y="94" width="2" height="14" fill="#C8853F"/>
+     <rect x="113" y="98" width="10" height="10" fill="#E0A064"/><rect x="113" y="98" width="10" height="3" fill="#C8853F"/>
+     <g transform="translate(56,108)"><g class="bob">${fig()}</g></g></svg>`;
+   case "robo": return `<svg ${V}>${GR}
+     <g transform="translate(140,92)"><g class="bob"><rect x="-18" y="-30" width="36" height="30" fill="#0F7A7A"/><rect x="-12" y="-24" width="10" height="10" fill="#CFEAE5"/><rect x="2" y="-24" width="10" height="10" fill="#CFEAE5"/><rect x="-10" y="-22" width="4" height="4" fill="#101820"/><rect x="6" y="-22" width="4" height="4" fill="#101820"/><rect x="-6" y="-10" width="12" height="3" fill="#1F5B57"/><rect x="-3" y="-40" width="6" height="10" fill="#9AA8A8"/><circle cx="0" cy="-42" r="4" fill="#F5A05A"/><rect x="-26" y="-26" width="8" height="4" fill="#2F9E9B"/><rect x="18" y="-26" width="8" height="4" fill="#2F9E9B"/></g></g>
+     <g transform="translate(182,52)"><g class="pv" style="transform-origin:0 0">${[0,1,2,3,4,5].map(i=>`<rect x="-2" y="-13" width="4" height="6" fill="#2F9E9B" transform="rotate(${i*60})"/>`).join("")}<circle r="5" fill="#0F7A7A"/></g></g>
+     <g transform="translate(58,108)"><g class="bob">${fig()}</g></g></svg>`;
+   case "food": return `<svg ${V}>${GR}
+     <g transform="translate(140,98)"><g class="bob"><ellipse cx="0" cy="6" rx="30" ry="8" fill="#fff" stroke="#D7E8E8" stroke-width="2"/><path d="M-18,2 Q0,-14 18,2 Z" fill="#F5A05A"/><circle cx="0" cy="-2" r="5" fill="#E07F3E"/></g></g>
+     ${[0,1,2].map(i=>`<g transform="translate(${128+i*12},66)"><g class="smoke" style="animation-delay:${i*0.4}s"><rect x="-2" y="-2" width="5" height="5" fill="#D7E8E8"/></g></g>`).join("")}
+     <g transform="translate(58,108)"><g class="bob">${fig()}</g></g></svg>`;
    default: return `<svg ${V}>${GR}<g transform="translate(110,108)"><g class="bob">${fig()}</g></g></svg>`;
   }
 }
@@ -833,6 +970,35 @@ function newGame(dir){
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]];}return a;}
 function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
 
+// Конфетти — выброс частиц для тактильной отдачи
+function confettiBurst(n){
+  n=n||26;
+  const colors=["#0F7A7A","#2F9E9B","#F5A05A","#D7E8E8","#5FA8A4","#F7C59F","#fff"];
+  const wrap=document.createElement("div"); wrap.className="confetti-layer"; document.body.appendChild(wrap);
+  for(let k=0;k<n;k++){
+    const p=document.createElement("i"), c=colors[k%colors.length];
+    const left=12+Math.random()*76, dx=(Math.random()*2-1)*140, dur=0.9+Math.random()*0.8, rot=(Math.random()*760-380), w=6+Math.random()*6;
+    p.style.cssText=`left:${left.toFixed(1)}%;top:36%;width:${w.toFixed(1)}px;height:${(w*0.5).toFixed(1)}px;background:${c};--dx:${dx.toFixed(0)}px;--rot:${rot.toFixed(0)}deg;animation-duration:${dur.toFixed(2)}s;animation-delay:${(Math.random()*0.12).toFixed(2)}s;`;
+    wrap.appendChild(p);
+  }
+  setTimeout(()=>wrap.remove(),1900);
+}
+
+// Отсчёт 3-2-1 перед стартом игры
+function countdown(onDone){
+  const mask=document.createElement("div"); mask.className="cd-mask"; document.body.appendChild(mask);
+  const seq=["3","2","1","Старт!"]; let i=0;
+  function step(){
+    if(i>=seq.length){ mask.remove(); onDone&&onDone(); return; }
+    const go=i===seq.length-1;
+    mask.innerHTML=`<div class="cd-num${go?' cd-go':''}">${seq[i]}</div>`;
+    try{const tg=window.Telegram&&window.Telegram.WebApp;tg&&tg.HapticFeedback&&tg.HapticFeedback.impactOccurred(go?"heavy":"medium");}catch(e){}
+    if(go) confettiBurst(34);
+    i++; setTimeout(step, go?720:760);
+  }
+  step();
+}
+
 function renderHUD(){
   document.getElementById("hud").classList.remove("hidden");
   setVal("vMoney","fMoney",S.money,100,false);
@@ -855,7 +1021,7 @@ function showCard(){
   const order = card.o.map((_,i)=>i);
   shuffleSeed(order, S.rng);                 // антипаттерн: порядок вариантов меняется
   S._card=card; S._order=order;
-  const tSec = Math.max(5, 15 - S.month);    // время сокращается с каждым шагом
+  const tSec = Math.max(30, 38 - S.month);   // не меньше 30 секунд — время прочитать и подумать
   S._tTotal = tSec; S._tStart = performance.now();
   const scr=document.getElementById("screen");
   scr.innerHTML = `<div class="card">
@@ -863,22 +1029,26 @@ function showCard(){
     <div class="ctitle">${card.t}</div>
     <div class="cdesc">${card.d}</div>
     <div class="scene">${scene(card.sc)}</div>
-    <div class="scene-cap">${SCENE_CAP[card.sc]||""}</div>
-    <div class="timer-lab" id="tlab">⏱ Осталось: <b>${tSec}</b> сек · решайте быстрее ради очков</div>
+    <div class="timer-lab" id="tlab">⏱ <b>${tSec}</b> сек</div>
     <div class="timer" id="tbar"><i id="tfill"></i></div>
-    <div class="q-hint">💡 Единственно «правильного» варианта нет — у каждого решения свои плюсы и риски. Очки за ход зависят от того, насколько сильной и сбалансированной осталась компания, и от скорости ответа.</div>
+    <div class="qmark">Выберите решение</div>
     ${order.map((oi,di)=>{const o=card.o[oi]; return `<button class="opt" data-i="${di}">
       <span>${o.l}${o.note?`<br><span class="note">${o.note}</span>`:""}</span><span class="arr">→</span>
     </button>`;}).join("")}
   </div>`;
   scr.querySelectorAll(".opt").forEach(b=>b.addEventListener("click",()=>choose(+b.dataset.i)));
   renderHUD();
-  if(S.month===0 && !TUTORIAL_DONE){ setTimeout(()=>tutorial(()=>startTimer(S._tTotal*10)), 300); }
-  else { startTimer(tSec*10); }
+  if(S.month===0){
+    const begin = ()=>countdown(()=>startTimer(S._tTotal*10));
+    if(!TUTORIAL_DONE){ setTimeout(()=>tutorial(begin), 300); }
+    else { setTimeout(begin, 250); }
+  } else { startTimer(tSec*10); }
 }
 
 function choose(di){
   clearTimer();
+  confettiBurst(16);
+  try{const tg=window.Telegram&&window.Telegram.WebApp;tg&&tg.HapticFeedback&&tg.HapticFeedback.impactOccurred("medium");}catch(e){}
   const o = S._card.o[S._order[di]];
   const elapsed = (performance.now()-S._tStart)/1000;
   applyChoice(o, elapsed, false);
@@ -887,8 +1057,9 @@ function applyChoice(o, elapsed, timedOut){
   const r=S.rng;
   const jit = v => Math.round(v*(0.85 + r()*0.30));   // антипаттерн: значения «плавают» ±15%
   let dm = o?jit(o.m):-7, du = o?jit(o.u):-350, dtm = o?jit(o.tm):-9;
-  if(o&&o.gamble){ if(r()<0.5){dm=jit(25);du=jit(1800);dtm=jit(-4);} else {dm=jit(-6);du=jit(-200);dtm=jit(-6);} }
-  if(o&&o.raise){ if(r()<0.6) dm+=jit(30); }
+  const fate={};
+  if(o&&o.gamble){ const win=r()<0.5; fate.gamble=true; fate.win=win; if(win){dm=jit(25);du=jit(1800);dtm=jit(-4);} else {dm=jit(-6);du=jit(-200);dtm=jit(-6);} }
+  if(o&&o.raise){ const win=r()<0.6; fate.raise=true; fate.win=win; if(win) dm+=jit(30); }
   S.money += dm; S.users = Math.max(0, S.users+du); S.team = clamp(S.team+dtm,0,100);
   const rev = Math.floor(S.users/CFG.fundFloor);
   S.money += rev - CFG.burn;
@@ -896,13 +1067,13 @@ function applyChoice(o, elapsed, timedOut){
   const speedFrac=timedOut?0:clamp(1-elapsed/S._tTotal,0,1);
   const strength = clamp(S.money,0,150)/150 + Math.min(S.users,8000)/8000 + S.team/100; // 0..3
   const moveScore = Math.round(strength*55);    // 0..165 за состояние компании
-  const speedBonus = Math.round(speedFrac*45);  // 0..45 за скорость
+  const speedBonus = Math.round(speedFrac*60);  // 0..60 — бонус за быстрый ответ
   const gained = timedOut ? Math.max(0, moveScore-25) : (moveScore + speedBonus);
   S.score = Math.max(0, S.score + gained);
   S.log.events.push({q:S.month,opt:o?o.l:"timeout",t:+(elapsed||0).toFixed(2),dm,du,dtm,g:gained});
   const dMoney = dm + rev - CFG.burn;
   S.month++; flashBars(); renderHUD();
-  const showOut = ()=>{ const expl = explain(o, dm, du, dtm, timedOut); showOutcome(dMoney, du, dtm, gained, timedOut, expl); };
+  const showOut = ()=>{ const expl = explain(o, dm, du, dtm, timedOut, fate); showOutcome(dMoney, du, dtm, gained, timedOut, expl); };
   if(S.money<0) return bankRescue(showOut);
   showOut();
 }
@@ -914,7 +1085,6 @@ function showOutcome(dMoney, dUsers, dTeam, gained, timedOut, expl){
   const hcls = timedOut ? "down" : "up";
   scr.innerHTML = `<div class="card out-card">
     <div class="verdict ${hcls}">${head}</div>
-    <div class="stickers">${outcomeStickers(dMoney,dUsers,dTeam,gained,timedOut)}</div>
     <div class="scoregain up"><span id="gnum" data-to="${gained}">+0</span> очков за ход</div>
     <div class="out-anim">
       ${deltaCol("💰", dMoney)}
@@ -962,31 +1132,52 @@ function narrative(m,u,t){
   return p.length? cap(p.join(", "))+"." : "Существенных изменений не произошло.";
 }
 function fmtU(n){ n=Math.round(n); return (n>=0?"+":"−")+Math.abs(n).toLocaleString("ru"); }
-function explain(o,dM,dU,dT,timedOut){
-  if(timedOut) return "Вы не успели принять решение. Конкуренты воспользовались паузой — показатели компании просели.";
+function explain(o,dM,dU,dT,timedOut,fate){
+  fate=fate||{};
+  if(timedOut) return "Вы промедлили с решением. Конкуренты воспользовались паузой — компания потеряла темп, и показатели просели по всем направлениям.";
   let txt;
   if(o && o.why){
     txt = o.why
       .replace(/\{u\}/g, fmtU(dU))
       .replace(/\{un\}/g, Math.abs(Math.round(dU)).toLocaleString("ru"))
-      .replace(/\{m\}/g, (dM>=0?"+$"+Math.round(dM):"−$"+Math.abs(Math.round(dM)))+"K")
+      .replace(/\{m\}/g, (dM>=0?"+$"+Math.round(dM):"\u2212$"+Math.abs(Math.round(dM)))+"K")
       .replace(/\{mc\}/g, "$"+Math.abs(Math.round(dM))+"K")
       .replace(/\{t\}/g, fmtU(dT));
   } else {
     const cz=[];
     if(dU>0) cz.push(`привлекло пользователей (${fmtU(dU)})`); else if(dU<0) cz.push(`вызвало отток (${fmtU(dU)})`);
-    if(dM<0) cz.push(`потребовало затрат (−$${Math.abs(Math.round(dM))}K)`); else if(dM>0) cz.push(`принесло средства (+$${Math.round(dM)}K)`);
+    if(dM<0) cz.push(`потребовало затрат (\u2212$${Math.abs(Math.round(dM))}K)`); else if(dM>0) cz.push(`принесло средства (+$${Math.round(dM)}K)`);
     txt = cz.length? `Решение ${cz.join(" и ")}.` : "Решение существенно не изменило показатели.";
   }
+  // чем закончился риск
+  let risk="";
+  if(fate.gamble){ risk = fate.win
+    ? " \uD83C\uDFB2 Рискованная ставка сыграла: смелый ход выстрелил, и рынок откликнулся взрывным интересом."
+    : " \uD83C\uDFB2 Рискованная ставка не зашла: рынок отреагировал прохладно, и часть усилий пропала даром."; }
+  else if(fate.raise){ risk = fate.win
+    ? " \uD83E\uDD1D Расчёт оправдался: переговоры прошли в вашу пользу, условия раунда улучшились."
+    : " \uD83E\uDD1D В этот раз не сложилось: выйти на лучшие условия не удалось."; }
+  // реакция метрик за ход
+  const react=[];
+  if(dU>=1000) react.push("пользователи хлынули волной");
+  else if(dU>=400) react.push("аудитория заметно подросла");
+  else if(dU>0) react.push("прибавилось немного пользователей");
+  else if(dU<=-300) react.push("заметная часть пользователей ушла");
+  else if(dU<0) react.push("несколько пользователей отписались");
+  if(dT<=-12) react.push("команда вымоталась");
+  else if(dT>=10) react.push("команда воспрянула духом");
+  if(dM<=-10) react.push("бюджет ощутимо просел");
+  else if(dM>=10) react.push("в кассе прибавилось");
+  const reactS = react.length? " По итогам хода "+react.join(", ")+"." : "";
   // куда попала компания
   const cons=[];
-  if(S.money<15) cons.push("Денег в обрез — компания близка к кассовому разрыву.");
-  else if(S.money>=95) cons.push("Финансовая подушка солидная.");
+  if(S.money<15) cons.push("Денег в обрез — компания у кассового разрыва, дальше нужна осторожность.");
+  else if(S.money>=95) cons.push("Финансовая подушка солидная — есть пространство для манёвра.");
   if(S.team<35) cons.push("Команда на пределе и может посыпаться.");
-  else if(S.team>=88) cons.push("Команда полна сил.");
-  if(S.users>=5000) cons.push("Пользовательская база уверенно растёт.");
-  const narr = " "+narrative(dM,dU,dT);
-  return txt + (cons.length? " "+cons[0] : "") + narr;
+  else if(S.team>=88) cons.push("Команда полна сил и готова к новым задачам.");
+  if(S.users>=5000) cons.push("База пользователей уже внушительна и притягивает внимание инвесторов.");
+  const consS = cons.length? " "+cons.slice(0,2).join(" ") : "";
+  return txt + risk + reactS + consS;
 }
 function continueAfterOutcome(){
   if(!S.funded && S.users>=CFG.fundAt){ S.funded=true; return midTap(); }
@@ -1061,7 +1252,7 @@ function midTap(){
   scr.innerHTML=`<div class="card out-card">${tapStage()}
     <div class="mlabel">⬡ <b>Hayot Ventures</b> пришёл на помощь</div>
     <div class="ctitle" style="font-size:21px;">Фонд верит в ваш стартап</div>
-    <div class="out-text"><b>Hayot Ventures</b> увидел ваш прогресс и пришёл на помощь, чтобы помочь победить в конкурсе. Сейчас будет тап-раунд: нажимайте как можно быстрее — каждое нажатие приносит очки, усиленные силой вашей компании. Прочитайте и нажмите, когда будете готовы.</div>
+    <div class="out-text"><b>Hayot Ventures</b> увидел ваш прогресс и пришёл на помощь, чтобы помочь победить в конкурсе. Далее последует раунд нажатий: каждое нажатие приносит очки, усиленные показателями вашей компании. Ознакомьтесь с условиями и нажмите кнопку, когда будете готовы.</div>
     <button class="btn btn-coral" id="mstart">Начать тап-раунд →</button>
   </div>`;
   renderHUD();
@@ -1078,8 +1269,8 @@ function midTapPlay(){
   scr.innerHTML=`<div class="card out-card">${tapStage()}
     <div class="mlabel">⬡ <b>Hayot Ventures</b> пришёл на помощь</div>
     <div class="scoregain up" id="livescore">${base.toLocaleString("ru")}</div>
-    <div class="tap-mult">Чем сильнее ваша компания, тем дороже нажатие.<br>Сейчас <b>1 нажатие = +${perTap} очков</b>. Жмите как можно быстрее!</div>
-    <div class="tap-wrap"><button class="tap-btn" id="tapbtn">НАЖМИТЕ</button>
+    <div class="tap-mult">Чем сильнее компания, тем ценнее каждое нажатие.<br>Сейчас <b>1 нажатие = +${perTap} очков</b>. Нажимайте чаще.</div>
+    <div class="tap-wrap"><button class="tap-btn" id="tapbtn">Нажимайте</button>
       <div class="out-text"><b>Hayot Ventures</b> пришёл на помощь вашему стартапу, чтобы помочь победить в конкурсе. Нажимайте — фонд усилит каждое нажатие согласно множителю вашей компании.</div>
       <div class="tap-bar"><i id="tapfill"></i></div></div>
   </div>`;
@@ -1100,29 +1291,71 @@ function finale(){
   const base = Math.round(S.score);
   const scr=document.getElementById("screen");
   scr.innerHTML = `<div class="card out-card">
-    <div class="mlabel">🏆 Финал · Полёт вашего бизнеса</div>
-    <div class="out-text" style="margin-bottom:8px;"><b>Hayot Ventures</b> дал вашему бизнесу взлететь! Нажимайте на игровое поле, чтобы набирать высоту, и облетайте барьеры, которые встают на пути бизнеса в Узбекистане. Столкновение завершает полёт. Чем дольше летите — тем больше очков, и это решает победу в конкурсе.</div>
+    <div class="mlabel">🏆 Финал · Полёт бизнеса</div>
+    <div class="out-text" style="margin-bottom:8px;">Самолёт <b>Hayot Ventures</b> поднимает ваш бизнес в небеса. Но на пути встают мошенники, желающие его перехватить. Нажимайте на экран, чтобы набирать высоту, и обходите препятствия: чем дольше длится полёт, тем выше итоговый результат.</div>
     <div class="fly-wrap" id="flywrap">
-      <canvas id="fly" width="320" height="380"></canvas>
+      <canvas id="fly"></canvas>
       <div class="fly-score" id="flyscore">0</div>
-      <div class="fly-start" id="flystart"><div>Нажмите на поле, чтобы взлететь ✈<br><span style="font-size:12px;font-weight:600;"><b>Hayot Ventures</b> поднял ваш бизнес в воздух</span></div></div>
+      <div class="fly-start" id="flystart"><div class="fs-inner">Нажмите, чтобы начать полёт<span>Самолёт Hayot Ventures поднимает ваш бизнес — обходите препятствия</span></div></div>
     </div>
-    <div class="tap-mult">Чем сильнее компания, тем больше очков за полёт.<br>Ваш бонус к очкам: <b>×${M.toFixed(1)}</b>.</div>
+    <div class="tap-mult">Бонус за силу компании: <b>×${M.toFixed(1)}</b> к очкам полёта.</div>
   </div>`;
   renderHUD();
   const cv=document.getElementById("fly"), ctx=cv.getContext("2d");
   const wrap=document.getElementById("flywrap");
-  const W=cv.width, H=cv.height, rng=S.rng;
-  let started=false, dead=false, t=0, raf=0;
+  const rng=S.rng;
+  const dpr=Math.min(window.devicePixelRatio||1,2);
+  const cssW=Math.max(260, Math.round(wrap.clientWidth||320));
+  const cssH=Math.round(clamp(window.innerHeight*0.5, 300, 430));
+  cv.style.width=cssW+"px"; cv.style.height=cssH+"px";
+  cv.width=Math.round(cssW*dpr); cv.height=Math.round(cssH*dpr);
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  const W=cssW, H=cssH;
+  let started=false, counting=false, dead=false, t=0, raf=0;
+  let crashing=false, crashVy=0, crashRot=0, crashPuffs=[];
+  let reviving=false, reviveT=0;
   let y=H*0.42, vy=0; const px=72;
   const G=0.45, JUMP=-6.8;
   let obs=[], spawnX=0, passed=0, flightScore=0;
   if(!S.log.flight) S.log.flight={seed:S.seed, inputs:[]};
-  function flap(){ if(dead) return; if(!started){started=true; const st=document.getElementById("flystart"); if(st) st.style.display="none";} vy=JUMP; S.log.flight.inputs.push(Math.round(performance.now())); }
-  function keyflap(e){ if(e.code==="Space"){ e.preventDefault(); flap(); } }
-  wrap.addEventListener("pointerdown",flap);
+  function flap(){ if(dead||!started) return; vy=JUMP; S.log.flight.inputs.push(Math.round(performance.now())); }
+  function beginFlight(){
+    if(started||counting||dead) return;
+    counting=true;
+    const st=document.getElementById("flystart"); if(st) st.style.display="none";
+    countdown(()=>{ counting=false; started=true; vy=JUMP; S.log.flight.inputs.push(Math.round(performance.now())); });
+  }
+  function onTap(){ if(dead) return; if(!started) beginFlight(); else flap(); }
+  function keyflap(e){ if(e.code==="Space"){ e.preventDefault(); onTap(); } }
+  wrap.addEventListener("pointerdown",onTap);
   document.addEventListener("keydown",keyflap);
-  function spawn(){ const gap=Math.max(95,150 - t*0.05); const m=40, gapY=m+rng()*(H-gap-m*2); obs.push({x:W+30,gapY,gap,w:40,passed:false}); }
+  function spawn(){
+    // проём сужается со временем, но не больше трети поля — всегда есть куда смещать ворота
+    const gap=Math.min(H*0.34, Math.max(84, 120 - t*0.012));
+    const m=40;
+    const speedNow=Math.min(6.8, 4.0 + t*0.0017);
+    const everyNow=Math.max(260, 305 - t*0.019);
+    const F=everyNow/speedNow;                       // кадров между препятствиями
+    const step=clamp(Math.round(F*2.8), 120, 220);   // максимально достижимый сдвиг по высоте
+    const cMin=m+gap/2, cMax=H-m-gap/2;
+    let c;
+    const prev=obs.length?obs[obs.length-1]:null;
+    if(prev){
+      const pc=prev.gapY+prev.gap/2;
+      // обязательный сдвиг вверх или вниз — ворота не выстраиваются в линию
+      const minJ=clamp(Math.round((cMax-cMin)*0.38), 32, 72);
+      const uL=Math.max(cMin,pc-step), uH=Math.min(cMax,pc-minJ);
+      const dL=Math.max(cMin,pc+minJ), dH=Math.min(cMax,pc+step);
+      const uOK=uH>uL, dOK=dH>dL;
+      if(uOK&&dOK) c = rng()<0.5 ? uL+rng()*(uH-uL) : dL+rng()*(dH-dL);
+      else if(uOK) c = uL+rng()*(uH-uL);
+      else if(dOK) c = dL+rng()*(dH-dL);
+      else c = clamp(pc, cMin, cMax);
+    } else {
+      c = cMin + rng()*Math.max(0, cMax-cMin);
+    }
+    obs.push({x:W+30,gapY:c-gap/2,gap,w:40,passed:false});
+  }
   function cloud(cx,cy,sc,a){
     ctx.save(); ctx.globalAlpha=a; ctx.fillStyle="#ffffff";
     ctx.beginPath();
@@ -1131,34 +1364,43 @@ function finale(){
     ctx.fill(); ctx.restore();
   }
   function plane(){
-    ctx.save(); ctx.translate(px,y); ctx.rotate(clamp(vy/12,-0.30,0.45));
+    const _rot = crashing ? crashRot : clamp(vy/12,-0.30,0.45);
+    ctx.save(); ctx.translate(px,y); ctx.rotate(_rot);
+    // мягкая тень под самолётом
+    ctx.save(); ctx.globalAlpha=0.12; ctx.fillStyle="#0B5E5E"; ctx.beginPath(); ctx.ellipse(0,17,30,6,0,0,7); ctx.fill(); ctx.restore();
     // инверсионный след
-    for(let i=0;i<4;i++){ ctx.fillStyle="rgba(95,168,164,"+(0.15-i*0.033)+")"; ctx.beginPath(); ctx.arc(-34-i*8-((t*0.6)%6),0,3.6-i*0.6,0,7); ctx.fill(); }
-    // киль (оранжевый) на хвосте
-    ctx.fillStyle="#F5A05A"; ctx.beginPath(); ctx.moveTo(-30,-3); ctx.lineTo(-36,-19); ctx.lineTo(-20,-4); ctx.closePath(); ctx.fill();
-    // горизонтальный стабилизатор
-    ctx.fillStyle="#1F5B57"; ctx.beginPath(); ctx.moveTo(-30,0); ctx.lineTo(-40,-3); ctx.lineTo(-30,-5); ctx.closePath(); ctx.fill();
-    // фюзеляж: длинная капсула, заострённый нос справа
-    ctx.fillStyle="#0F7A7A"; ctx.beginPath();
-    ctx.moveTo(-30,3); ctx.quadraticCurveTo(-31,-6,-16,-7); ctx.lineTo(20,-7);
-    ctx.quadraticCurveTo(38,-6,44,0);
-    ctx.quadraticCurveTo(38,6,20,7); ctx.lineTo(-16,7);
-    ctx.quadraticCurveTo(-31,8,-30,3); ctx.closePath(); ctx.fill();
-    // главное крыло (большое, назад-вниз)
-    ctx.fillStyle="#F5A05A"; ctx.beginPath(); ctx.moveTo(8,5); ctx.lineTo(-18,22); ctx.lineTo(-2,5); ctx.closePath(); ctx.fill();
-    // двигатель под крылом
-    ctx.fillStyle="#2E6E6A"; ctx.fillRect(-6,12,13,6); ctx.fillStyle="#CFEAE5"; ctx.fillRect(-6,12,3,6);
+    for(let i=0;i<5;i++){ ctx.fillStyle="rgba(95,168,164,"+(0.16-i*0.03)+")"; ctx.beginPath(); ctx.arc(-36-i*9-((t*0.7)%7),0,4-i*0.6,0,7); ctx.fill(); }
+    // хвостовой киль
+    ctx.fillStyle="#0B5E5E"; ctx.beginPath(); ctx.moveTo(-26,-2); ctx.quadraticCurveTo(-38,-20,-29,-3); ctx.lineTo(-18,-4); ctx.closePath(); ctx.fill();
+    ctx.fillStyle="#F5A05A"; ctx.beginPath(); ctx.moveTo(-30,-7); ctx.lineTo(-36,-18); ctx.lineTo(-25,-6); ctx.closePath(); ctx.fill();
+    // заднее крыло
+    ctx.fillStyle="#2E6E6A"; ctx.beginPath(); ctx.moveTo(-22,2); ctx.lineTo(-34,12); ctx.lineTo(-19,6); ctx.closePath(); ctx.fill();
+    // фюзеляж с объёмным градиентом
+    const g=ctx.createLinearGradient(0,-9,0,9); g.addColorStop(0,"#159a95"); g.addColorStop(0.5,"#0F7A7A"); g.addColorStop(1,"#0a5d5d");
+    ctx.fillStyle=g; ctx.beginPath();
+    ctx.moveTo(-30,0);
+    ctx.quadraticCurveTo(-30,-8,-14,-8); ctx.lineTo(22,-8);
+    ctx.quadraticCurveTo(40,-7,48,0);
+    ctx.quadraticCurveTo(40,7,22,8); ctx.lineTo(-14,8);
+    ctx.quadraticCurveTo(-30,8,-30,0); ctx.closePath(); ctx.fill();
+    // верхний блик
+    ctx.fillStyle="rgba(255,255,255,.16)"; ctx.beginPath(); ctx.moveTo(-12,-6); ctx.lineTo(22,-6); ctx.quadraticCurveTo(34,-5.5,40,-3); ctx.quadraticCurveTo(20,-4.5,-12,-4.5); ctx.closePath(); ctx.fill();
+    // переднее крыло (с нижней гранью потемнее — объём)
+    ctx.fillStyle="#F5A05A"; ctx.beginPath(); ctx.moveTo(10,5); ctx.lineTo(-16,24); ctx.lineTo(2,7); ctx.closePath(); ctx.fill();
+    ctx.fillStyle="#E07F3E"; ctx.beginPath(); ctx.moveTo(2,7); ctx.lineTo(-16,24); ctx.lineTo(-7,9); ctx.closePath(); ctx.fill();
+    // двигатель
+    ctx.fillStyle="#2E6E6A"; ctx.beginPath(); ctx.ellipse(-1,13,8,4,0,0,7); ctx.fill(); ctx.fillStyle="#0B5E5E"; ctx.beginPath(); ctx.ellipse(-8,13,2.6,4,0,0,7); ctx.fill();
     // оранжевая полоса вдоль борта
-    ctx.fillStyle="#F5A05A"; ctx.fillRect(-26,1.5,62,2.2);
-    // кабина (нос)
-    ctx.fillStyle="#0B5E5E"; ctx.beginPath(); ctx.moveTo(44,0); ctx.quadraticCurveTo(36,-5,30,-4); ctx.lineTo(30,0); ctx.closePath(); ctx.fill();
-    ctx.fillStyle="#D7E8E8"; ctx.fillRect(31,-3.5,6,3);
+    ctx.strokeStyle="#F5A05A"; ctx.lineWidth=2.4; ctx.lineCap="round"; ctx.beginPath(); ctx.moveTo(-24,2); ctx.lineTo(40,1); ctx.stroke();
+    // кабина
+    ctx.fillStyle="#0B3F3F"; ctx.beginPath(); ctx.moveTo(48,0); ctx.quadraticCurveTo(40,-6,30,-5.5); ctx.lineTo(30,0); ctx.closePath(); ctx.fill();
+    ctx.fillStyle="#BFEBE6"; ctx.beginPath(); ctx.moveTo(44,-1); ctx.quadraticCurveTo(38,-4.4,32,-4); ctx.lineTo(32,-1); ctx.closePath(); ctx.fill();
     // иллюминаторы
-    ctx.fillStyle="#CFEAE5"; for(let i=0;i<8;i++){ ctx.fillRect(-16+i*4.6,-2.5,2.3,2.3); }
-    // надпись Hayot на борту
-    ctx.fillStyle="#fff"; ctx.font="700 8.5px Manrope,Arial,sans-serif"; ctx.textAlign="center"; ctx.textBaseline="middle"; ctx.fillText("Hayot",6,3.6);
-    // мигающий огонёк
-    if((((t/14)|0)%2)===0){ ctx.fillStyle="#E24B4A"; ctx.beginPath(); ctx.arc(44,0,1.6,0,7); ctx.fill(); }
+    ctx.fillStyle="#CFEAE5"; for(let i=0;i<7;i++){ ctx.beginPath(); ctx.arc(-12+i*5,-1.5,1.4,0,7); ctx.fill(); }
+    // надпись Hayot
+    ctx.fillStyle="#fff"; ctx.font="700 8px Manrope,Arial,sans-serif"; ctx.textAlign="center"; ctx.textBaseline="middle"; ctx.fillText("Hayot",6,3.4);
+    // мигающий огонёк на крыле
+    if((((t/12)|0)%2)===0){ ctx.fillStyle="#E24B4A"; ctx.beginPath(); ctx.arc(-16,24,1.8,0,7); ctx.fill(); }
     ctx.restore();
   }
   function ropeThief(cx,hy,side,reach,tt,planeY){
@@ -1227,30 +1469,56 @@ function finale(){
     [[7,44,1.05,.95],[15,92,0.8,.8],[5,150,1.3,.9],[19,206,0.72,.7],[11,256,0.95,.82]].forEach((c,i)=>{
       const cx=W+60-(((ct*c[0])+i*95)%span); cloud(cx,c[1],c[2],c[3]);
     });
-    if(started && !dead){
+    if(reviving){
+      reviveT++;
+      y += (H*0.42 - y)*0.14;
+      const pulse=0.5+0.5*Math.sin(reviveT*0.32);
+      ctx.save(); ctx.globalAlpha=0.16+0.18*pulse; ctx.fillStyle="#2F9E9B"; ctx.beginPath(); ctx.arc(px,y,24+pulse*10,0,7); ctx.fill(); ctx.restore();
+      for(let i=0;i<6;i++){ const rr=14+((reviveT*1.6+i*8)%32); ctx.save(); ctx.globalAlpha=Math.max(0,0.85-rr/36); ctx.fillStyle=i%2?"#F5A05A":"#fff"; ctx.beginPath(); ctx.arc(px+Math.cos(reviveT*0.13+i*1.05)*rr, y+20-rr*0.7, 2.1, 0, 7); ctx.fill(); ctx.restore(); }
+      ctx.save(); ctx.globalAlpha=clamp(reviveT/12,0,1); ctx.fillStyle="#0F7A7A"; ctx.font="700 12px Manrope,Arial,sans-serif"; ctx.textAlign="center"; ctx.fillText("Hayot Group поднимает вас", W/2, Math.max(22, y-36)); ctx.restore();
+      if(reviveT>46 || Math.abs(y-H*0.42)<1.5){ reviving=false; vy=0; }
+    }
+    else if(crashing){
+      crashVy += 0.65; y += crashVy; crashRot += 0.14;
+      crashPuffs.push({x:px-6+(Math.random()*8-4), y:y-4, r:3+Math.random()*2, life:0});
+      if(y>H+50){ crashing=false; showOver(); }
+    }
+    else if(started && !dead){
       t++; vy+=G; y+=vy;
-      const speed=Math.min(6, 2.0 + t*0.004);
+      const speed=Math.min(6.8, 4.0 + t*0.0017);
       spawnX-=speed;
-      const every=Math.max(150, 230 - t*0.05);
+      const every=Math.max(260, 305 - t*0.019);    // препятствия расставлены дальше; со временем чуть ближе
       if(spawnX<=0){ spawn(); spawnX=every; }
-      const pr={x:px-28,y:y-7,w:70,h:14};
+      // компактный хитбокс по фюзеляжу (без крыльев и носа) — честнее к игроку
+      const pr={x:px-16, y:y-5, w:46, h:10};
+      const BAND=15;   // «столб» воров уже, чем выглядит (учитываем только тела у верёвки)
+      const FG=6;      // прощаем лёгкое касание у самой кромки проёма
       for(const o of obs){
         o.x-=speed;
-        const ocx=o.x+o.w/2, bx0=ocx-22, bx1=ocx+22;
+        const ocx=o.x+o.w/2, bx0=ocx-BAND, bx1=ocx+BAND;
         if(!o.passed && bx1<pr.x){ o.passed=true; passed++; }
-        if(pr.x<bx1 && pr.x+pr.w>bx0 && (pr.y<o.gapY || pr.y+pr.h>o.gapY+o.gap)) die();
+        const overlapX = pr.x < bx1 && pr.x+pr.w > bx0;
+        const hitTop = pr.y < o.gapY - FG;
+        const hitBot = pr.y+pr.h > o.gapY + o.gap + FG;
+        if(overlapX && (hitTop || hitBot)) die();
       }
       flightScore=Math.round((passed*40 + t*0.6)*M);
       obs=obs.filter(o=>o.x>-o.w-12);
-      if(y<8 || y>H-8) die();
+      if(y<5 || y>H-5) die();
     }
+    for(const p of crashPuffs){ p.life++; p.r+=0.55; ctx.save(); ctx.globalAlpha=Math.max(0,0.5-p.life/42); ctx.fillStyle="#9AA8A8"; ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,7); ctx.fill(); ctx.restore(); }
+    crashPuffs=crashPuffs.filter(p=>p.life<42);
     for(const o of obs) obDraw(o);
     plane();
     const fs=document.getElementById("flyscore"); if(fs) fs.textContent=flightScore.toLocaleString("ru");
   }
   function die(){
-    if(dead) return; dead=true; cancelAnimationFrame(raf);
+    if(dead) return; dead=true;
     try{const tg=window.Telegram&&window.Telegram.WebApp; tg&&tg.HapticFeedback&&tg.HapticFeedback.notificationOccurred("error");}catch(e){}
+    crashing=true; crashVy=Math.max(vy,2.5); crashRot=clamp(vy/12,-0.3,0.6);   // самолёт срывается в падение
+  }
+  function showOver(){
+    cancelAnimationFrame(raf);
     const ov=document.createElement("div"); ov.className="fly-over";
     ov.innerHTML=`<div class="fly-card">
       <div class="fly-big">Полёт окончен</div>
@@ -1259,10 +1527,16 @@ function finale(){
       <button class="btn btn-ghost" id="finish">Завершить и записать результат</button>
     </div>`;
     wrap.appendChild(ov);
-    const rv=document.getElementById("revive"); if(rv) rv.onclick=()=>{ S.revived=true; ov.remove(); dead=false; obs=obs.filter(o=>o.x>px+130); y=H*0.42; vy=0; loop(); };
-    document.getElementById("finish").onclick=()=>{ wrap.removeEventListener("pointerdown",flap); document.removeEventListener("keydown",keyflap); S.log.flight.score=flightScore; S.log.flight.t=t; S.score=base+flightScore; endGame(); };
+    const rv=document.getElementById("revive"); if(rv) rv.onclick=()=>{
+      S.revived=true; ov.remove();
+      obs=obs.filter(o=>o.x>px+170);
+      crashing=false; crashPuffs=[]; crashRot=0;
+      y=H+40; vy=0; dead=false; reviving=true; reviveT=0;   // воскрешение: подъём снизу
+      loop();
+    };
+    document.getElementById("finish").onclick=()=>{ wrap.removeEventListener("pointerdown",onTap); document.removeEventListener("keydown",keyflap); S.log.flight.score=flightScore; S.log.flight.t=t; S.score=base+flightScore; endGame(); };
   }
-  loop();
+  loop();   // ждём тап игрока → затем отсчёт 3-2-1 → старт полёта
 }
 
 function startTimer(totalTenths){
@@ -1273,7 +1547,7 @@ function startTimer(totalTenths){
     left--;
     const sec=Math.ceil(left/10);
     if(fill) fill.style.width=(left/totalTenths*100)+"%";
-    if(lab) lab.innerHTML=`⏱ Осталось: <b>${sec}</b> сек · решайте быстрее ради очков`;
+    if(lab) lab.innerHTML=`⏱ <b>${sec}</b> сек`;
     if(bar && left<=totalTenths*0.4) bar.classList.add("warn");
     if(left<=0){ clearTimer(); timeUp(); }
   },100);
@@ -1286,7 +1560,7 @@ function tutorial(onDone){
     {sel:".rc.money",ic:"💰",h:"Капитал",p:"Деньги компании. Каждый месяц расходуются на работу. Если средства закончатся — на помощь придёт <b>Hayot Bank</b>: выдаст займ, чтобы продолжить путь."},
     {sel:".rc.users",ic:"👥",h:"Пользователи",p:"Чем их больше, тем выше выручка и итоговая оценка вашей компании."},
     {sel:".rc.team",ic:"⚡",h:"Команда",p:"Мотивация команды. Если упадёт до нуля — развитие остановится."},
-    {ic:"⏱",h:"Время и очки",p:"Единственно верного варианта нет — выбирайте то, что усилит компанию. Очки за ход зависят от состояния компании после решения (капитал, пользователи, команда) и от скорости ответа. Время на ход сокращается; таймер запустится, когда закроете инструкцию."},
+    {ic:"⏱",h:"Время и очки",p:"Единственно верного варианта нет — выбирайте то, что усилит компанию. На каждый ход даётся около 30 секунд: успеете прочитать и подумать, а за быстрый ответ — бонус к очкам."},
     {ic:"🏆",h:"Как победить",p:"В середине игры <b>Hayot Ventures</b> проведёт тап-раунд с множителем за вашу компанию, а в финале — полёт бизнеса: облетайте препятствия как можно дольше. Именно полёт приносит основную часть очков. Больше всех очков — победа!"},
   ];
   let i=0;
@@ -1298,7 +1572,7 @@ function tutorial(onDone){
     if(st.sel){ const el=document.querySelector(st.sel); if(el) el.classList.add("hl"); }
     mask.innerHTML=`<div class="tut-card"><div class="ic">${st.ic}</div><h3>${st.h}</h3><p>${st.p}</p>
       <div class="tut-dots">${steps.map((_,k)=>`<i class="${k===i?'on':''}"></i>`).join("")}</div>
-      <button class="btn btn-primary" id="tnext">${i<steps.length-1?'Далее →':'Поехали!'}</button></div>`;
+      <button class="btn btn-primary" id="tnext">${i<steps.length-1?'Далее →':'Начать'}</button></div>`;
     document.getElementById("tnext").onclick=()=>{ i++; if(i>=steps.length){ clearHl(); mask.remove(); onDone&&onDone(); } else show(); };
   }
   show();
@@ -1373,27 +1647,13 @@ function welcome(){
   document.getElementById("screen").innerHTML = `<div class="hero">
     ${LOGO}
     <h1>Путь <span class="em">основателя</span></h1>
-    <p>Конкурс-симулятор от <b>Hayot Ventures</b>. Проведите компанию через 12 решений и финальный полёт бизнеса. Побеждает участник, набравший больше всех очков.</p>
+    <p>Симулятор стартапа от <b>Hayot Ventures</b>. Пройдите 12 решений и финальный полёт бизнеса. Побеждает тот, кто наберёт больше очков.</p>
 
     <div class="wbanner" id="wbanner">${welcomeBanner()}<div class="wtag">📈 Превратите идею в растущий бизнес</div></div>
 
-    <div class="previewchips">
-      <button class="pchip" data-t="💰 Капитал — деньги компании. Каждый месяц тратятся на работу. Если закончатся — на помощь придёт Hayot Bank."><span>💰</span>Капитал</button>
-      <button class="pchip" data-t="👥 Пользователи — чем их больше, тем выше выручка и итоговая оценка вашего бизнеса."><span>👥</span>Пользователи</button>
-      <button class="pchip" data-t="⚡ Команда — мотивация команды. Если упадёт до нуля, развитие остановится."><span>⚡</span>Команда</button>
-    </div>
-    <div class="chiptip" id="chiptip">👆 Нажмите на показатель, чтобы узнать, за что он отвечает</div>
-
-    <div class="tipcard">
-      <div class="tiphead">💡 Знаете ли вы?</div>
-      <div class="tiptext" id="tiptext">${WTIPS[0]}</div>
-      <div class="tipnav"><div class="tipdots" id="tipdots"></div><button class="tipbtn" id="tipnext">Следующий совет →</button></div>
-    </div>
-
     <div class="about-hv">
-      <div class="ah-head">⬡ Игру создал венчурный фонд <b>Hayot Ventures</b></div>
-      <div class="ah-text">Мы инвестируем в идеи на самой ранней стадии — Pre-Seed. «Путь основателя» создан, чтобы сделать предпринимательство ближе и понятнее: в игровой форме пройти путь стартапа, прокачать бизнес-мышление и найти талантливых основателей. Лучших участников мы приглашаем подать заявку в фонд.</div>
-      <div class="ah-goals"><span>🎯 Развиваем предпринимательство</span><span>🔎 Ищем основателей</span><span>💡 Инвестируем в идеи</span></div>
+      <div class="ah-head">⬡ Игру создал фонд <b>Hayot Ventures</b></div>
+      <div class="ah-text">Мы инвестируем в идеи на ранней стадии (Pre-Seed). «Путь основателя» помогает развивать предпринимательство и находить талантливых основателей — лучших мы приглашаем подать заявку в фонд.</div>
     </div>
 
     <details class="rules rules-acc">
@@ -1402,7 +1662,7 @@ function welcome(){
         <li><b>Цель.</b> Набрать максимальное число очков и занять первое место в таблице лидеров.</li>
         <li><b>Показатели.</b> Капитал, Пользователи и Команда — поддерживайте их в балансе.</li>
         <li><b>Бюджет и Hayot Bank.</b> Следите за капиталом. Если средства закончатся, <b>Hayot Bank</b> (часть <b>Hayot Group</b>) выдаст экстренный займ, чтобы продолжить путь — под небольшой процент, который немного уменьшит итоговые очки.</li>
-        <li><b>Решения на время.</b> На каждый ход отводится ограниченное время, которое сокращается с каждым шагом. Быстрый ответ приносит больше очков, промедление — штраф.</li>
+        <li><b>Решения на время.</b> На каждый ход даётся около 30 секунд — успеете прочитать и подумать. Чем быстрее принято решение, тем больше бонус к очкам.</li>
         <li><b>Очки за ход.</b> Начисляются за состояние компании после решения (капитал, пользователи, команда) и за скорость ответа. Единственно верного варианта нет — выбирайте то, что усиливает компанию.</li>
         <li><b>Честная игра.</b> Варианты решений, их порядок и эффекты меняются каждую партию — заучить выигрышный шаблон невозможно.</li>
         <li><b>Помощь Hayot Ventures.</b> В середине игры фонд проводит тап-раунд. Множитель раунда складывается из состояния компании — капитала, числа пользователей и мотивации команды. Чем сильнее и сбалансированнее компания, тем выше множитель и тем больше очков приносит каждое нажатие.</li>
@@ -1412,28 +1672,12 @@ function welcome(){
       </ul>
     </details>
 
-    <div class="att">🎟 Попыток: <b id="attn">${att}</b> · +10 за каждого приглашённого друга (до 100)</div>
+    <div class="att">🎟 Попыток: <b id="attn">${att}</b></div>
     <button class="invite" onclick="invite()">📤 Пригласить друга (+10 попыток)</button>
-    <button class="btn btn-primary" onclick="tryStart()" style="margin-top:10px;">🚀 Начать</button>
+    <button class="btn btn-primary" onclick="tryStart()" style="margin-top:10px;">🚀 Начать игру</button>
   </div>`;
 
-  // интерактив: карусель советов
-  let ti=0;
-  const tt=document.getElementById("tiptext"), dots=document.getElementById("tipdots");
-  dots.innerHTML=WTIPS.map((_,k)=>`<i class="${k===0?'on':''}"></i>`).join("");
-  document.getElementById("tipnext").onclick=()=>{ ti=(ti+1)%WTIPS.length;
-    tt.classList.remove("fadein"); void tt.offsetWidth; tt.classList.add("fadein"); tt.innerHTML=WTIPS[ti];
-    dots.querySelectorAll("i").forEach((d,k)=>d.classList.toggle("on",k===ti));
-    try{const tg=window.Telegram&&window.Telegram.WebApp;tg&&tg.HapticFeedback&&tg.HapticFeedback.selectionChanged();}catch(e){} };
-
-  // интерактив: чипы-показатели
-  const ct=document.getElementById("chiptip");
-  document.querySelectorAll(".pchip").forEach(b=>b.addEventListener("click",()=>{
-    document.querySelectorAll(".pchip").forEach(x=>x.classList.remove("on")); b.classList.add("on");
-    ct.innerHTML=b.dataset.t; ct.classList.remove("fadein"); void ct.offsetWidth; ct.classList.add("fadein");
-    try{const tg=window.Telegram&&window.Telegram.WebApp;tg&&tg.HapticFeedback&&tg.HapticFeedback.selectionChanged();}catch(e){} }));
-
-  // интерактив: тап по баннеру — взлёт с эмодзи
+  // тап по баннеру — лёгкая анимация эмодзи
   const wb=document.getElementById("wbanner"), EMW=["📈","💹","🚀","💰","⭐"];
   wb.addEventListener("click",(e)=>{
     const fx=document.createElement("div"); fx.className="burstfx"; fx.textContent=EMW[Math.random()*EMW.length|0];
