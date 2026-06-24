@@ -98,9 +98,10 @@
 
   /* ── анимированная сцена-ролик под вопросом (пиксель-стиль) ── */
   .scene{aspect-ratio:4/3;border-radius:14px;margin-bottom:10px;overflow:hidden;border:1px solid var(--line);position:relative;
-    background:linear-gradient(180deg,#E6F3F0 0%,#F5F6F7 72%);}
+    background:#EAF5F2;}
   .scene svg{display:block;width:100%;height:100%;}
-  .scene-img{display:block;width:100%;height:100%;object-fit:cover;animation:sceneKen 9s ease-in-out infinite alternate;}
+  .scene-img{display:block;width:100%;height:100%;object-fit:contain;animation:sceneFloat 4.2s ease-in-out infinite;}
+  @keyframes sceneFloat{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-4px) scale(1.015)}}
   .scene-live{position:relative;overflow:hidden;}
   .scene::after,.scene-live::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(115deg,transparent 42%,rgba(255,255,255,.22) 50%,transparent 58%);transform:translateX(-130%);animation:shineSweep 5s ease-in-out infinite;}
   @keyframes shineSweep{0%{transform:translateX(-130%)}60%,100%{transform:translateX(130%)}}
@@ -419,28 +420,11 @@ function _load(key,file,cut){
   im.onerror=function(){};
   im.src=AB+file;
 }
-["founder","hero","scammer","plane","bank"].forEach(k=>_load(k, (k==="founder"?"founder_smart":k==="hero"?"hero_3d":k==="scammer"?"scammer_3d":k==="plane"?"plane_3d":"bank_3d")+".png", true));
-_load("scammer2","scammer_3d_2.png",true);
+["founder","hero"].forEach(k=>_load(k, (k==="founder"?"founder_smart":"hero_3d")+".png", true));
+_load("bank","bank_3d.png",false);
 ["fintech","ai","market","health","edtech","agro","logi","robo","food"].forEach(k=>_load("ic_"+k,"icon_"+k+".png",true));
 _load("sky","sky_bg.png",false);
 ["idea","build","signup","people","revenue","coins","chart","race","bug","handshake","stage","fintech","ai","market","health","edtech","agro","logi","robo","food","taphelp"].forEach(k=>_load("sc_"+k,"scene_"+k+".png",false));
-
-/* ── Покадровая анимация (флипбук): подхватывает кадры _2, если они есть ── */
-const FR2={};
-const FRFILE={founder:"founder_smart_2.png", hero:"hero_3d_2.png"};
-const FRKEYS=["founder","hero","sc_taphelp","sc_idea","sc_build","sc_signup","sc_people","sc_revenue","sc_coins","sc_chart","sc_handshake","sc_stage"];
-function _frFile(k){ return FRFILE[k] || ("scene_"+k.replace(/^sc_/,"")+"_2.png"); }
-FRKEYS.forEach(k=>{ const u=AB+_frFile(k); const im=new Image(); im.onload=()=>{ FR2[k]=u; }; im.onerror=()=>{}; im.src=u; });
-let _fp=0;
-setInterval(()=>{
-  _fp^=1;
-  document.querySelectorAll("[data-asset]").forEach(el=>{
-    const k=el.getAttribute("data-asset"); const f2=FR2[k]; if(!f2) return;
-    const url=_fp?f2:assetSrc(k);
-    if(el.tagName==="IMG"){ if(el.getAttribute("src")!==url) el.setAttribute("src",url); }
-    else { el.setAttribute("href",url); try{el.setAttributeNS("http://www.w3.org/1999/xlink","href",url);}catch(e){} }
-  });
-}, 650);
 document.addEventListener("gesturestart",function(e){e.preventDefault();},{passive:false});  // запрет pinch/двойного тапа на iOS
 document.addEventListener("dblclick",function(e){e.preventDefault();},{passive:false});
 const APPLY_URL = "https://t.me/hayotvcbot?start=apply";
@@ -1268,11 +1252,11 @@ function continueAfterOutcome(){
 }
 
 function tapStage(){
-  return `<div class="fund-stage scene-live" style="aspect-ratio:16/10;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,#EAF5F2,#F5F6F7);border-radius:18px;margin-bottom:14px"><img data-asset="sc_taphelp" src="${assetSrc('sc_taphelp')}" alt="" style="width:100%;height:100%;object-fit:cover;animation:sceneKen 9s ease-in-out infinite alternate"></div>`;
+  return `<div class="fund-stage scene-live" style="aspect-ratio:16/10;display:flex;align-items:center;justify-content:center;background:#EAF5F2;border-radius:18px;margin-bottom:14px"><img data-asset="sc_taphelp" src="${assetSrc('sc_taphelp')}" alt="" style="width:100%;height:100%;object-fit:contain;animation:sceneFloat 4.2s ease-in-out infinite"></div>`;
 }
 // ролик: Hayot Bank приходит на помощь
 function bankScene(){
-  return `<div class="fund-stage" style="height:152px;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,#D7E8E8,#F5F6F7)"><img data-asset="bank" src="${assetSrc('bank')}" alt="Hayot Bank" style="max-height:150px;max-width:92%;object-fit:contain;animation:wfloat 3.6s ease-in-out infinite"></div>`;
+  return `<div class="fund-stage" style="height:152px;display:flex;align-items:center;justify-content:center;background:#EAF5F2"><img data-asset="bank" src="${assetSrc('bank')}" alt="Hayot Bank" style="width:100%;height:100%;object-fit:contain;animation:wfloat 3.6s ease-in-out infinite"></div>`;
   const coins = [[78,18,0],[96,12,.25],[114,20,.5],[132,14,.15],[150,22,.4],[120,30,.6]]
     .map(([x,y,d])=>`<g transform="translate(${x},${y})"><g class="cn" style="animation-delay:${d}s"><circle r="6" fill="#F5A05A" stroke="#D9852F" stroke-width="1.3"/><text y="3.2" text-anchor="middle" font-size="8" font-weight="800" fill="#7A4A12" font-family="Arial">$</text></g></g>`).join("");
   const sparks=[[150,40,0],[58,48,.5],[176,72,.8],[40,80,.3]]
@@ -1444,7 +1428,7 @@ function finale(){
   function plane(){
     const _tgtR = crashing ? crashRot : clamp(vy/12,-0.28,0.42); _rotS += (_tgtR-_rotS)*0.16; const _rot=_rotS;
     ctx.save(); ctx.translate(px,y); ctx.rotate(_rot);
-    if(IMG.plane){ const w=92, h=w*(IMG.plane.height/IMG.plane.width); ctx.drawImage(IMG.plane, -w*0.46, -h/2, w, h); ctx.restore(); return; }
+    // векторный самолёт (чёткий, с надписью Hayot и фирменной полосой) — растровый отключён намеренно
     // мягкая тень под самолётом
     ctx.save(); ctx.globalAlpha=0.12; ctx.fillStyle="#0B5E5E"; ctx.beginPath(); ctx.ellipse(0,17,30,6,0,0,7); ctx.fill(); ctx.restore();
     // инверсионный след
@@ -1530,8 +1514,9 @@ function finale(){
     ctx.beginPath(); ctx.arc(hX,hY,2.8,0,7); ctx.fill();
     // ГОЛОВА
     ctx.fillStyle="#E7C9A1"; ctx.beginPath(); ctx.arc(bx,by-13,6.6,0,7); ctx.fill();
-    // шапка-бини
-    ctx.fillStyle="#141414"; ctx.beginPath(); ctx.arc(bx,by-15,6.9,Math.PI,2*Math.PI); ctx.fill(); ctx.fillRect(bx-7,by-16,14,2.6);
+    // тюбетейка (доппи) — узбекский колорит
+    ctx.fillStyle="#15161A"; ctx.beginPath(); ctx.arc(bx,by-15,6.5,Math.PI,2*Math.PI); ctx.fill(); ctx.fillRect(bx-7,by-15.4,14,2.2);
+    ctx.fillStyle="#EDEDED"; for(let k=-2;k<=2;k++){ ctx.fillRect(bx+k*2.3-0.4,by-17.2,0.8,0.8); }
     // маска на глаза
     ctx.fillStyle="#141414"; ctx.fillRect(bx-6,by-14,12,3.6);
     ctx.fillStyle="#fff"; ctx.fillRect(bx-4,by-13.2,2.4,2.2); ctx.fillRect(bx+1.6,by-13.2,2.4,2.2);
