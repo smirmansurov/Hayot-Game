@@ -1382,7 +1382,7 @@ function finale(){
   const W=cssW, H=cssH;
   let started=false, counting=false, dead=false, t=0, raf=0;
   let demo=true, demoT=0;
-  let crashing=false, crashVy=0, crashRot=0, crashPuffs=[], enginePuffs=[];
+  let crashing=false, crashVy=0, crashRot=0, crashPuffs=[], enginePuffs=[], _rotS=0;
   let reviving=false, reviveT=0;
   let y=H*0.42, vy=0; const px=72;
   const G=0.45, JUMP=-6.8;
@@ -1438,7 +1438,7 @@ function finale(){
     ctx.fill(); ctx.restore();
   }
   function plane(){
-    const _rot = crashing ? crashRot : clamp(vy/12,-0.30,0.45);
+    const _tgtR = crashing ? crashRot : clamp(vy/12,-0.28,0.42); _rotS += (_tgtR-_rotS)*0.16; const _rot=_rotS;
     ctx.save(); ctx.translate(px,y); ctx.rotate(_rot);
     if(IMG.plane){ const w=92, h=w*(IMG.plane.height/IMG.plane.width); ctx.drawImage(IMG.plane, -w*0.46, -h/2, w, h); ctx.restore(); return; }
     // мягкая тень под самолётом
@@ -1548,7 +1548,7 @@ function finale(){
   function loop(){
     raf=requestAnimationFrame(loop);
     ctx.clearRect(0,0,W,H);
-    if(IMG.sky){ ctx.drawImage(IMG.sky,0,0,W,H); }
+    if(IMG.sky){ const so=(performance.now()*0.018)%W; ctx.drawImage(IMG.sky,-so,0,W,H); ctx.drawImage(IMG.sky,W-so,0,W,H); }
     else {
     const ct=performance.now()/1000, span=W+120;
     [[7,44,1.05,.95],[15,92,0.8,.8],[5,150,1.3,.9],[19,206,0.72,.7],[11,256,0.95,.82]].forEach((c,i)=>{
