@@ -72,6 +72,9 @@
   .hero h1{font-family:var(--serif);font-size:34px;font-weight:800;letter-spacing:-.3px;line-height:1.12;}
   .hero h1 .em{font-style:italic;color:var(--teal);}
   .hero p{color:var(--muted);font-size:15px;line-height:1.6;margin:12px 0 18px;}
+  .how{display:flex;flex-direction:column;gap:8px;text-align:left;margin:14px 0 4px;}
+  .how-row{display:flex;gap:10px;align-items:flex-start;background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:13.5px;line-height:1.45;color:var(--ink);}
+  .how-n{flex:none;width:22px;height:22px;border-radius:50%;background:var(--teal);color:#fff;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;}
   .how{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px 18px;text-align:left;margin-bottom:20px;}
   .how b{font-size:13px;}
   .how div{font-size:13px;color:var(--muted);line-height:1.7;margin-top:6px;}
@@ -417,6 +420,7 @@ function _load(key,file,cut){
   im.src=AB+file;
 }
 ["founder","hero","scammer","plane","bank"].forEach(k=>_load(k, (k==="founder"?"founder_smart":k==="hero"?"hero_3d":k==="scammer"?"scammer_3d":k==="plane"?"plane_3d":"bank_3d")+".png", true));
+_load("scammer2","scammer_3d_2.png",true);
 ["fintech","ai","market","health","edtech","agro","logi","robo","food"].forEach(k=>_load("ic_"+k,"icon_"+k+".png",true));
 _load("sky","sky_bg.png",false);
 ["idea","build","signup","people","revenue","coins","chart","race","bug","handshake","stage","fintech","ai","market","health","edtech","agro","logi","robo","food","taphelp"].forEach(k=>_load("sc_"+k,"scene_"+k+".png",false));
@@ -1486,10 +1490,11 @@ function finale(){
     const by = hy + 18;                                  // центр торса ниже кисти
     if(IMG.scammer){
       ctx.strokeStyle="#8A6A3A"; ctx.lineWidth=3; ctx.beginPath(); ctx.moveTo(cx,hy); ctx.lineTo(bx,by-14); ctx.stroke();
-      const w=46, h=w*(IMG.scammer.height/IMG.scammer.width);
+      const simg = (IMG.scammer2 && (((Math.floor(tt/15)+Math.round(ph*4))&1)===0)) ? IMG.scammer2 : IMG.scammer;
+      const w=46, h=w*(simg.height/simg.width);
       ctx.save();
-      if(side<0){ ctx.translate(bx,0); ctx.scale(-1,1); ctx.drawImage(IMG.scammer,-w/2,by-h*0.40,w,h); }
-      else { ctx.drawImage(IMG.scammer,bx-w/2,by-h*0.40,w,h); }
+      if(side<0){ ctx.translate(bx,0); ctx.scale(-1,1); ctx.drawImage(simg,-w/2,by-h*0.40,w,h); }
+      else { ctx.drawImage(simg,bx-w/2,by-h*0.40,w,h); }
       ctx.restore(); return;
     }
     ctx.lineCap="round"; ctx.lineJoin="round";
@@ -1750,43 +1755,32 @@ function welcome(){
   document.getElementById("screen").innerHTML = `<div class="hero">
     ${LOGO}
     <h1>Путь <span class="em">основателя</span></h1>
-    <p>Симулятор стартапа от <b>Hayot Ventures</b>. Пройдите 12 решений и финальный полёт бизнеса. Побеждает тот, кто наберёт больше очков.</p>
+    <p>Игра от фонда <b>Hayot Ventures</b>: проведите стартап от идеи до раунда и наберите больше всех очков.</p>
 
     <div class="welcome-founder"><img data-asset="founder" src="${assetSrc('founder')}" alt="Hayot Ventures"></div>
-    <div class="wbanner" id="wbanner">${welcomeBanner()}<div class="wtag">📈 Превратите идею в растущий бизнес</div></div>
 
-    <div class="about-hv">
-      <div class="ah-head">⬡ Игру создал фонд <b>Hayot Ventures</b></div>
-      <div class="ah-text">Мы инвестируем в идеи на ранней стадии (Pre-Seed). «Путь основателя» помогает развивать предпринимательство и находить талантливых основателей — лучших мы приглашаем подать заявку в фонд.</div>
+    <div class="how">
+      <div class="how-row"><span class="how-n">1</span><span><b>12 решений.</b> Каждый выбор меняет капитал, пользователей и команду — держите их в балансе.</span></div>
+      <div class="how-row"><span class="how-n">2</span><span><b>Раунд с фондом.</b> В середине игры Hayot Ventures устраивает тап-раунд: очки множатся на силу вашей компании.</span></div>
+      <div class="how-row"><span class="how-n">3</span><span><b>Финальный полёт.</b> Проведите самолёт сквозь препятствия — чем дольше летите, тем больше очков.</span></div>
     </div>
 
     <details class="rules rules-acc">
-      <summary>📋 Правила конкурса <span class="chev">▾</span></summary>
+      <summary>📋 Правила и призы <span class="chev">▾</span></summary>
       <ul>
-        <li><b>Цель.</b> Набрать максимальное число очков и занять первое место в таблице лидеров.</li>
-        <li><b>Показатели.</b> Капитал, Пользователи и Команда — поддерживайте их в балансе.</li>
-        <li><b>Бюджет и Hayot Bank.</b> Следите за капиталом. Если средства закончатся, <b>Hayot Bank</b> (часть <b>Hayot Group</b>) выдаст экстренный займ, чтобы продолжить путь — под небольшой процент, который немного уменьшит итоговые очки.</li>
-        <li><b>Решения на время.</b> На каждый ход даётся около 30 секунд — успеете прочитать и подумать. Чем быстрее принято решение, тем больше бонус к очкам.</li>
-        <li><b>Очки за ход.</b> Начисляются за состояние компании после решения (капитал, пользователи, команда) и за скорость ответа. Единственно верного варианта нет — выбирайте то, что усиливает компанию.</li>
-        <li><b>Честная игра.</b> Варианты решений, их порядок и эффекты меняются каждую партию — заучить выигрышный шаблон невозможно.</li>
-        <li><b>Помощь Hayot Ventures.</b> В середине игры фонд проводит тап-раунд. Множитель раунда складывается из состояния компании — капитала, числа пользователей и мотивации команды. Чем сильнее и сбалансированнее компания, тем выше множитель и тем больше очков приносит каждое нажатие.</li>
-        <li><b>Финал — полёт бизнеса.</b> Основная часть очков. Ваш бизнес летит, а вы облетаете препятствия; сложность нарастает со временем. Чем дольше длится полёт, тем больше очков.</li>
-        <li><b>Попытки.</b> Для участия пригласите как минимум одного друга. За каждого присоединившегося начисляется +10 попыток (не более 100). В зачёт идёт лучший из ваших результатов.</li>
-        <li><b>Запрещено.</b> Боты, автокликеры и сторонние программы, накрутка результатов, мультиаккаунты. Результаты лидеров проверяются вручную; нарушители дисквалифицируются.</li>
+        <li><b>Цель.</b> Набрать максимум очков и подняться в таблице лидеров.</li>
+        <li><b>Очки.</b> За состояние компании после каждого решения и за скорость ответа; в полёте — за пройденную дистанцию.</li>
+        <li><b>Деньги.</b> Если капитал кончится, Hayot Bank выдаст займ под небольшой процент — он чуть снизит итоговые очки.</li>
+        <li><b>Попытки.</b> Пригласите друга — +10 попыток (до 100). В зачёт идёт лучший результат.</li>
+        <li><b>Честная игра.</b> Варианты и эффекты меняются каждую партию. Боты и накрутка — дисквалификация.</li>
       </ul>
     </details>
 
     <div class="att">🎟 Попыток: <b id="attn">${att}</b></div>
     <button class="invite" onclick="invite()">📤 Пригласить друга (+10 попыток)</button>
-    <button class="btn btn-primary" onclick="tryStart()" style="margin-top:10px;">🚀 Начать игру</button>
+    <button class="btn btn-primary" onclick="tryStart()" style="margin-top:10px;">🚀 Начать</button>
   </div>`;
 
-  // тап по баннеру — лёгкая анимация эмодзи
-  const wb=document.getElementById("wbanner"), EMW=["📈","💹","🚀","💰","⭐"];
-  wb.addEventListener("click",(e)=>{
-    const fx=document.createElement("div"); fx.className="burstfx"; fx.textContent=EMW[Math.random()*EMW.length|0];
-    fx.style.left=(20+Math.random()*60)+"%"; wb.appendChild(fx); setTimeout(()=>fx.remove(),900);
-    try{const tg=window.Telegram&&window.Telegram.WebApp;tg&&tg.HapticFeedback&&tg.HapticFeedback.impactOccurred("light");}catch(e){} });
 }
 function showDirs(){
   document.getElementById("hud").classList.add("hidden");
