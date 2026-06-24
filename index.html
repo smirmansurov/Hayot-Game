@@ -100,7 +100,7 @@
   .scene{aspect-ratio:4/3;border-radius:14px;margin-bottom:10px;overflow:hidden;border:1px solid var(--line);position:relative;
     background:#EAF5F2;}
   .scene svg{display:block;width:100%;height:100%;}
-  .scene-img{display:block;width:100%;height:100%;object-fit:contain;animation:sceneFloat 4.2s ease-in-out infinite;}
+  .scene-img{display:block;width:100%;height:100%;object-fit:cover;animation:sceneKen 9s ease-in-out infinite alternate;}
   @keyframes sceneFloat{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-4px) scale(1.015)}}
   .scene-live{position:relative;overflow:hidden;}
   .scene::after,.scene-live::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(115deg,transparent 42%,rgba(255,255,255,.22) 50%,transparent 58%);transform:translateX(-130%);animation:shineSweep 5s ease-in-out infinite;}
@@ -420,7 +420,8 @@ function _load(key,file,cut){
   im.onerror=function(){};
   im.src=AB+file;
 }
-["founder","hero"].forEach(k=>_load(k, (k==="founder"?"founder_smart":"hero_3d")+".png", true));
+["founder","hero","scammer","plane"].forEach(k=>_load(k, (k==="founder"?"founder_smart":k==="hero"?"hero_3d":k==="scammer"?"scammer_3d":"plane_3d")+".png", true));
+_load("scammer2","scammer_3d_2.png",true);
 _load("bank","bank_3d.png",false);
 ["fintech","ai","market","health","edtech","agro","logi","robo","food"].forEach(k=>_load("ic_"+k,"icon_"+k+".png",true));
 _load("sky","sky_bg.png",false);
@@ -1252,7 +1253,7 @@ function continueAfterOutcome(){
 }
 
 function tapStage(){
-  return `<div class="fund-stage scene-live" style="aspect-ratio:16/10;display:flex;align-items:center;justify-content:center;background:#EAF5F2;border-radius:18px;margin-bottom:14px"><img data-asset="sc_taphelp" src="${assetSrc('sc_taphelp')}" alt="" style="width:100%;height:100%;object-fit:contain;animation:sceneFloat 4.2s ease-in-out infinite"></div>`;
+  return `<div class="fund-stage scene-live" style="aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;background:#EAF5F2;border-radius:18px;margin-bottom:14px"><img data-asset="sc_taphelp" src="${assetSrc('sc_taphelp')}" alt="" style="width:100%;height:100%;object-fit:cover;object-position:center;animation:sceneKen 9s ease-in-out infinite alternate"></div>`;
 }
 // ролик: Hayot Bank приходит на помощь
 function bankScene(){
@@ -1428,7 +1429,7 @@ function finale(){
   function plane(){
     const _tgtR = crashing ? crashRot : clamp(vy/12,-0.28,0.42); _rotS += (_tgtR-_rotS)*0.16; const _rot=_rotS;
     ctx.save(); ctx.translate(px,y); ctx.rotate(_rot);
-    // векторный самолёт (чёткий, с надписью Hayot и фирменной полосой) — растровый отключён намеренно
+    if(IMG.plane){ const w=92, h=w*(IMG.plane.height/IMG.plane.width); ctx.drawImage(IMG.plane, -w*0.46, -h/2, w, h); ctx.restore(); return; }
     // мягкая тень под самолётом
     ctx.save(); ctx.globalAlpha=0.12; ctx.fillStyle="#0B5E5E"; ctx.beginPath(); ctx.ellipse(0,17,30,6,0,0,7); ctx.fill(); ctx.restore();
     // инверсионный след
@@ -1474,7 +1475,7 @@ function finale(){
     const by = hy + 18;                                  // центр торса ниже кисти
     if(IMG.scammer){
       ctx.strokeStyle="#8A6A3A"; ctx.lineWidth=3; ctx.beginPath(); ctx.moveTo(cx,hy); ctx.lineTo(bx,by-14); ctx.stroke();
-      const simg = (IMG.scammer2 && (((Math.floor(tt/15)+Math.round(ph*4))&1)===0)) ? IMG.scammer2 : IMG.scammer;
+      let simg=IMG.scammer; if(reach && IMG.scammer2){ simg = (0.5+0.5*Math.sin(tt*0.16+ph))>0.5 ? IMG.scammer2 : IMG.scammer; }
       const w=46, h=w*(simg.height/simg.width);
       ctx.save();
       if(side<0){ ctx.translate(bx,0); ctx.scale(-1,1); ctx.drawImage(simg,-w/2,by-h*0.40,w,h); }
@@ -1538,12 +1539,12 @@ function finale(){
   function loop(){
     raf=requestAnimationFrame(loop);
     ctx.clearRect(0,0,W,H);
-    if(IMG.sky){ const so=(performance.now()*0.018)%W; ctx.drawImage(IMG.sky,-so,0,W,H); ctx.drawImage(IMG.sky,W-so,0,W,H); }
-    else {
-    const ct=performance.now()/1000, span=W+120;
-    [[7,44,1.05,.95],[15,92,0.8,.8],[5,150,1.3,.9],[19,206,0.72,.7],[11,256,0.95,.82]].forEach((c,i)=>{
-      const cx=W+60-(((ct*c[0])+i*95)%span); cloud(cx,c[1],c[2],c[3]);
-    });
+    if(IMG.sky){ ctx.drawImage(IMG.sky,0,0,W,H); }
+    else { ctx.fillStyle="#CBE8F5"; ctx.fillRect(0,0,W,H); }
+    { const ct=performance.now()/1000, span=W+120;
+      [[7,44,1.05,.95],[15,92,0.8,.8],[5,150,1.3,.9],[19,206,0.72,.7],[11,256,0.95,.82]].forEach((c,i)=>{
+        const cx=W+60-(((ct*c[0])+i*95)%span); cloud(cx,c[1],c[2],c[3]);
+      });
     }
     if(demo){
       demoT++;
