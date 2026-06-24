@@ -94,10 +94,13 @@
   .hidden{display:none;}
 
   /* ── анимированная сцена-ролик под вопросом (пиксель-стиль) ── */
-  .scene{height:182px;border-radius:14px;margin-bottom:10px;overflow:hidden;border:1px solid var(--line);
+  .scene{aspect-ratio:4/3;border-radius:14px;margin-bottom:10px;overflow:hidden;border:1px solid var(--line);position:relative;
     background:linear-gradient(180deg,#E6F3F0 0%,#F5F6F7 72%);}
   .scene svg{display:block;width:100%;height:100%;}
-  .scene-img{display:block;width:100%;height:100%;object-fit:contain;animation:sceneKen 9s ease-in-out infinite alternate;}
+  .scene-img{display:block;width:100%;height:100%;object-fit:cover;animation:sceneKen 9s ease-in-out infinite alternate;}
+  .scene-live{position:relative;overflow:hidden;}
+  .scene::after,.scene-live::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(115deg,transparent 42%,rgba(255,255,255,.22) 50%,transparent 58%);transform:translateX(-130%);animation:shineSweep 5s ease-in-out infinite;}
+  @keyframes shineSweep{0%{transform:translateX(-130%)}60%,100%{transform:translateX(130%)}}
   html,body{touch-action:manipulation;}
   .tap-btn,.fly-wrap,#fly,.opt,.btn{touch-action:manipulation;}
   @keyframes sceneKen{from{transform:scale(1.0)}to{transform:scale(1.03)}}
@@ -416,7 +419,24 @@ function _load(key,file,cut){
 ["founder","hero","scammer","plane","bank"].forEach(k=>_load(k, (k==="founder"?"founder_smart":k==="hero"?"hero_3d":k==="scammer"?"scammer_3d":k==="plane"?"plane_3d":"bank_3d")+".png", true));
 ["fintech","ai","market","health","edtech","agro","logi","robo","food"].forEach(k=>_load("ic_"+k,"icon_"+k+".png",true));
 _load("sky","sky_bg.png",false);
-["idea","build","signup","people","revenue","coins","chart","race","bug","handshake","stage","fintech","ai","market","health","edtech","agro","logi","robo","food"].forEach(k=>_load("sc_"+k,"scene_"+k+".png",false));
+["idea","build","signup","people","revenue","coins","chart","race","bug","handshake","stage","fintech","ai","market","health","edtech","agro","logi","robo","food","taphelp"].forEach(k=>_load("sc_"+k,"scene_"+k+".png",false));
+
+/* ── Покадровая анимация (флипбук): подхватывает кадры _2, если они есть ── */
+const FR2={};
+const FRFILE={founder:"founder_smart_2.png", hero:"hero_3d_2.png"};
+const FRKEYS=["founder","hero","sc_taphelp","sc_idea","sc_build","sc_signup","sc_people","sc_revenue","sc_coins","sc_chart","sc_handshake","sc_stage"];
+function _frFile(k){ return FRFILE[k] || ("scene_"+k.replace(/^sc_/,"")+"_2.png"); }
+FRKEYS.forEach(k=>{ const u=AB+_frFile(k); const im=new Image(); im.onload=()=>{ FR2[k]=u; }; im.onerror=()=>{}; im.src=u; });
+let _fp=0;
+setInterval(()=>{
+  _fp^=1;
+  document.querySelectorAll("[data-asset]").forEach(el=>{
+    const k=el.getAttribute("data-asset"); const f2=FR2[k]; if(!f2) return;
+    const url=_fp?f2:assetSrc(k);
+    if(el.tagName==="IMG"){ if(el.getAttribute("src")!==url) el.setAttribute("src",url); }
+    else { el.setAttribute("href",url); try{el.setAttributeNS("http://www.w3.org/1999/xlink","href",url);}catch(e){} }
+  });
+}, 650);
 document.addEventListener("gesturestart",function(e){e.preventDefault();},{passive:false});  // запрет pinch/двойного тапа на iOS
 document.addEventListener("dblclick",function(e){e.preventDefault();},{passive:false});
 const APPLY_URL = "https://t.me/hayotvcbot?start=apply";
@@ -425,7 +445,12 @@ function goApply(){
   try{ const tg=window.Telegram&&window.Telegram.WebApp; if(tg&&tg.openTelegramLink){ tg.openTelegramLink(url); return; } }catch(e){}
   try{ window.open(url,"_blank"); }catch(e){ location.href=url; }
 }
-const LOGO = `<svg viewBox="0 0 100 100" width="84" height="84"><polygon points="50,8 70,20 70,44 50,56 30,44 30,20" fill="#1F5B57"/><polygon points="92,50 92,74 72,86 52,74 52,50 72,38" fill="#F5A05A"/><polygon points="50,92 30,80 30,56 50,44 70,56 70,80" fill="#2E6E6A"/><polygon points="8,50 8,26 28,14 48,26 48,50 28,62" fill="#5FA8A4"/></svg>`;
+const LOGO = `<svg viewBox="0 0 30 30" width="84" height="84" aria-label="Hayot Ventures">
+  <path d="M8.04656 0.000120163L14.9332 6.87664L12.6498 12.6314L6.88661 14.9114L0 8.0349L2.27116 2.28986L8.04656 0.000120163Z" fill="#02676C"/>
+  <path d="M14.9297 6.87652L21.8163 0L27.5795 2.28001L29.8628 8.03478L22.9762 14.9113L17.2227 12.6434L14.9297 6.87652Z" fill="#FF7733"/>
+  <path d="M22.9762 14.9139L29.8628 21.7905L27.5795 27.5453L21.8163 29.8253L14.9297 22.9487L17.2008 17.2037L22.9762 14.9139Z" fill="#02676C"/>
+  <path d="M0 21.7905L6.88661 14.9139L12.6498 17.1916L14.9332 22.9487L8.04656 29.8253L2.2931 27.5574L0 21.7905Z" fill="#02676C"/>
+</svg>`;
 
 // Направления стартапа — выбор на старте
 const DIRS = [
@@ -1239,19 +1264,7 @@ function continueAfterOutcome(){
 }
 
 function tapStage(){
-  const O="#F5A05A";
-  const PIN = `<polygon points="50,8 70,20 70,44 50,56 30,44 30,20" fill="#1F5B57"/><polygon points="92,50 92,74 72,86 52,74 52,50 72,38" fill="#F5A05A"/><polygon points="50,92 30,80 30,56 50,44 70,56 70,80" fill="#2E6E6A"/><polygon points="8,50 8,26 28,14 48,26 48,50 28,62" fill="#5FA8A4"/>`;
-  const rays = Array.from({length:12}).map((_,i)=>`<polygon points="0,-5 0,5 64,0" fill="rgba(255,255,255,.22)" transform="rotate(${i*30})"/>`).join("");
-  const confetti = [['#fff',30,2.2,0],[O,60,2.6,.3],['#D7E8E8',92,2.0,.6],['#fff',128,2.8,.15],[O,160,2.3,.45]]
-    .map(([c,x,d,dl])=>`<g transform="translate(${x},-6)"><g class="cf" style="animation-duration:${d}s;animation-delay:${dl}s"><rect x="-3" y="-3" width="6" height="6" rx="1.5" fill="${c}"/></g></g>`).join("");
-  return `<div class="fund-stage" style="height:132px"><svg viewBox="0 0 200 132" width="100%" height="132">
-    <g transform="translate(100,58)"><g class="rays">${rays}</g></g>
-    <circle class="glowp" cx="100" cy="58" r="30" fill="rgba(255,255,255,.45)"/>
-    <g transform="translate(100,34)"><g class="badgein"><g transform="scale(0.38) translate(-50,-50)">${PIN}</g></g></g>
-    ${confetti}
-    <g transform="translate(58,112)"><g class="flyL"><g class="floaty">${hero()}</g></g></g>
-    <g transform="translate(142,112)"><g class="flyR"><g class="floaty" style="animation-delay:.3s">${hero()}</g></g></g>
-    <g transform="translate(100,110)"><g class="floaty" style="animation-delay:.6s">${fig()}</g></g></svg></div>`;
+  return `<div class="fund-stage scene-live" style="aspect-ratio:16/10;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,#EAF5F2,#F5F6F7);border-radius:18px;margin-bottom:14px"><img data-asset="sc_taphelp" src="${assetSrc('sc_taphelp')}" alt="" style="width:100%;height:100%;object-fit:cover;animation:sceneKen 9s ease-in-out infinite alternate"></div>`;
 }
 // ролик: Hayot Bank приходит на помощь
 function bankScene(){
@@ -1369,13 +1382,13 @@ function finale(){
   const W=cssW, H=cssH;
   let started=false, counting=false, dead=false, t=0, raf=0;
   let demo=true, demoT=0;
-  let crashing=false, crashVy=0, crashRot=0, crashPuffs=[];
+  let crashing=false, crashVy=0, crashRot=0, crashPuffs=[], enginePuffs=[];
   let reviving=false, reviveT=0;
   let y=H*0.42, vy=0; const px=72;
   const G=0.45, JUMP=-6.8;
   let obs=[], spawnX=0, passed=0, flightScore=0;
   if(!S.log.flight) S.log.flight={seed:S.seed, inputs:[]};
-  function flap(){ if(dead||!started) return; vy=JUMP; S.log.flight.inputs.push(Math.round(performance.now())); }
+  function flap(){ if(dead||!started) return; vy=JUMP; for(let i=0;i<4;i++) enginePuffs.push({x:px-30,y:y+(Math.random()*8-4),vx:-(2+Math.random()*2.2),r:3+Math.random()*3,life:0}); S.log.flight.inputs.push(Math.round(performance.now())); }
   function onTap(){ if(started && !dead) flap(); }   // поле реагирует только в полёте — случайные касания игру не запускают
   function keyflap(e){ if(e.code==="Space"){ e.preventDefault(); onTap(); } }
   wrap.addEventListener("pointerdown",onTap);
@@ -1590,6 +1603,8 @@ function finale(){
     }
     for(const p of crashPuffs){ p.life++; p.r+=0.55; ctx.save(); ctx.globalAlpha=Math.max(0,0.5-p.life/42); ctx.fillStyle="#9AA8A8"; ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,7); ctx.fill(); ctx.restore(); }
     crashPuffs=crashPuffs.filter(p=>p.life<42);
+    for(const p of enginePuffs){ p.life++; p.x+=p.vx; p.r+=0.4; ctx.save(); ctx.globalAlpha=Math.max(0,0.55-p.life/22); ctx.fillStyle=p.life<7?"#FFC65A":"#CFE6E1"; ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,7); ctx.fill(); ctx.restore(); }
+    enginePuffs=enginePuffs.filter(p=>p.life<22);
     for(const o of obs) obDraw(o);
     plane();
     const fs=document.getElementById("flyscore"); if(fs) fs.textContent=flightScore.toLocaleString("ru");
@@ -1612,9 +1627,9 @@ function finale(){
     const rv=document.getElementById("revive"); if(rv) rv.onclick=()=>{
       S.revived=true; ov.remove();
       obs=obs.filter(o=>o.x>px+170);
-      crashing=false; crashPuffs=[]; crashRot=0;
-      y=H+40; vy=0; dead=false; reviving=true; reviveT=0;   // воскрешение: подъём снизу
-      loop();
+      crashing=false; crashPuffs=[]; enginePuffs=[]; crashRot=0;
+      y=H*0.42; vy=0; dead=false;
+      countdown(()=>{ started=true; vy=JUMP; loop(); });   // таймер 3-2-1 перед продолжением
     };
     document.getElementById("finish").onclick=()=>{ wrap.removeEventListener("pointerdown",onTap); document.removeEventListener("keydown",keyflap); S.log.flight.score=flightScore; S.log.flight.t=t; S.score=base+flightScore; endGame(); };
   }
@@ -1700,18 +1715,24 @@ function endGame(reason){
 function stat(ic,v,fmt){return `<div class="rc2"><b>${ic} ${fmt?Math.round(v).toLocaleString("ru"):Math.round(v)}</b><span>${ic=="💰"?"тыс. $":ic=="👥"?"юзеров":"мораль"}</span></div>`;}
 
 function welcomeBanner(){
-  const bars=[[24,18],[60,28],[96,24],[132,40],[168,34],[204,50],[240,44],[268,60]];
-  const barsvg=bars.map(([x,h],i)=>{const lo=(h*0.55).toFixed(0),y0=(74-h*0.55).toFixed(0),y1=74-h;
-    return `<rect x="${x}" width="20" rx="4" fill="${i%2?'#2F9E9B':'#0F7A7A'}">`+
-      `<animate attributeName="height" values="${lo};${h};${lo}" dur="2.6s" begin="-${(i*0.18).toFixed(2)}s" repeatCount="indefinite" calcMode="spline" keyTimes="0;0.5;1" keySplines="0.4 0 0.2 1;0.4 0 0.2 1"/>`+
-      `<animate attributeName="y" values="${y0};${y1};${y0}" dur="2.6s" begin="-${(i*0.18).toFixed(2)}s" repeatCount="indefinite" calcMode="spline" keyTimes="0;0.5;1" keySplines="0.4 0 0.2 1;0.4 0 0.2 1"/></rect>`;}).join("");
-  return `<svg viewBox="0 0 300 86" width="100%" preserveAspectRatio="xMidYMid slice" style="display:block">
-    <defs><linearGradient id="wsky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#EAF5F2"/><stop offset="1" stop-color="#F8FAFA"/></linearGradient></defs>
-    <rect width="300" height="86" fill="url(#wsky)"/>
-    <line x1="8" y1="74" x2="292" y2="74" stroke="#CFE4E2" stroke-width="2"/>
-    ${barsvg}
-    <polyline points="20,60 80,48 140,40 200,26 262,14" fill="none" stroke="#F5A05A" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
-    <g transform="translate(262,14)"><polygon points="0,0 -10,-1 -4,-9" fill="#F5A05A"/><g class="spark"><polygon points="0,-9 1.4,-3 7,-1.6 1.4,0 0,6 -1.4,0 -7,-1.6 -1.4,-3" fill="#fff"/></g></g>
+  const P="M8,74 C46,72 64,62 96,60 C128,58 150,46 188,42 C224,38 252,26 292,12";
+  return `<svg viewBox="0 0 300 90" width="100%" preserveAspectRatio="xMidYMid slice" style="display:block">
+    <defs>
+      <linearGradient id="wsky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#EAF5F2"/><stop offset="1" stop-color="#F8FAFA"/></linearGradient>
+      <linearGradient id="wfill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2F9E9B" stop-opacity="0.32"/><stop offset="1" stop-color="#2F9E9B" stop-opacity="0"/></linearGradient>
+      <linearGradient id="wline" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#0F7A7A"/><stop offset="1" stop-color="#FF7733"/></linearGradient>
+    </defs>
+    <rect width="300" height="90" fill="url(#wsky)"/>
+    ${[26,44,62].map(y=>`<line x1="8" y1="${y}" x2="292" y2="${y}" stroke="#DCEAE8" stroke-width="1"/>`).join("")}
+    <line x1="8" y1="78" x2="292" y2="78" stroke="#CFE4E2" stroke-width="2"/>
+    <path d="${P} L292,78 L8,78 Z" fill="url(#wfill)"/>
+    <path d="${P}" fill="none" stroke="url(#wline)" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="430" stroke-dashoffset="430">
+      <animate attributeName="stroke-dashoffset" values="430;0" dur="2.2s" begin="0s;wdot.end+0.6s" fill="freeze" calcMode="spline" keyTimes="0;1" keySplines="0.4 0 0.2 1"/>
+    </path>
+    <circle r="4.6" fill="#FF7733" stroke="#fff" stroke-width="1.6">
+      <animateMotion id="wdot" dur="2.2s" begin="0s" fill="freeze" path="${P}" calcMode="spline" keyTimes="0;1" keySplines="0.4 0 0.2 1"/>
+      <animate attributeName="r" values="4.6;6.4;4.6" dur="1.3s" begin="2.2s" repeatCount="indefinite"/>
+    </circle>
   </svg>`;
 }
 const WTIPS=[
