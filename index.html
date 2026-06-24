@@ -1253,7 +1253,7 @@ function continueAfterOutcome(){
 }
 
 function tapStage(){
-  return `<div class="fund-stage scene-live" style="aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;background:#EAF5F2;border-radius:18px;margin-bottom:14px"><img data-asset="sc_taphelp" src="${assetSrc('sc_taphelp')}" alt="" style="width:100%;height:100%;object-fit:cover;object-position:center;animation:sceneKen 9s ease-in-out infinite alternate"></div>`;
+  return `<div class="fund-stage scene-live" style="width:100%;height:auto;aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;background:#EAF5F2;border-radius:18px;margin-bottom:14px"><img data-asset="sc_taphelp" src="${assetSrc('sc_taphelp')}" alt="" style="width:100%;height:100%;object-fit:cover;object-position:center;animation:sceneKen 9s ease-in-out infinite alternate"></div>`;
 }
 // ролик: Hayot Bank приходит на помощь
 function bankScene(){
@@ -1474,12 +1474,14 @@ function finale(){
     const bx = cx + side*9 + sway;                       // центр тела
     const by = hy + 18;                                  // центр торса ниже кисти
     if(IMG.scammer){
-      ctx.strokeStyle="#8A6A3A"; ctx.lineWidth=3; ctx.beginPath(); ctx.moveTo(cx,hy); ctx.lineTo(bx,by-14); ctx.stroke();
       let simg=IMG.scammer; if(reach && IMG.scammer2){ simg = (0.5+0.5*Math.sin(tt*0.16+ph))>0.5 ? IMG.scammer2 : IMG.scammer; }
-      const w=46, h=w*(simg.height/simg.width);
+      const w=44, h=w*(simg.height/simg.width);
+      const cb=cx+sway*0.6, topY=by-h*0.46;            // тело висит прямо под верёвкой, верх спрайта = рука-захват
+      ctx.strokeStyle="#8A6A3A"; ctx.lineWidth=3; ctx.lineCap="round";
+      ctx.beginPath(); ctx.moveTo(cx,hy); ctx.lineTo(cb, topY+6); ctx.stroke();
       ctx.save();
-      if(side<0){ ctx.translate(bx,0); ctx.scale(-1,1); ctx.drawImage(simg,-w/2,by-h*0.40,w,h); }
-      else { ctx.drawImage(simg,bx-w/2,by-h*0.40,w,h); }
+      if(side<0){ ctx.translate(cb,0); ctx.scale(-1,1); ctx.drawImage(simg,-w/2,topY,w,h); }
+      else { ctx.drawImage(simg,cb-w/2,topY,w,h); }
       ctx.restore(); return;
     }
     ctx.lineCap="round"; ctx.lineJoin="round";
