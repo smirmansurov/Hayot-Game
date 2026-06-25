@@ -15,8 +15,8 @@
   .out-card{text-align:center;}
   .mlabel{font-size:12.5px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:var(--teal);margin-bottom:6px;}
   .out-text{font-size:14px;line-height:1.55;color:var(--ink);}
-  .fin-emblem{width:46px;height:46px;margin:2px auto 4px;animation:finspin 14s linear infinite;}
-  .fin-emblem svg{width:46px;height:46px;display:block;}
+  .fin-emblem{width:62px;height:62px;margin:2px auto 6px;animation:finspin 14s linear infinite;}
+  .fin-emblem svg{width:62px;height:62px;display:block;}
   @keyframes finspin{to{transform:rotate(360deg);}}
   .fly-wrap{position:relative;border-radius:14px;overflow:hidden;border:1px solid var(--line);margin:10px 0;touch-action:manipulation;}
   #fly{display:block;touch-action:manipulation;}
@@ -111,7 +111,7 @@ function finale(){
   scr.innerHTML = `<div class="card out-card">
     <div class="fin-emblem">${LOGO}</div>
     <div class="mlabel">🏆 Финал · Орбита стартапа</div>
-    <div class="out-text" style="margin-bottom:8px;">Ваш стартап выходит на орбиту рынка. В центре — <b>монополист</b>, который засыпает вас деньгами, чтобы поглотить. Облетайте его золотые монеты и собирайте <b>монеты Hayot</b> на орбите: собрали все — открывается новый раунд. <b>Тап</b> разворачивает ракету. Чем дальше пройдёте, тем выше итог.</div>
+    <div class="out-text" style="margin-bottom:8px;">Облетайте золотые монеты <b>монополиста</b> и собирайте <b>монеты Hayot</b>. <b>Тап</b> — разворот ракеты.</div>
     <div class="fly-wrap" id="flywrap" style="display:flex;align-items:center;justify-content:center;background:#08222A;">
       <canvas id="fly"></canvas>
     </div>
@@ -128,7 +128,7 @@ function finale(){
   cv.style.width=Sq+"px"; cv.style.height=Sq+"px";
   cv.width=Math.round(Sq*dpr); cv.height=Math.round(Sq*dpr);
   ctx.setTransform(dpr,0,0,dpr,0,0);
-  const CX=Sq/2, CY=Sq/2, R=Sq*0.33, TAU=Math.PI*2;
+  const CX=Sq/2, CY=Sq/2, R=Sq*0.37, TAU=Math.PI*2;
   let stars=[]; { const n=Math.round(Sq*0.16); for(let i=0;i<n;i++) stars.push({x:Math.random()*Sq,y:Math.random()*Sq,r:Math.random()*1.4+0.3,tw:Math.random()*TAU}); }
   let raf=0, running=false, state="idle";
   let ang=-Math.PI/2, dir=1, oscore=0, t=0, spin=0;
@@ -245,7 +245,7 @@ function finale(){
     hud();
     if(state==="roundclear") panel("Раунд "+round+" пройден!","+"+(100*round)+" очков","#8BE8E2");
     if(state==="reviving"){ ctx.save(); ctx.textAlign="center"; ctx.fillStyle="rgba(6,16,20,.5)"; ctx.fillRect(0,Sq-44,Sq,44); ctx.textBaseline="middle"; ctx.fillStyle="#5FD0C9"; ctx.font="800 14px Manrope,Arial"; ctx.fillText("Hayot Group выводит вас на орбиту", CX, Sq-22); ctx.restore(); }
-    if(state==="demo"){ ctx.save(); ctx.textAlign="center"; ctx.fillStyle="rgba(6,16,20,.58)"; ctx.fillRect(0,Sq-60,Sq,60); ctx.textBaseline="middle"; ctx.fillStyle="#FFD27A"; ctx.font="800 14px Manrope,Arial"; ctx.fillText("Демонстрация — так нужно играть", CX, Sq-39); ctx.fillStyle="#dceae8"; ctx.font="700 11.5px Manrope,Arial"; ctx.fillText("Собирайте бирюзовые монеты Hayot · облетайте золотые", CX, Sq-18); ctx.restore(); }
+    if(state==="demo"){ ctx.save(); ctx.textAlign="center"; ctx.fillStyle="rgba(6,16,20,.55)"; ctx.fillRect(0,Sq-38,Sq,38); ctx.textBaseline="middle"; ctx.fillStyle="#FFD27A"; ctx.font="800 13px Manrope,Arial"; ctx.fillText("Демо · собирайте бирюзовые, облетайте золотые", CX, Sq-19); ctx.restore(); }
   }
   function loop(){ raf=requestAnimationFrame(loop); stepUpd(); render(); }
 
