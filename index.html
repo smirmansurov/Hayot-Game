@@ -260,6 +260,9 @@
   .orb-text{font-size:12.5px;color:#bcd0ce;line-height:1.45;margin-bottom:12px;}
   .orb-card .btn{margin-top:8px;font-size:15px;padding:13px;}
   .orb-card .btn-ghost2{background:transparent;border:1px solid #2d6661;color:#a9bcba;box-shadow:none;}
+  .fin-emblem{width:46px;height:46px;margin:2px auto 4px;animation:finspin 14s linear infinite;}
+  .fin-emblem svg{width:46px;height:46px;display:block;}
+  @keyframes finspin{to{transform:rotate(360deg);}}
   .cd-mask{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(16,24,32,.5);z-index:200;-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px);}
   .cd-num{font-family:var(--sans);font-weight:800;font-size:120px;line-height:1;color:#fff;text-shadow:0 10px 34px rgba(0,0,0,.35);animation:cdpop .8s ease both;}
   .cd-num.cd-go{font-size:58px;color:#F5A05A;}
@@ -432,7 +435,7 @@ function _load(key,file,cut){
 ["founder","hero","scammer","plane"].forEach(k=>_load(k, (k==="founder"?"founder_smart":k==="hero"?"hero_3d":k==="scammer"?"scammer_3d":"plane_3d")+".png", true));
 _load("scammer2","scammer_3d_2.png",true);
 _load("bank","bank_3d.png",false);
-_load("orbitBoss","orbit_boss.png",false); _load("orbitBg","orbit_bg.png",false);
+_load("orbitBoss","orbit_boss.png?v=3",false); _load("orbitBg","orbit_bg.png?v=3",false);
 ["fintech","ai","market","health","edtech","agro","logi","robo","food"].forEach(k=>_load("ic_"+k,"icon_"+k+".png",true));
 _load("sky","sky_bg.png",false);
 ["idea","build","signup","people","revenue","coins","chart","race","bug","handshake","stage","fintech","ai","market","health","edtech","agro","logi","robo","food","taphelp"].forEach(k=>_load("sc_"+k,"scene_"+k+".png",false));
@@ -1358,6 +1361,7 @@ function finale(){
   const base = Math.round(S.score);
   const scr=document.getElementById("screen");
   scr.innerHTML = `<div class="card out-card">
+    <div class="fin-emblem">${LOGO}</div>
     <div class="mlabel">🏆 Финал · Орбита стартапа</div>
     <div class="out-text" style="margin-bottom:8px;">Ваш стартап выходит на орбиту рынка. В центре — <b>монополист</b>, который засыпает вас деньгами, чтобы поглотить. Облетайте его золотые монеты и собирайте <b>монеты Hayot</b> на орбите: собрали все — открывается новый раунд. <b>Тап</b> разворачивает ракету. Чем дальше пройдёте, тем выше итог.</div>
     <div class="fly-wrap" id="flywrap" style="display:flex;align-items:center;justify-content:center;background:#08222A;">
@@ -1376,7 +1380,7 @@ function finale(){
   cv.style.width=Sq+"px"; cv.style.height=Sq+"px";
   cv.width=Math.round(Sq*dpr); cv.height=Math.round(Sq*dpr);
   ctx.setTransform(dpr,0,0,dpr,0,0);
-  const CX=Sq/2, CY=Sq/2, R=Sq*0.285, TAU=Math.PI*2;
+  const CX=Sq/2, CY=Sq/2, R=Sq*0.33, TAU=Math.PI*2;
   let stars=[]; { const n=Math.round(Sq*0.16); for(let i=0;i<n;i++) stars.push({x:Math.random()*Sq,y:Math.random()*Sq,r:Math.random()*1.4+0.3,tw:Math.random()*TAU}); }
   let raf=0, running=false, state="idle";
   let ang=-Math.PI/2, dir=1, oscore=0, t=0, spin=0;
@@ -1385,21 +1389,21 @@ function finale(){
   let parts=[], waves=[], clearFx=0, gemsTotal=0, gemsLeft=0;
   if(!S.log.flight) S.log.flight={seed:S.seed, score:0};
 
-  function rp(r){ return { aspeed:Math.min(0.072,0.030+r*0.0055), pspeed:Math.min(4.2,1.9+r*0.38), spawn:Math.max(16,56-r*5), spread:Math.min(0.58,0.06+r*0.075) }; }
+  function rp(r){ return { aspeed:Math.min(0.066,0.026+r*0.005), pspeed:Math.min(4.0,1.7+r*0.34), spawn:Math.max(18,60-r*5), spread:(r<3?0:Math.min(0.55,0.18+(r-3)*0.09)), triple:r>=3 }; }
   function spawnRing(r){ const n=Math.min(12,4+r); gemsTotal=n; gemsLeft=n; orbs=[]; const off=Math.random()*TAU; for(let i=0;i<n;i++) orbs.push({ang:off+i*(TAU/n)+(Math.random()-0.5)*0.18,got:false,fx:0}); }
   function angDiff(a,b){ let d=(a-b)%TAU; if(d>Math.PI)d-=TAU; if(d<-Math.PI)d+=TAU; return d; }
   function orbitScore(){ return Math.round(oscore*M); }
 
   function fire(P){
-    const speed=P.pspeed, travel=(R-40)/speed, roll=Math.random();
-    if(round>=4 && Math.random()<Math.min(0.22,0.04+round*0.012)){ const n=6+Math.min(4,round-4), b=Math.random()*TAU, skip=Math.floor(Math.random()*n); for(let i=0;i<n;i++){ if(i===skip) continue; projs.push({ang:b+i*(TAU/n),r:40,speed:speed*0.85,scored:false}); } fireFx=1; shake=Math.max(shake,3); return; }
+    const ST=44, speed=P.pspeed, travel=(R-ST)/speed, roll=Math.random();
+    if(round>=4 && Math.random()<Math.min(0.20,0.05+round*0.012)){ const n=6+Math.min(4,round-4), b=Math.random()*TAU, skip=Math.floor(Math.random()*n); for(let i=0;i<n;i++){ if(i===skip) continue; projs.push({ang:b+i*(TAU/n),r:ST,speed:speed*0.85,scored:false}); } fireFx=1; shake=Math.max(shake,3); return; }
+    if(P.triple && Math.random()<P.spread){ const base=(Math.random()<0.6)? ang+dir*P.aspeed*travel+(Math.random()*2-1)*0.10 : Math.random()*TAU; for(const d of [-0.30,0,0.30]) projs.push({ang:base+d,r:ST,speed,scored:false}); fireFx=1; shake=Math.max(shake,2.6); return; }
     let bse;
-    if(roll<0.5) bse=ang+dir*P.aspeed*travel+(Math.random()*2-1)*0.13;
-    else if(roll<0.76) bse=ang+(Math.random()*2-1)*0.5;
+    if(roll<0.5) bse=ang+dir*P.aspeed*travel+(Math.random()*2-1)*0.12;
+    else if(roll<0.78) bse=ang+(Math.random()*2-1)*0.5;
     else bse=Math.random()*TAU;
-    if(Math.random()<P.spread){ for(const d of [-0.34,0,0.34]) projs.push({ang:bse+d,r:40,speed,scored:false}); }
-    else projs.push({ang:bse,r:40,speed,scored:false});
-    fireFx=1; shake=Math.max(shake,2.4);
+    projs.push({ang:bse,r:ST,speed,scored:false});
+    fireFx=1; shake=Math.max(shake,2.2);
   }
   function roundClear(){
     state="roundclear"; oscore+=100*round; projs=[]; phaseT=100; clearFx=1; shake=Math.max(shake,4);
