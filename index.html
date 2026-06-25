@@ -251,6 +251,15 @@
   .fly-big{font-family:var(--sans);font-size:20px;font-weight:800;color:var(--ink);}
   .fly-sub{font-size:14px;color:var(--muted);margin:6px 0 12px;}
   .fly-card .btn{margin-top:8px;font-size:14px;padding:12px;}
+  .orb-over{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(6,16,20,.74);padding:14px;}
+  .orb-card{background:radial-gradient(120% 100% at 50% 0%,#123a45,#0a2129);border:1px solid #1f5b57;border-radius:16px;padding:16px 16px 14px;text-align:center;width:100%;max-width:300px;box-shadow:0 18px 40px rgba(0,0,0,.5);}
+  .orb-ic{width:46px;height:46px;margin:0 auto 6px;display:flex;align-items:center;justify-content:center;border-radius:50%;font-size:24px;background:rgba(245,160,90,.16);border:1px solid rgba(245,160,90,.5);}
+  .orb-tag{font-size:11px;letter-spacing:.5px;text-transform:uppercase;color:#5FD0C9;font-weight:800;margin-bottom:2px;}
+  .orb-title{font-family:var(--serif);font-size:20px;font-weight:800;color:#EAF5F2;line-height:1.15;margin-bottom:4px;}
+  .orb-score{font-size:13px;color:#a9bcba;margin-bottom:8px;} .orb-score b{color:#FFD27A;}
+  .orb-text{font-size:12.5px;color:#bcd0ce;line-height:1.45;margin-bottom:12px;}
+  .orb-card .btn{margin-top:8px;font-size:15px;padding:13px;}
+  .orb-card .btn-ghost2{background:transparent;border:1px solid #2d6661;color:#a9bcba;box-shadow:none;}
   .cd-mask{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(16,24,32,.5);z-index:200;-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px);}
   .cd-num{font-family:var(--sans);font-weight:800;font-size:120px;line-height:1;color:#fff;text-shadow:0 10px 34px rgba(0,0,0,.35);animation:cdpop .8s ease both;}
   .cd-num.cd-go{font-size:58px;color:#F5A05A;}
@@ -423,6 +432,7 @@ function _load(key,file,cut){
 ["founder","hero","scammer","plane"].forEach(k=>_load(k, (k==="founder"?"founder_smart":k==="hero"?"hero_3d":k==="scammer"?"scammer_3d":"plane_3d")+".png", true));
 _load("scammer2","scammer_3d_2.png",true);
 _load("bank","bank_3d.png",false);
+_load("orbitBoss","orbit_boss.png",false); _load("orbitBg","orbit_bg.png",false);
 ["fintech","ai","market","health","edtech","agro","logi","robo","food"].forEach(k=>_load("ic_"+k,"icon_"+k+".png",true));
 _load("sky","sky_bg.png",false);
 ["idea","build","signup","people","revenue","coins","chart","race","bug","handshake","stage","fintech","ai","market","health","edtech","agro","logi","robo","food","taphelp"].forEach(k=>_load("sc_"+k,"scene_"+k+".png",false));
@@ -1348,285 +1358,197 @@ function finale(){
   const base = Math.round(S.score);
   const scr=document.getElementById("screen");
   scr.innerHTML = `<div class="card out-card">
-    <div class="mlabel">🏆 Финал · Полёт бизнеса</div>
-    <div class="out-text" style="margin-bottom:8px;">Самолёт <b>Hayot Ventures</b> поднимает ваш бизнес в небеса. Но на пути встают мошенники, желающие его перехватить. Нажимайте на экран, чтобы набирать высоту, и обходите препятствия: чем дольше длится полёт, тем выше итоговый результат.</div>
-    <div class="fly-wrap" id="flywrap">
+    <div class="mlabel">🏆 Финал · Орбита стартапа</div>
+    <div class="out-text" style="margin-bottom:8px;">Ваш стартап выходит на орбиту рынка. В центре — <b>монополист</b>, который засыпает вас деньгами, чтобы поглотить. Облетайте его золотые монеты и собирайте <b>монеты Hayot</b> на орбите: собрали все — открывается новый раунд. <b>Тап</b> разворачивает ракету. Чем дальше пройдёте, тем выше итог.</div>
+    <div class="fly-wrap" id="flywrap" style="display:flex;align-items:center;justify-content:center;background:#08222A;">
       <canvas id="fly"></canvas>
-      <div class="fly-score" id="flyscore" style="display:none">0</div>
-      <div class="fly-demo" id="flydemo"><b>▶ Демонстрация — так нужно облетать препятствия</b></div>
     </div>
-    <button class="btn btn-coral" id="flystartbtn">▶ Начать полёт</button>
-    <div class="tap-mult">Посмотрите демонстрацию выше, затем нажмите «Начать полёт».<br>Бонус за силу компании: <b>×${M.toFixed(1)}</b> к очкам.</div>
+    <button class="btn btn-coral" id="flystartbtn">▶ Вывести стартап на орбиту</button>
+    <div class="tap-mult">Бонус за силу компании: <b>×${M.toFixed(1)}</b> к очкам.</div>
   </div>`;
   renderHUD();
   const cv=document.getElementById("fly"), ctx=cv.getContext("2d");
   const wrap=document.getElementById("flywrap");
-  const rng=S.rng;
   const dpr=Math.min(window.devicePixelRatio||1,2);
   const cssW=Math.max(260, Math.round(wrap.clientWidth||320));
-  const cssH=Math.round(clamp(window.innerHeight*0.5, 300, 430));
-  cv.style.width=cssW+"px"; cv.style.height=cssH+"px";
-  cv.width=Math.round(cssW*dpr); cv.height=Math.round(cssH*dpr);
+  const maxH=Math.round(clamp(window.innerHeight*0.52, 300, 440));
+  const Sq=Math.min(cssW, maxH);
+  cv.style.width=Sq+"px"; cv.style.height=Sq+"px";
+  cv.width=Math.round(Sq*dpr); cv.height=Math.round(Sq*dpr);
   ctx.setTransform(dpr,0,0,dpr,0,0);
-  const W=cssW, H=cssH;
-  let started=false, counting=false, dead=false, t=0, raf=0;
-  let demo=true, demoT=0;
-  let crashing=false, crashVy=0, crashRot=0, crashPuffs=[], enginePuffs=[], _rotS=0;
-  let reviving=false, reviveT=0;
-  let y=H*0.42, vy=0; const px=72;
-  const G=0.45, JUMP=-6.8;
-  let obs=[], spawnX=0, passed=0, flightScore=0;
-  if(!S.log.flight) S.log.flight={seed:S.seed, inputs:[]};
-  function flap(){ if(dead||!started) return; vy=JUMP; for(let i=0;i<4;i++) enginePuffs.push({x:px-30,y:y+(Math.random()*8-4),vx:-(2+Math.random()*2.2),r:3+Math.random()*3,life:0}); S.log.flight.inputs.push(Math.round(performance.now())); }
-  function onTap(){ if(started && !dead) flap(); }   // поле реагирует только в полёте — случайные касания игру не запускают
-  function keyflap(e){ if(e.code==="Space"){ e.preventDefault(); onTap(); } }
-  wrap.addEventListener("pointerdown",onTap);
-  document.addEventListener("keydown",keyflap);
-  const startBtn=document.getElementById("flystartbtn");
-  startBtn.addEventListener("click",()=>{
-    if(started||counting) return;
-    demo=false; obs=[]; spawnX=0; y=H*0.42; vy=0; t=0; passed=0; flightScore=0;
-    const dm=document.getElementById("flydemo"); if(dm) dm.style.display="none";
-    const fsc=document.getElementById("flyscore"); if(fsc) fsc.style.display="";
-    startBtn.style.display="none";
-    counting=true;
-    countdown(()=>{ counting=false; started=true; vy=JUMP; S.log.flight.inputs.push(Math.round(performance.now())); });
-  });
-  function spawn(){
-    // проём сужается со временем, но не больше трети поля — всегда есть куда смещать ворота
-    const gap=Math.min(H*0.34, Math.max(84, 120 - t*0.012));
-    const m=40;
-    const speedNow=Math.min(6.8, 4.0 + t*0.0017);
-    const everyNow=Math.max(260, 305 - t*0.019);
-    const F=everyNow/speedNow;                       // кадров между препятствиями
-    const step=clamp(Math.round(F*2.8), 120, 220);   // максимально достижимый сдвиг по высоте
-    const cMin=m+gap/2, cMax=H-m-gap/2;
-    let c;
-    const prev=obs.length?obs[obs.length-1]:null;
-    if(prev){
-      const pc=prev.gapY+prev.gap/2;
-      // обязательный сдвиг вверх или вниз — ворота не выстраиваются в линию
-      const minJ=clamp(Math.round((cMax-cMin)*0.38), 32, 72);
-      const uL=Math.max(cMin,pc-step), uH=Math.min(cMax,pc-minJ);
-      const dL=Math.max(cMin,pc+minJ), dH=Math.min(cMax,pc+step);
-      const uOK=uH>uL, dOK=dH>dL;
-      if(uOK&&dOK) c = rng()<0.5 ? uL+rng()*(uH-uL) : dL+rng()*(dH-dL);
-      else if(uOK) c = uL+rng()*(uH-uL);
-      else if(dOK) c = dL+rng()*(dH-dL);
-      else c = clamp(pc, cMin, cMax);
-    } else {
-      c = cMin + rng()*Math.max(0, cMax-cMin);
+  const CX=Sq/2, CY=Sq/2, R=Sq*0.285, TAU=Math.PI*2;
+  let stars=[]; { const n=Math.round(Sq*0.16); for(let i=0;i<n;i++) stars.push({x:Math.random()*Sq,y:Math.random()*Sq,r:Math.random()*1.4+0.3,tw:Math.random()*TAU}); }
+  let raf=0, running=false, state="idle";
+  let ang=-Math.PI/2, dir=1, oscore=0, t=0, spin=0;
+  let projs=[], orbs=[], spawnT=46, fireFx=0, shake=0, hitFx=0;
+  let round=1, shield=80, phaseT=0, dyingT=0, reviveT=0, ex=null;
+  let parts=[], waves=[], clearFx=0, gemsTotal=0, gemsLeft=0;
+  if(!S.log.flight) S.log.flight={seed:S.seed, score:0};
+
+  function rp(r){ return { aspeed:Math.min(0.072,0.030+r*0.0055), pspeed:Math.min(4.2,1.9+r*0.38), spawn:Math.max(16,56-r*5), spread:Math.min(0.58,0.06+r*0.075) }; }
+  function spawnRing(r){ const n=Math.min(12,4+r); gemsTotal=n; gemsLeft=n; orbs=[]; const off=Math.random()*TAU; for(let i=0;i<n;i++) orbs.push({ang:off+i*(TAU/n)+(Math.random()-0.5)*0.18,got:false,fx:0}); }
+  function angDiff(a,b){ let d=(a-b)%TAU; if(d>Math.PI)d-=TAU; if(d<-Math.PI)d+=TAU; return d; }
+  function orbitScore(){ return Math.round(oscore*M); }
+
+  function fire(P){
+    const speed=P.pspeed, travel=(R-40)/speed, roll=Math.random();
+    if(round>=4 && Math.random()<Math.min(0.22,0.04+round*0.012)){ const n=6+Math.min(4,round-4), b=Math.random()*TAU, skip=Math.floor(Math.random()*n); for(let i=0;i<n;i++){ if(i===skip) continue; projs.push({ang:b+i*(TAU/n),r:40,speed:speed*0.85,scored:false}); } fireFx=1; shake=Math.max(shake,3); return; }
+    let bse;
+    if(roll<0.5) bse=ang+dir*P.aspeed*travel+(Math.random()*2-1)*0.13;
+    else if(roll<0.76) bse=ang+(Math.random()*2-1)*0.5;
+    else bse=Math.random()*TAU;
+    if(Math.random()<P.spread){ for(const d of [-0.34,0,0.34]) projs.push({ang:bse+d,r:40,speed,scored:false}); }
+    else projs.push({ang:bse,r:40,speed,scored:false});
+    fireFx=1; shake=Math.max(shake,2.4);
+  }
+  function roundClear(){
+    state="roundclear"; oscore+=100*round; projs=[]; phaseT=100; clearFx=1; shake=Math.max(shake,4);
+    waves.push({r:14,a:1}); const COL=["#0F7A7A","#2F9E9B","#F5A05A","#FFD27A","#ffffff"];
+    for(let i=0;i<48;i++){ const an=Math.random()*TAU, sp=2.4+Math.random()*4.4; parts.push({x:CX,y:CY,vx:Math.cos(an)*sp,vy:Math.sin(an)*sp-2.4,rot:Math.random()*6,vr:(Math.random()-.5)*0.5,col:COL[i%COL.length],life:1}); }
+  }
+  function onHit(){
+    if(state!=="play") return;
+    const rx=CX+R*Math.cos(ang), ry=CY+R*Math.sin(ang);
+    state="dying"; dyingT=0; hitFx=1; shake=12; ex={x:rx,y:ry,r:6,a:1};
+    const COL=["#2F9E9B","#F5A05A","#CFF0EA","#FFD27A","#0F7A7A"];
+    for(let i=0;i<22;i++){ const an=Math.random()*TAU, sp=1.5+Math.random()*4; parts.push({x:rx,y:ry,vx:Math.cos(an)*sp,vy:Math.sin(an)*sp,rot:Math.random()*6,vr:(Math.random()-.5)*0.6,col:COL[i%COL.length],life:1}); }
+  }
+
+  function stepUpd(){
+    spin+=0.05; fireFx*=0.9; shake*=0.86; hitFx*=0.95; clearFx*=0.93; if(shield>0)shield--;
+    for(const p of parts){ p.vy+=0.13; p.x+=p.vx; p.y+=p.vy; p.vx*=0.99; p.rot+=p.vr; p.life-=0.013; } parts=parts.filter(p=>p.life>0);
+    for(const w of waves){ w.r+=6.2; w.a-=0.028; } waves=waves.filter(w=>w.a>0);
+    if(state==="demo"){
+      ang+=dir*0.034;
+      spawnT--; if(spawnT<=0){ const b=ang+dir*0.6+(Math.random()*2-1)*0.2; projs.push({ang:b,r:40,speed:2.2,scored:false}); fireFx=1; spawnT=70+Math.random()*30; }
+      for(const p of projs){ p.r+=p.speed; }
+      let danger=null,dmin=1;
+      for(const p of projs){ if(p.r>R-46 && p.r<R+14){ const ad=angDiff(p.ang,ang); if(Math.abs(ad)<0.5 && Math.abs(ad)<Math.abs(dmin)){ danger=p; dmin=ad; } } }
+      if(danger){ dir = dmin>0 ? -1 : 1; }
+      else { let nd=9; for(const o of orbs){ if(!o.got){ const ad=angDiff(o.ang,ang); if(Math.abs(ad)<Math.abs(nd)) nd=ad; } } if(nd<9 && Math.abs(nd)>0.05) dir = nd>0?1:-1; }
+      for(const o of orbs){ if(!o.got && Math.abs(angDiff(o.ang,ang))<0.15){ o.got=true; o.fx=1; gemsLeft--; if(gemsLeft<=0) spawnRing(1); } if(o.fx>0)o.fx-=0.05; }
+      orbs=orbs.filter(o=> !o.got || o.fx>0);
+      projs=projs.filter(p=> p.r < Sq*0.62);
     }
-    obs.push({x:W+30,gapY:c-gap/2,gap,w:40,passed:false});
+    if(state==="play"){
+      const P=rp(round); t++;
+      ang+=dir*P.aspeed;
+      spawnT--; if(spawnT<=0){ fire(P); spawnT=P.spawn+Math.random()*14; }
+      for(const p of projs){ p.r+=p.speed; if(!p.scored && p.r>R+16){ p.scored=true; oscore+=2; } }
+      for(const p of projs){ if(shield<=0 && Math.abs(p.r-R)<13 && Math.abs(angDiff(p.ang,ang))<0.17){ onHit(); break; } }
+      projs=projs.filter(p=> p.r < Sq*0.62);
+      for(const o of orbs){ if(!o.got && Math.abs(angDiff(o.ang,ang))<0.15){ o.got=true; o.fx=1; oscore+=10; gemsLeft--; if(gemsLeft<=0) roundClear(); } if(o.fx>0)o.fx-=0.05; }
+      orbs=orbs.filter(o=> !o.got || o.fx>0);
+    } else if(state==="roundclear"){
+      phaseT--; if(phaseT<=0){ round++; spawnRing(round); spawnT=42; shield=Math.max(shield,Math.min(100,50+round*2)); state="play"; }
+    }
+    else if(state==="dying"){ dyingT++; if(ex){ ex.r+=4; ex.a-=0.05; } if(dyingT>52){ if(!S.revived) rescue(); else over(); } }
+    else if(state==="reviving"){ reviveT++; if(reviveT>46){ state="revwait"; countdown(()=>{ state="play"; shield=200; }); } }
   }
-  function cloud(cx,cy,sc,a){
-    ctx.save(); ctx.globalAlpha=a; ctx.fillStyle="#ffffff";
-    ctx.beginPath();
-    ctx.arc(cx,cy,8*sc,0,7); ctx.arc(cx+9*sc,cy-5*sc,10*sc,0,7); ctx.arc(cx+20*sc,cy-2*sc,9*sc,0,7);
-    ctx.arc(cx+29*sc,cy,7*sc,0,7); ctx.arc(cx+15*sc,cy+4*sc,9*sc,0,7);
-    ctx.fill(); ctx.restore();
+
+  function neb(x,y,r,col){ const g=ctx.createRadialGradient(x,y,2,x,y,r); g.addColorStop(0,col); g.addColorStop(1,"rgba(0,0,0,0)"); ctx.fillStyle=g; ctx.beginPath(); ctx.arc(x,y,r,0,TAU); ctx.fill(); }
+  function drawBg(){
+    if(IMG.orbitBg){ ctx.drawImage(IMG.orbitBg,0,0,Sq,Sq); ctx.fillStyle="rgba(6,18,24,.16)"; ctx.fillRect(0,0,Sq,Sq); }
+    else { const g=ctx.createRadialGradient(CX,CY,30,CX,CY,Sq*0.82); g.addColorStop(0,"#0E323C"); g.addColorStop(1,"#06161C"); ctx.fillStyle=g; ctx.fillRect(0,0,Sq,Sq); neb(CX*0.66,CY*0.55,Sq*0.42,"rgba(47,158,155,0.10)"); neb(CX*1.32,CY*1.28,Sq*0.44,"rgba(245,160,90,0.07)"); for(const s of stars){ ctx.globalAlpha=0.35+0.55*Math.abs(Math.sin(spin*0.5+s.tw)); ctx.fillStyle="#CFF0EA"; ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,TAU); ctx.fill(); } ctx.globalAlpha=1; }
+    ctx.strokeStyle="rgba(255,255,255,0.05)"; ctx.lineWidth=1; for(const rr of [R*0.55,R*1.4]){ ctx.beginPath(); ctx.arc(CX,CY,rr,0,TAU); ctx.stroke(); }
+    const bgg=ctx.createRadialGradient(CX,CY,4,CX,CY,48); bgg.addColorStop(0,"rgba(245,160,90,0.18)"); bgg.addColorStop(1,"rgba(245,160,90,0)"); ctx.fillStyle=bgg; ctx.beginPath(); ctx.arc(CX,CY,48,0,TAU); ctx.fill();
   }
-  function plane(){
-    const _tgtR = crashing ? crashRot : clamp(vy/12,-0.28,0.42); _rotS += (_tgtR-_rotS)*0.16; const _rot=_rotS;
-    ctx.save(); ctx.translate(px,y); ctx.rotate(_rot);
-    if(IMG.plane){ const w=92, h=w*(IMG.plane.height/IMG.plane.width); ctx.drawImage(IMG.plane, -w*0.46, -h/2, w, h); ctx.restore(); return; }
-    // мягкая тень под самолётом
-    ctx.save(); ctx.globalAlpha=0.12; ctx.fillStyle="#0B5E5E"; ctx.beginPath(); ctx.ellipse(0,17,30,6,0,0,7); ctx.fill(); ctx.restore();
-    // инверсионный след
-    for(let i=0;i<5;i++){ ctx.fillStyle="rgba(95,168,164,"+(0.16-i*0.03)+")"; ctx.beginPath(); ctx.arc(-36-i*9-((t*0.7)%7),0,4-i*0.6,0,7); ctx.fill(); }
-    // хвостовой киль
-    ctx.fillStyle="#0B5E5E"; ctx.beginPath(); ctx.moveTo(-26,-2); ctx.quadraticCurveTo(-38,-20,-29,-3); ctx.lineTo(-18,-4); ctx.closePath(); ctx.fill();
-    ctx.fillStyle="#F5A05A"; ctx.beginPath(); ctx.moveTo(-30,-7); ctx.lineTo(-36,-18); ctx.lineTo(-25,-6); ctx.closePath(); ctx.fill();
-    // заднее крыло
-    ctx.fillStyle="#2E6E6A"; ctx.beginPath(); ctx.moveTo(-22,2); ctx.lineTo(-34,12); ctx.lineTo(-19,6); ctx.closePath(); ctx.fill();
-    // фюзеляж с объёмным градиентом
-    const g=ctx.createLinearGradient(0,-9,0,9); g.addColorStop(0,"#159a95"); g.addColorStop(0.5,"#0F7A7A"); g.addColorStop(1,"#0a5d5d");
-    ctx.fillStyle=g; ctx.beginPath();
-    ctx.moveTo(-30,0);
-    ctx.quadraticCurveTo(-30,-8,-14,-8); ctx.lineTo(22,-8);
-    ctx.quadraticCurveTo(40,-7,48,0);
-    ctx.quadraticCurveTo(40,7,22,8); ctx.lineTo(-14,8);
-    ctx.quadraticCurveTo(-30,8,-30,0); ctx.closePath(); ctx.fill();
-    // верхний блик
-    ctx.fillStyle="rgba(255,255,255,.16)"; ctx.beginPath(); ctx.moveTo(-12,-6); ctx.lineTo(22,-6); ctx.quadraticCurveTo(34,-5.5,40,-3); ctx.quadraticCurveTo(20,-4.5,-12,-4.5); ctx.closePath(); ctx.fill();
-    // переднее крыло (с нижней гранью потемнее — объём)
-    ctx.fillStyle="#F5A05A"; ctx.beginPath(); ctx.moveTo(10,5); ctx.lineTo(-16,24); ctx.lineTo(2,7); ctx.closePath(); ctx.fill();
-    ctx.fillStyle="#E07F3E"; ctx.beginPath(); ctx.moveTo(2,7); ctx.lineTo(-16,24); ctx.lineTo(-7,9); ctx.closePath(); ctx.fill();
-    // двигатель
-    ctx.fillStyle="#2E6E6A"; ctx.beginPath(); ctx.ellipse(-1,13,8,4,0,0,7); ctx.fill(); ctx.fillStyle="#0B5E5E"; ctx.beginPath(); ctx.ellipse(-8,13,2.6,4,0,0,7); ctx.fill();
-    // оранжевая полоса вдоль борта
-    ctx.strokeStyle="#F5A05A"; ctx.lineWidth=2.4; ctx.lineCap="round"; ctx.beginPath(); ctx.moveTo(-24,2); ctx.lineTo(40,1); ctx.stroke();
-    // кабина
-    ctx.fillStyle="#0B3F3F"; ctx.beginPath(); ctx.moveTo(48,0); ctx.quadraticCurveTo(40,-6,30,-5.5); ctx.lineTo(30,0); ctx.closePath(); ctx.fill();
-    ctx.fillStyle="#BFEBE6"; ctx.beginPath(); ctx.moveTo(44,-1); ctx.quadraticCurveTo(38,-4.4,32,-4); ctx.lineTo(32,-1); ctx.closePath(); ctx.fill();
-    // иллюминаторы
-    ctx.fillStyle="#CFEAE5"; for(let i=0;i<7;i++){ ctx.beginPath(); ctx.arc(-12+i*5,-1.5,1.4,0,7); ctx.fill(); }
-    // надпись Hayot
-    ctx.fillStyle="#fff"; ctx.font="700 8px Manrope,Arial,sans-serif"; ctx.textAlign="center"; ctx.textBaseline="middle"; ctx.fillText("Hayot",6,3.4);
-    // мигающий огонёк на крыле
-    if((((t/12)|0)%2)===0){ ctx.fillStyle="#E24B4A"; ctx.beginPath(); ctx.arc(-16,24,1.8,0,7); ctx.fill(); }
+  function drawBoss(){
+    ctx.save(); ctx.translate(CX,CY);
+    if(fireFx>0.05){ ctx.strokeStyle="rgba(245,160,90,"+(fireFx*0.5)+")"; ctx.lineWidth=3; ctx.beginPath(); ctx.arc(0,0,34+(1-fireFx)*20,0,TAU); ctx.stroke(); }
+    if(IMG.orbitBoss){ const s=76*(1+fireFx*0.07); ctx.drawImage(IMG.orbitBoss,-s/2,-s/2,s,s); ctx.restore(); return; }
+    ctx.scale(1+fireFx*0.07,1+fireFx*0.07);
+    ctx.fillStyle="#22303A"; ctx.beginPath(); ctx.arc(0,9,24,0,TAU); ctx.fill();
+    ctx.fillStyle="#ECC39A"; ctx.beginPath(); ctx.arc(0,-6,15,0,TAU); ctx.fill();
+    ctx.fillStyle="#14181C"; ctx.fillRect(-16,-21,32,5); ctx.fillRect(-11,-38,22,18); ctx.fillStyle="#F5A05A"; ctx.fillRect(-11,-24,22,3);
+    ctx.fillStyle="#F2C14E"; ctx.font="800 12px Manrope,Arial"; ctx.textAlign="center"; ctx.textBaseline="middle"; ctx.fillText("$",0,9);
     ctx.restore();
   }
-  function ropeThief(cx,hy,side,reach,tt,planeY){
-    // hy — точка захвата на верёвке (кисть). Тело висит на ней и качается маятником.
-    const ph = cx*0.06 + hy*0.045;                       // фаза рассинхронизирована по позиции
-    const sway = Math.sin(tt*0.05 + ph) * 5.5;           // качание корпуса
-    const bx = cx + side*9 + sway;                       // центр тела
-    const by = hy + 18;                                  // центр торса ниже кисти
-    if(IMG.scammer){
-      let simg=IMG.scammer; if(reach && IMG.scammer2){ simg = (0.5+0.5*Math.sin(tt*0.16+ph))>0.5 ? IMG.scammer2 : IMG.scammer; }
-      const w=44, h=w*(simg.height/simg.width);
-      const cb=cx+sway*0.6, topY=by-h*0.46;            // тело висит прямо под верёвкой, верх спрайта = рука-захват
-      ctx.strokeStyle="#8A6A3A"; ctx.lineWidth=3; ctx.lineCap="round";
-      ctx.beginPath(); ctx.moveTo(cx,hy); ctx.lineTo(cb, topY+6); ctx.stroke();
-      ctx.save();
-      if(side<0){ ctx.translate(cb,0); ctx.scale(-1,1); ctx.drawImage(simg,-w/2,topY,w,h); }
-      else { ctx.drawImage(simg,cb-w/2,topY,w,h); }
-      ctx.restore(); return;
-    }
-    ctx.lineCap="round"; ctx.lineJoin="round";
-    // РУКА-ЗАХВАТ (за торсом): плечо -> кисть, всегда держится за верёвку в точке (cx,hy)
-    const gsX = bx - side*4, gsY = by - 8;
-    ctx.strokeStyle="#E7C9A1"; ctx.lineWidth=3.6;
-    ctx.beginPath(); ctx.moveTo(gsX,gsY);
-    ctx.quadraticCurveTo((gsX+cx)/2 - side*2, (gsY+hy)/2, cx, hy); ctx.stroke();
-    ctx.fillStyle="#D9B98C"; ctx.beginPath(); ctx.arc(cx,hy,2.7,0,7); ctx.fill();  // кисть на верёвке
-    // НОГИ (качаются с инерцией — чуть сильнее корпуса)
-    const lsw = Math.sin(tt*0.05 + ph + 0.7) * 3.4;
-    ctx.save(); ctx.translate(bx, by+4); ctx.rotate(lsw*0.02);
-    ctx.fillStyle="#1A1A1A"; ctx.fillRect(-5,0,4.2,11); ctx.fillRect(0.8,0,4.2,11);
-    ctx.fillStyle="#0A0C0E"; ctx.fillRect(-6,9,5.5,3); ctx.fillRect(0.5,9,5.5,3);
-    ctx.restore();
-    // ТОРС в полоску (поверх плеча)
-    for(let i=0;i<5;i++){ ctx.fillStyle=i%2?"#1A1A1A":"#EFEFEF"; ctx.fillRect(bx-8,by-8+i*2.8,16,2.8); }
-    ctx.fillStyle="#3B6D11"; ctx.font="700 9px Arial"; ctx.textAlign="center"; ctx.textBaseline="middle"; ctx.fillText("$",bx,by+1);
-    // СВОБОДНАЯ РУКА: тянется к самолёту (с хватательным движением) или болтается
-    const fsX = bx + side*4, fsY = by - 8;
-    ctx.strokeStyle="#E7C9A1"; ctx.lineWidth=3.6; ctx.fillStyle="#D9B98C";
-    let hX,hY;
-    if(reach){
-      const dx = px - bx, dy = planeY - by, dl = Math.hypot(dx,dy)||1;
-      const grab = 0.5 + 0.5*Math.sin(tt*0.16 + ph);     // ловит самолёт: рука то вытягивается, то поджимается
-      const reachLen = Math.min(dl, 17) * (0.6 + 0.4*grab);
-      hX = fsX + dx/dl*reachLen; hY = fsY + dy/dl*reachLen;
-    } else {
-      const fsw = Math.sin(tt*0.05 + ph + 1.2) * 4;
-      hX = fsX + side*5; hY = fsY + 11 + fsw;
-    }
-    ctx.beginPath(); ctx.moveTo(fsX,fsY); ctx.quadraticCurveTo((fsX+hX)/2 + side*2, (fsY+hY)/2, hX, hY); ctx.stroke();
-    ctx.beginPath(); ctx.arc(hX,hY,2.8,0,7); ctx.fill();
-    // ГОЛОВА
-    ctx.fillStyle="#E7C9A1"; ctx.beginPath(); ctx.arc(bx,by-13,6.6,0,7); ctx.fill();
-    // тюбетейка (доппи) — узбекский колорит
-    ctx.fillStyle="#15161A"; ctx.beginPath(); ctx.arc(bx,by-15,6.5,Math.PI,2*Math.PI); ctx.fill(); ctx.fillRect(bx-7,by-15.4,14,2.2);
-    ctx.fillStyle="#EDEDED"; for(let k=-2;k<=2;k++){ ctx.fillRect(bx+k*2.3-0.4,by-17.2,0.8,0.8); }
-    // маска на глаза
-    ctx.fillStyle="#141414"; ctx.fillRect(bx-6,by-14,12,3.6);
-    ctx.fillStyle="#fff"; ctx.fillRect(bx-4,by-13.2,2.4,2.2); ctx.fillRect(bx+1.6,by-13.2,2.4,2.2);
-    ctx.fillStyle="#141414"; ctx.fillRect(bx-3.2,by-12.6,1.3,1.4); ctx.fillRect(bx+2.3,by-12.6,1.3,1.4);
-    // рот: у «ловца» жадный оскал, у остальных нейтральный
-    if(reach){ ctx.fillStyle="#7A1F1F"; ctx.fillRect(bx-2.6,by-9,5.2,2.1); ctx.fillStyle="#fff"; ctx.fillRect(bx-2.6,by-9,5.2,0.7); }
-    else { ctx.fillStyle="#B98C66"; ctx.fillRect(bx-2,by-9,4,1.3); }
-  }
-  function obDraw(o){
-    const cx=o.x+o.w/2, STEP=40;
-    ctx.strokeStyle="#8A6A3A"; ctx.lineWidth=2.6; ctx.lineCap="round";
-    ctx.beginPath(); ctx.moveTo(cx,-2); ctx.lineTo(cx,o.gapY-2); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(cx,o.gapY+o.gap+2); ctx.lineTo(cx,H+2); ctx.stroke();
-    const top=[]; for(let yy=8; yy+38<=o.gapY-2; yy+=STEP) top.push(yy);
-    top.forEach((yy,i)=> ropeThief(cx,yy, i%2?1:-1, i===top.length-1, t, y));
-    const bot=[]; for(let yy=o.gapY+o.gap+10; yy+38<=H; yy+=STEP) bot.push(yy);
-    bot.forEach((yy,i)=> ropeThief(cx,yy, i%2?1:-1, i===0, t, y));
-  }
-  function loop(){
-    raf=requestAnimationFrame(loop);
-    ctx.clearRect(0,0,W,H);
-    if(IMG.sky){ ctx.drawImage(IMG.sky,0,0,W,H); }
-    else { ctx.fillStyle="#CBE8F5"; ctx.fillRect(0,0,W,H); }
-    { const ct=performance.now()/1000, span=W+120;
-      [[7,44,1.05,.95],[15,92,0.8,.8],[5,150,1.3,.9],[19,206,0.72,.7],[11,256,0.95,.82]].forEach((c,i)=>{
-        const cx=W+60-(((ct*c[0])+i*95)%span); cloud(cx,c[1],c[2],c[3]);
-      });
-    }
-    if(demo){
-      demoT++;
-      const dsp=2.4; spawnX-=dsp;
-      if(spawnX<=0){ const dgap=Math.min(H*0.4,150), dm=44; const gy=dm+(Math.sin(demoT*0.025)*0.5+0.5)*Math.max(0,(H-dgap-dm*2)); obs.push({x:W+30,gapY:gy,gap:dgap,w:40,passed:false}); spawnX=230; }
-      let tgt=null,bb=1e9; for(const o of obs){ o.x-=dsp; const ocx=o.x+o.w/2; if(ocx+15>=px-16 && (ocx-px)<bb){ bb=ocx-px; tgt=o; } }
-      const aim=tgt?tgt.gapY+tgt.gap/2:H*0.42;
-      vy=(aim-y)*0.12; y+=vy;
-      obs=obs.filter(o=>o.x>-60);
-    }
-    else if(reviving){
-      reviveT++;
-      y += (H*0.42 - y)*0.14;
-      const pulse=0.5+0.5*Math.sin(reviveT*0.32);
-      ctx.save(); ctx.globalAlpha=0.16+0.18*pulse; ctx.fillStyle="#2F9E9B"; ctx.beginPath(); ctx.arc(px,y,24+pulse*10,0,7); ctx.fill(); ctx.restore();
-      for(let i=0;i<6;i++){ const rr=14+((reviveT*1.6+i*8)%32); ctx.save(); ctx.globalAlpha=Math.max(0,0.85-rr/36); ctx.fillStyle=i%2?"#F5A05A":"#fff"; ctx.beginPath(); ctx.arc(px+Math.cos(reviveT*0.13+i*1.05)*rr, y+20-rr*0.7, 2.1, 0, 7); ctx.fill(); ctx.restore(); }
-      ctx.save(); ctx.globalAlpha=clamp(reviveT/12,0,1); ctx.fillStyle="#0F7A7A"; ctx.font="700 12px Manrope,Arial,sans-serif"; ctx.textAlign="center"; ctx.fillText("Hayot Group поднимает вас", W/2, Math.max(22, y-36)); ctx.restore();
-      if(reviveT>46 || Math.abs(y-H*0.42)<1.5){ reviving=false; vy=0; }
-    }
-    else if(crashing){
-      crashVy += 0.65; y += crashVy; crashRot += 0.14;
-      crashPuffs.push({x:px-6+(Math.random()*8-4), y:y-4, r:3+Math.random()*2, life:0});
-      if(y>H+50){ crashing=false; showOver(); }
-    }
-    else if(started && !dead){
-      t++; vy+=G; y+=vy;
-      const speed=Math.min(6.8, 4.0 + t*0.0017);
-      spawnX-=speed;
-      const every=Math.max(260, 305 - t*0.019);    // препятствия расставлены дальше; со временем чуть ближе
-      if(spawnX<=0){ spawn(); spawnX=every; }
-      // компактный хитбокс по фюзеляжу (без крыльев и носа) — честнее к игроку
-      const pr={x:px-16, y:y-5, w:46, h:10};
-      const BAND=15;   // «столб» воров уже, чем выглядит (учитываем только тела у верёвки)
-      const FG=6;      // прощаем лёгкое касание у самой кромки проёма
-      for(const o of obs){
-        o.x-=speed;
-        const ocx=o.x+o.w/2, bx0=ocx-BAND, bx1=ocx+BAND;
-        if(!o.passed && bx1<pr.x){ o.passed=true; passed++; }
-        const overlapX = pr.x < bx1 && pr.x+pr.w > bx0;
-        const hitTop = pr.y < o.gapY - FG;
-        const hitBot = pr.y+pr.h > o.gapY + o.gap + FG;
-        if(overlapX && (hitTop || hitBot)) die();
+  function drawToken(x,y,fx){ ctx.save(); ctx.translate(x,y); const sc=1+0.06*Math.sin(spin*2)+fx*0.8; ctx.scale(sc,sc); const g=ctx.createRadialGradient(0,0,2,0,0,16); g.addColorStop(0,"rgba(47,158,155,0.55)"); g.addColorStop(1,"rgba(47,158,155,0)"); ctx.fillStyle=g; ctx.beginPath(); ctx.arc(0,0,16,0,TAU); ctx.fill(); ctx.fillStyle="#2F9E9B"; ctx.beginPath(); ctx.arc(0,0,9,0,TAU); ctx.fill(); ctx.lineWidth=2; ctx.strokeStyle="#F5A05A"; ctx.stroke(); ctx.rotate(spin*0.5); for(let i=0;i<4;i++){ ctx.rotate(Math.PI/2); ctx.fillStyle=(i===1)?"#F5A05A":"#FFFFFF"; ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(5.6,-1.7); ctx.lineTo(2.4,-5.6); ctx.closePath(); ctx.fill(); } ctx.restore(); }
+  function drawCoin(x,y){ ctx.save(); ctx.translate(x,y); ctx.fillStyle="rgba(0,0,0,.30)"; ctx.beginPath(); ctx.arc(0.5,1.6,8,0,TAU); ctx.fill(); ctx.fillStyle="#F2C14E"; ctx.beginPath(); ctx.arc(0,0,8,0,TAU); ctx.fill(); ctx.lineWidth=2; ctx.strokeStyle="#C8901A"; ctx.stroke(); ctx.fillStyle="#8A5E12"; ctx.font="800 10px Manrope,Arial"; ctx.textAlign="center"; ctx.textBaseline="middle"; ctx.fillText("$",0,0.5); ctx.restore(); }
+  function drawRocket(x,y,rot){ ctx.save(); ctx.translate(x,y); ctx.rotate(rot); if(shield>0){ ctx.strokeStyle="rgba(120,230,220,"+(0.4+0.3*Math.sin(spin*2))+")"; ctx.lineWidth=2.4; ctx.beginPath(); ctx.arc(0,0,17,0,TAU); ctx.stroke(); } const fl=6+Math.random()*4; ctx.fillStyle="#F5A05A"; ctx.beginPath(); ctx.moveTo(-4,9); ctx.lineTo(0,9+fl); ctx.lineTo(4,9); ctx.closePath(); ctx.fill(); ctx.fillStyle="#FFD27A"; ctx.beginPath(); ctx.moveTo(-2,9); ctx.lineTo(0,9+fl*0.6); ctx.lineTo(2,9); ctx.closePath(); ctx.fill(); ctx.lineWidth=1.6; ctx.strokeStyle="#0a2e34"; ctx.fillStyle="#F5A05A"; ctx.beginPath(); ctx.moveTo(-7,3); ctx.lineTo(-12,11); ctx.lineTo(-7,9); ctx.closePath(); ctx.moveTo(7,3); ctx.lineTo(12,11); ctx.lineTo(7,9); ctx.closePath(); ctx.fill(); ctx.fillStyle="#2F9E9B"; ctx.beginPath(); ctx.moveTo(0,-15); ctx.quadraticCurveTo(7,-6,7,4); ctx.lineTo(7,9); ctx.lineTo(-7,9); ctx.lineTo(-7,4); ctx.quadraticCurveTo(-7,-6,0,-15); ctx.closePath(); ctx.fill(); ctx.stroke(); ctx.fillStyle="#F5A05A"; ctx.beginPath(); ctx.moveTo(0,-15); ctx.quadraticCurveTo(5,-9,4,-4); ctx.lineTo(-4,-4); ctx.quadraticCurveTo(-5,-9,0,-15); ctx.closePath(); ctx.fill(); ctx.fillStyle="#CFF0EA"; ctx.beginPath(); ctx.arc(0,-2,3,0,TAU); ctx.fill(); ctx.lineWidth=1.4; ctx.strokeStyle="#0a2e34"; ctx.stroke(); ctx.restore(); }
+  function hud(){ ctx.save(); ctx.textBaseline="top"; ctx.font="800 13px Manrope,Arial"; ctx.textAlign="left"; ctx.fillStyle="#CFF0EA"; ctx.fillText("Раунд "+round,12,12); ctx.textAlign="center"; ctx.fillStyle="#8BE8E2"; ctx.fillText("Монеты "+(gemsTotal-gemsLeft)+"/"+gemsTotal,CX,12); ctx.textAlign="right"; ctx.fillStyle="#FFD27A"; ctx.fillText(orbitScore().toLocaleString("ru"),Sq-12,12); ctx.restore(); }
+  function panel(title,sub,color){ ctx.save(); ctx.fillStyle="rgba(6,16,20,.5)"; ctx.fillRect(0,0,Sq,Sq); ctx.textAlign="center"; ctx.textBaseline="middle"; ctx.shadowColor="rgba(0,0,0,.5)"; ctx.shadowBlur=10; ctx.fillStyle=color||"#8BE8E2"; ctx.font="800 24px Georgia,serif"; ctx.fillText(title,CX,CY-8); if(sub){ ctx.fillStyle="#dceae8"; ctx.font="700 14px Manrope,Arial"; ctx.fillText(sub,CX,CY+20); } ctx.restore(); }
+
+  function render(){
+    ctx.clearRect(0,0,Sq,Sq);
+    ctx.save(); if(shake>0.2) ctx.translate((Math.random()*2-1)*shake,(Math.random()*2-1)*shake);
+    drawBg();
+    ctx.strokeStyle="rgba(255,255,255,0.16)"; ctx.lineWidth=2; ctx.setLineDash([5,8]); ctx.beginPath(); ctx.arc(CX,CY,R,0,TAU); ctx.stroke(); ctx.setLineDash([]);
+    for(const o of orbs) drawToken(CX+R*Math.cos(o.ang),CY+R*Math.sin(o.ang),o.fx);
+    drawBoss();
+    for(const p of projs) drawCoin(CX+p.r*Math.cos(p.ang),CY+p.r*Math.sin(p.ang));
+    { const rx=CX+R*Math.cos(ang), ry=CY+R*Math.sin(ang), rrot=ang+dir*Math.PI/2+Math.PI/2;
+      if(ex && ex.a>0){ ctx.strokeStyle="rgba(245,160,90,"+ex.a+")"; ctx.lineWidth=3; ctx.beginPath(); ctx.arc(ex.x,ex.y,ex.r,0,TAU); ctx.stroke(); ctx.fillStyle="rgba(255,210,120,"+(ex.a*0.4)+")"; ctx.beginPath(); ctx.arc(ex.x,ex.y,ex.r*0.5,0,TAU); ctx.fill(); }
+      if(state!=="dying"){ let rsc=1;
+        if(state==="reviving"){ rsc=Math.min(1,reviveT/40); const g=ctx.createRadialGradient(rx,ry,2,rx,ry,34); g.addColorStop(0,"rgba(120,230,220,"+(0.55*(1-reviveT/52))+")"); g.addColorStop(1,"rgba(120,230,220,0)"); ctx.fillStyle=g; ctx.beginPath(); ctx.arc(rx,ry,34,0,TAU); ctx.fill(); }
+        ctx.save(); ctx.translate(rx,ry); ctx.scale(rsc,rsc); ctx.translate(-rx,-ry); drawRocket(rx,ry,rrot); ctx.restore();
       }
-      flightScore=Math.round((passed*40 + t*0.6)*M);
-      obs=obs.filter(o=>o.x>-o.w-12);
-      if(y<5 || y>H-5) die();
     }
-    for(const p of crashPuffs){ p.life++; p.r+=0.55; ctx.save(); ctx.globalAlpha=Math.max(0,0.5-p.life/42); ctx.fillStyle="#9AA8A8"; ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,7); ctx.fill(); ctx.restore(); }
-    crashPuffs=crashPuffs.filter(p=>p.life<42);
-    for(const p of enginePuffs){ p.life++; p.x+=p.vx; p.r+=0.4; ctx.save(); ctx.globalAlpha=Math.max(0,0.55-p.life/22); ctx.fillStyle=p.life<7?"#FFC65A":"#CFE6E1"; ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,7); ctx.fill(); ctx.restore(); }
-    enginePuffs=enginePuffs.filter(p=>p.life<22);
-    for(const o of obs) obDraw(o);
-    plane();
-    const fs=document.getElementById("flyscore"); if(fs) fs.textContent=flightScore.toLocaleString("ru");
+    for(const w of waves){ ctx.strokeStyle="rgba(245,160,90,"+w.a+")"; ctx.lineWidth=3.4; ctx.beginPath(); ctx.arc(CX,CY,w.r,0,TAU); ctx.stroke(); }
+    for(const p of parts){ ctx.save(); ctx.globalAlpha=Math.max(0,p.life); ctx.translate(p.x,p.y); ctx.rotate(p.rot); ctx.fillStyle=p.col; ctx.fillRect(-3.2,-2.2,6.4,4.4); ctx.restore(); }
+    if(clearFx>0.02){ ctx.fillStyle="rgba(255,255,255,"+(clearFx*0.30)+")"; ctx.fillRect(0,0,Sq,Sq); }
+    if(hitFx>0.02){ ctx.fillStyle="rgba(226,75,74,"+(hitFx*0.35)+")"; ctx.fillRect(0,0,Sq,Sq); }
+    ctx.restore();
+    hud();
+    if(state==="roundclear") panel("Раунд "+round+" пройден!","+"+(100*round)+" очков","#8BE8E2");
+    if(state==="reviving"){ ctx.save(); ctx.textAlign="center"; ctx.fillStyle="rgba(6,16,20,.5)"; ctx.fillRect(0,Sq-44,Sq,44); ctx.textBaseline="middle"; ctx.fillStyle="#5FD0C9"; ctx.font="800 14px Manrope,Arial"; ctx.fillText("Hayot Group выводит вас на орбиту", CX, Sq-22); ctx.restore(); }
+    if(state==="demo"){ ctx.save(); ctx.textAlign="center"; ctx.fillStyle="rgba(6,16,20,.58)"; ctx.fillRect(0,Sq-60,Sq,60); ctx.textBaseline="middle"; ctx.fillStyle="#FFD27A"; ctx.font="800 14px Manrope,Arial"; ctx.fillText("Демонстрация — так нужно играть", CX, Sq-39); ctx.fillStyle="#dceae8"; ctx.font="700 11.5px Manrope,Arial"; ctx.fillText("Собирайте бирюзовые монеты Hayot · облетайте золотые", CX, Sq-18); ctx.restore(); }
   }
-  function die(){
-    if(dead) return; dead=true;
-    try{const tg=window.Telegram&&window.Telegram.WebApp; tg&&tg.HapticFeedback&&tg.HapticFeedback.notificationOccurred("error");}catch(e){}
-    crashing=true; crashVy=Math.max(vy,2.5); crashRot=clamp(vy/12,-0.3,0.6);   // самолёт срывается в падение
-  }
-  function showOver(){
+  function loop(){ raf=requestAnimationFrame(loop); stepUpd(); render(); }
+
+  function reverse(){ if(state==="play"){ dir*=-1; shake=Math.max(shake,1.4); } }
+  function onTap(){ reverse(); }
+  function keytap(e){ if(e.code==="Space"){ e.preventDefault(); reverse(); } }
+  wrap.addEventListener("pointerdown", onTap);
+  document.addEventListener("keydown", keytap);
+
+  const startBtn=document.getElementById("flystartbtn");
+  startBtn.addEventListener("click", ()=>{
+    if(running) return; running=true; startBtn.style.display="none";
+    ang=-Math.PI/2; dir=1; oscore=0; t=0; round=1; projs=[]; parts=[]; waves=[]; orbs=[]; spawnT=46;
+    spawnRing(1); shield=80; state="idle";
+    countdown(()=>{ state="play"; shield=70; });
+  });
+
+  function rescue(){
     cancelAnimationFrame(raf);
-    const ov=document.createElement("div"); ov.className="fly-over";
-    ov.innerHTML=`<div class="fly-card">
-      <div class="fly-big">Полёт окончен</div>
-      <div class="fly-sub">Очки полёта: <b>${flightScore.toLocaleString("ru")}</b></div>
-      ${!S.revived?`${rescueScene()}<div style="font-size:13px;color:var(--muted);line-height:1.5;margin-bottom:10px;text-align:left;">Ваш бизнес вошёл в экосистему <b>Hayot Group</b> — и партнёры уже летят на выручку. Их связи дают вам второй шанс: они снова поднимут бизнес в воздух <b>без потери очков</b>.</div><button class="btn btn-coral pulse" id="revive">🤝 Принять помощь <b>Hayot Group</b></button>`:'<div style="font-size:13px;color:var(--muted);margin-bottom:8px;">Связи <b>Hayot Group</b> уже помогли вам в этой партии — второй шанс использован.</div>'}
-      <button class="btn btn-ghost" id="finish">Завершить и записать результат</button>
+    const ov=document.createElement("div"); ov.className="orb-over";
+    ov.innerHTML=`<div class="orb-card">
+      <div class="orb-ic">🛟</div>
+      <div class="orb-tag">Hayot Group на связи</div>
+      <div class="orb-title">Монополист вас настиг</div>
+      <div class="orb-score">Очки: <b>${orbitScore().toLocaleString("ru")}</b></div>
+      <div class="orb-text">Ваш стартап — часть экосистемы <b>Hayot Group</b>. Партнёры выводят вас обратно на орбиту: второй шанс <b>без потери очков</b> и пара секунд неуязвимости.</div>
+      <button class="btn btn-coral pulse" id="oRevive">🤝 Принять помощь</button>
+      <button class="btn btn-ghost2" id="oFinish">Завершить</button>
     </div>`;
     wrap.appendChild(ov);
-    const rv=document.getElementById("revive"); if(rv) rv.onclick=()=>{
-      S.revived=true; ov.remove();
-      obs=obs.filter(o=>o.x>px+170);
-      crashing=false; crashPuffs=[]; enginePuffs=[]; crashRot=0;
-      y=H*0.42; vy=0; dead=false;
-      countdown(()=>{ started=true; vy=JUMP; loop(); });   // таймер 3-2-1 перед продолжением
-    };
-    document.getElementById("finish").onclick=()=>{ wrap.removeEventListener("pointerdown",onTap); document.removeEventListener("keydown",keyflap); S.log.flight.score=flightScore; S.log.flight.t=t; S.score=base+flightScore; endGame(); };
+    document.getElementById("oRevive").onclick=()=>{ S.revived=true; ov.remove(); startRevive(); };
+    document.getElementById("oFinish").onclick=()=>finishGame();
   }
-  loop();   // ждём тап игрока → затем отсчёт 3-2-1 → старт полёта
+  function startRevive(){ projs=[]; parts=[]; waves=[]; ex=null; state="reviving"; reviveT=0; shield=220; loop(); }
+  function over(){
+    cancelAnimationFrame(raf);
+    const ov=document.createElement("div"); ov.className="orb-over";
+    ov.innerHTML=`<div class="orb-card">
+      <div class="orb-ic">🪐</div>
+      <div class="orb-tag">Орбита окончена</div>
+      <div class="orb-title">Монополист вас поглотил</div>
+      <div class="orb-score">Очки орбиты: <b>${orbitScore().toLocaleString("ru")}</b></div>
+      <div class="orb-text">Связи <b>Hayot Group</b> уже помогли в этой партии — второй шанс использован.</div>
+      <button class="btn btn-coral" id="oFinish2">Завершить и записать результат</button>
+    </div>`;
+    wrap.appendChild(ov);
+    document.getElementById("oFinish2").onclick=()=>finishGame();
+  }
+  function finishGame(){
+    wrap.removeEventListener("pointerdown", onTap); document.removeEventListener("keydown", keytap);
+    S.log.flight.score=orbitScore(); S.log.flight.rounds=round; S.score=base+orbitScore();
+    endGame();
+  }
+
+  spawnRing(1); state="demo"; loop();
 }
 
 function startTimer(totalTenths){
@@ -1651,7 +1573,7 @@ function tutorial(onDone){
     {sel:".rc.users",ic:"👥",h:"Пользователи",p:"Чем их больше, тем выше выручка и итоговая оценка вашей компании."},
     {sel:".rc.team",ic:"⚡",h:"Команда",p:"Мотивация команды. Если упадёт до нуля — развитие остановится."},
     {ic:"⏱",h:"Время и очки",p:"Единственно верного варианта нет — выбирайте то, что усилит компанию. На каждый ход даётся около 30 секунд: успеете прочитать и подумать, а за быстрый ответ — бонус к очкам."},
-    {ic:"🏆",h:"Как победить",p:"В середине игры <b>Hayot Ventures</b> проведёт тап-раунд с множителем за вашу компанию, а в финале — полёт бизнеса: облетайте препятствия как можно дольше. Именно полёт приносит основную часть очков. Больше всех очков — победа!"},
+    {ic:"🏆",h:"Как победить",p:"В середине игры <b>Hayot Ventures</b> проведёт тап-раунд с множителем за вашу компанию, а в финале — орбита стартапа: собирайте монеты Hayot и уклоняйтесь от монополиста, проходя раунд за раундом. Именно орбита приносит основную часть очков. Больше всех очков — победа!"},
   ];
   let i=0;
   const mask=document.createElement("div"); mask.className="tut-mask"; document.body.appendChild(mask);
@@ -1750,14 +1672,14 @@ function welcome(){
     <div class="how">
       <div class="how-row"><span class="how-n">1</span><span><b>12 решений.</b> Каждый выбор меняет капитал, пользователей и команду — держите их в балансе.</span></div>
       <div class="how-row"><span class="how-n">2</span><span><b>Раунд с фондом.</b> В середине игры Hayot Ventures устраивает тап-раунд: очки множатся на силу вашей компании.</span></div>
-      <div class="how-row"><span class="how-n">3</span><span><b>Финальный полёт.</b> Проведите самолёт сквозь препятствия — чем дольше летите, тем больше очков.</span></div>
+      <div class="how-row"><span class="how-n">3</span><span><b>Финал — орбита.</b> Выведите стартап на орбиту: собирайте монеты Hayot и облетайте монеты монополиста — чем дальше, тем больше очков.</span></div>
     </div>
 
     <details class="rules rules-acc">
       <summary>📋 Правила и призы <span class="chev">▾</span></summary>
       <ul>
         <li><b>Цель.</b> Набрать максимум очков и подняться в таблице лидеров.</li>
-        <li><b>Очки.</b> За состояние компании после каждого решения и за скорость ответа; в полёте — за пройденную дистанцию.</li>
+        <li><b>Очки.</b> За состояние компании после каждого решения и за скорость ответа; на орбите — за собранные монеты Hayot и пройденные раунды.</li>
         <li><b>Деньги.</b> Если капитал кончится, Hayot Bank выдаст займ под небольшой процент — он чуть снизит итоговые очки.</li>
         <li><b>Попытки.</b> Пригласите друга — +10 попыток (до 100). В зачёт идёт лучший результат.</li>
         <li><b>Честная игра.</b> Варианты и эффекты меняются каждую партию. Боты и накрутка — дисквалификация.</li>
