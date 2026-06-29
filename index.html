@@ -361,6 +361,14 @@
   .welcome-founder{text-align:center;margin:2px 0 6px;}
   .welcome-founder img{width:168px;max-width:56%;height:auto;filter:drop-shadow(0 14px 26px rgba(15,122,122,.22));animation:wfloat 3.4s ease-in-out infinite;}
   @keyframes wfloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+  .lbtable{margin-top:8px;text-align:left;max-height:46vh;overflow:auto;border:1px solid var(--line);border-radius:12px;background:#fff;}
+  .lbrow{display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid #EEF3F2;font-size:14px;}
+  .lbrow:last-child{border-bottom:none;}
+  .lbrow.me{background:#EAF5F2;}
+  .lbn{width:30px;font-weight:800;color:var(--teal);}
+  .lbname{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .lbsc{font-weight:800;}
+  .lbme{font-size:13px;color:var(--muted);margin-bottom:6px;}
 </style>
 </head>
 <body>
@@ -1017,11 +1025,17 @@ function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a
 function shuffleSeed(a,rng){for(let i=a.length-1;i>0;i--){const j=(rng()*(i+1))|0;[a[i],a[j]]=[a[j],a[i]];}return a;}
 // ── попытки и приглашения (демо-клиент; в конкурсе начисление проверяет сервер) ──
 const ATT_START=3, ATT_PER_INVITE=10, ATT_CAP=100;
-function getAtt(){ try{let v=localStorage.getItem("hv_att"); if(v===null){localStorage.setItem("hv_att",String(ATT_START)); return ATT_START;} return clamp(parseInt(v,10)||0,0,ATT_CAP);}catch(e){return ATT_START;} }
+function getAtt(){ if(typeof BK!=="undefined"&&BK.active&&BK.att!=null) return BK.att; try{let v=localStorage.getItem("hv_att"); if(v===null){localStorage.setItem("hv_att",String(ATT_START)); return ATT_START;} return clamp(parseInt(v,10)||0,0,ATT_CAP);}catch(e){return ATT_START;} }
 function setAtt(n){ try{localStorage.setItem("hv_att",String(clamp(n,0,ATT_CAP)));}catch(e){} refreshAtt(); }
 function refreshAtt(){ const e=document.getElementById("attn"); if(e) e.textContent=getAtt(); }
 function refLink(){ let uid=""; try{uid=(window.Telegram&&Telegram.WebApp&&Telegram.WebApp.initDataUnsafe&&Telegram.WebApp.initDataUnsafe.user&&Telegram.WebApp.initDataUnsafe.user.id)||"";}catch(e){} return location.origin+location.pathname+(uid?("?ref="+uid):""); }
 function invite(){
+  if(typeof BK!=="undefined" && BK.active){
+    const id=_myTgId(); const link="https://t.me/"+HAYOT_BOT+"/"+HAYOT_MINIAPP+"?startapp=ref"+id;
+    const t="Сыграй в «Путь основателя» от Hayot Ventures и поборись за приз!";
+    try{const tg=_tg(); if(tg&&tg.openTelegramLink) tg.openTelegramLink("https://t.me/share/url?url="+encodeURIComponent(link)+"&text="+encodeURIComponent(t)); else window.open(link,"_blank"); }catch(e){}
+    return;
+  }
   const link=refLink(); const text="Сыграй в «Путь основателя» от Hayot Ventures и поборись за приз!";
   try{const tg=window.Telegram&&window.Telegram.WebApp;
     if(tg&&tg.openTelegramLink){ tg.openTelegramLink("https://t.me/share/url?url="+encodeURIComponent(link)+"&text="+encodeURIComponent(text)); }
@@ -1041,6 +1055,42 @@ function shareResult(score){
     else if(navigator.clipboard){ navigator.clipboard.writeText(msg+" "+link); alert("Результат скопирован:\n"+msg); }
     else alert(msg+" "+link);
   }catch(e){}
+}
+/* ── Backend: лидерборд, попытки, рефералы. Активен только в Telegram Mini App. ── */
+const HAYOT_API = "https://web-production-54f5c.up.railway.app";
+const HAYOT_BOT = "hayotvcbot", HAYOT_MINIAPP = "game"; // short name Mini App из BotFather
+const BK = { active:false, att:null, best:0, rank:null, invited:0 };
+function _tg(){ return window.Telegram && window.Telegram.WebApp; }
+function _initData(){ var t=_tg(); return (t&&t.initData)||""; }
+function _myTgId(){ var t=_tg(); return (t&&t.initDataUnsafe&&t.initDataUnsafe.user&&t.initDataUnsafe.user.id)||""; }
+async function _get(path){ const r=await fetch(HAYOT_API+path); if(!r.ok) throw new Error("HTTP "+r.status); return r.json(); }
+async function _post(path,body){ const r=await fetch(HAYOT_API+path,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)}); if(!r.ok&&r.status!==409) throw new Error("HTTP "+r.status); return r.json(); }
+async function backendInit(){
+  if(!HAYOT_API || !_initData()) return;
+  try{ const d=await _post("/api/auth",{initData:_initData()});
+    if(d&&d.me){ BK.active=true; BK.att=d.me.attempts; BK.best=d.me.best_score; BK.rank=d.me.rank; BK.invited=d.me.invited_count; refreshAtt(); } }
+  catch(e){}
+}
+async function backendSubmit(score, rounds){
+  if(!BK.active) return null;
+  try{ const d=await _post("/api/submit",{initData:_initData(),score:Math.round(score),rounds:Math.round(rounds||0)});
+    if(d&&d.me){ BK.att=d.me.attempts; BK.best=d.me.best_score; BK.rank=d.me.rank; } return d; }
+  catch(e){ return null; }
+}
+function esc(x){ return String(x).replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+async function leaderboardScreen(){
+  document.getElementById("hud").classList.add("hidden");
+  document.getElementById("screen").innerHTML = `<div class="hero">${LOGO}
+    <h1>Таблица <span class="em">лидеров</span></h1>
+    <div id="lbwrap"><p style="color:var(--muted)">Загружаю…</p></div>
+    <button class="btn btn-primary" onclick="welcome()" style="margin-top:12px;">← Назад</button></div>`;
+  try{
+    const d=await _get("/api/leaderboard?initData="+encodeURIComponent(_initData()));
+    let rows=(d.top||[]).map(x=>`<div class="lbrow${(d.me&&d.me.rank===x.rank)?' me':''}"><span class="lbn">${x.rank}</span><span class="lbname">${esc(x.name)}</span><span class="lbsc">${x.score.toLocaleString("ru")}</span></div>`).join("");
+    if(!rows) rows='<p style="color:var(--muted)">Пока никто не сыграл — будь первым!</p>';
+    let mine=(d.me&&d.me.rank)?`<div class="lbme">Твоё место: <b>#${d.me.rank}</b> · лучший: <b>${(d.me.best_score||0).toLocaleString("ru")}</b></div>`:(d.me?`<div class="lbme">Сыграй партию, чтобы попасть в таблицу.</div>`:'');
+    document.getElementById("lbwrap").innerHTML=mine+'<div class="lbtable">'+rows+'</div>';
+  }catch(e){ document.getElementById("lbwrap").innerHTML='<p style="color:var(--muted)">Таблица доступна при запуске игры внутри Telegram.</p>'; }
 }
 function newGame(dir){
   const seed=((Date.now()^(Math.random()*1e9))>>>0);
@@ -1361,11 +1411,11 @@ function finale(){
   const M = 1 + cM + cU + cT;
   const base = Math.round(S.score);
   const scr=document.getElementById("screen");
-  scr.innerHTML = `<div class="card out-card">
+  scr.innerHTML = `<div class="card out-card" style="padding-left:12px;padding-right:12px;">
     <div class="fin-emblem">${LOGO}</div>
     <div class="mlabel">🏆 Финал · Орбита стартапа</div>
     <div class="out-text" style="margin-bottom:8px;">Облетайте золотые монеты <b>монополиста</b> и собирайте <b>монеты Hayot</b>. <b>Тап</b> — разворот ракеты.</div>
-    <div class="fly-wrap" id="flywrap" style="display:flex;align-items:center;justify-content:center;background:#08222A;">
+    <div class="fly-wrap" id="flywrap" style="display:flex;align-items:center;justify-content:center;background:#08222A;margin:10px -12px;">
       <canvas id="fly"></canvas>
     </div>
     <button class="btn btn-coral" id="flystartbtn">▶ Вывести стартап на орбиту</button>
@@ -1376,7 +1426,7 @@ function finale(){
   const wrap=document.getElementById("flywrap");
   const dpr=Math.min(window.devicePixelRatio||1,2);
   const cssW=Math.max(260, Math.round(wrap.clientWidth||320));
-  const maxH=Math.round(clamp(window.innerHeight*0.52, 300, 440));
+  const maxH=Math.round(clamp(window.innerHeight-300, 300, 560));
   const Sq=Math.min(cssW, maxH);
   cv.style.width=Sq+"px"; cv.style.height=Sq+"px";
   cv.width=Math.round(Sq*dpr); cv.height=Math.round(Sq*dpr);
@@ -1624,13 +1674,23 @@ function endGame(reason){
     <div class="score">${final.toLocaleString("ru")}</div>
     <div class="rank">очков</div>
     ${(S.loans>0)?`<div class="loaninfo">🏦 <b>Hayot Bank</b> поддержал вас: ${S.loans} ${S.loans===1?"займ":"займа(ов)"} на <b>${(S.borrowed||0).toLocaleString("ru")} тыс. $</b> · проценты: <b>−${interest.toLocaleString("ru")}</b> очков</div>`:''}
-    <p>${bankrupt?"Вы отказались от поддержки <b>Hayot Bank</b> и завершили партию. ":"Ваш бизнес прошёл путь вместе с <b>Hayot Ventures</b>. "}Лучший ваш результат: <b>${best.toLocaleString("ru")}</b>. В зачёт конкурса идёт лучшая из попыток.</p>
+    <p>${bankrupt?"Вы отказались от поддержки <b>Hayot Bank</b> и завершили партию. ":"Ваш бизнес прошёл путь вместе с <b>Hayot Ventures</b>. "}Лучший ваш результат: <b id="bestp">${best.toLocaleString("ru")}</b>. В зачёт конкурса идёт лучшая из попыток.</p>
     <button class="btn btn-coral" onclick="shareResult(${final})">📣 Поделиться результатом</button>
     <div class="att" style="margin-top:14px;">🎟 Осталось попыток: <b id="attn">${att}</b></div>
     <button class="invite" onclick="invite()">📤 Пригласить друга (+10 попыток)</button>
+    <button class="invite" onclick="leaderboardScreen()">🏆 Таблица лидеров</button>
+    <div class="att" id="rankl" style="margin-top:6px;"></div>
     <button class="btn btn-primary" onclick="tryStart()" style="margin-top:10px;">Сыграть ещё раз</button>
     <button class="btn btn-coral" onclick="goApply()" style="margin-top:10px;">⬡ Подать заявку в <b>Hayot Ventures</b> →</button>
   </div>`;
+  if(typeof BK!=="undefined" && BK.active){
+    backendSubmit(final, (S.log&&S.log.flight&&S.log.flight.rounds)||0).then(d=>{
+      if(d&&d.me){ const a=document.getElementById("attn"); if(a)a.textContent=d.me.attempts;
+        const bp=document.getElementById("bestp"); if(bp&&d.me.best_score!=null) bp.textContent=d.me.best_score.toLocaleString("ru");
+        const rk=document.getElementById("rankl"); if(rk&&d.me.rank) rk.innerHTML='🏅 Место в таблице: <b>#'+d.me.rank+'</b>';
+        if(d&&d.error==="no_attempts"){ const rk2=document.getElementById("rankl"); if(rk2) rk2.innerHTML='Попытки закончились — пригласите друга (+10).'; } }
+    });
+  }
 }
 function stat(ic,v,fmt){return `<div class="rc2"><b>${ic} ${fmt?Math.round(v).toLocaleString("ru"):Math.round(v)}</b><span>${ic=="💰"?"тыс. $":ic=="👥"?"юзеров":"мораль"}</span></div>`;}
 
@@ -1693,6 +1753,7 @@ function welcome(){
 
     <div class="att">🎟 Попыток: <b id="attn">${att}</b></div>
     <button class="invite" onclick="invite()">📤 Пригласить друга (+10 попыток)</button>
+    <button class="invite" onclick="leaderboardScreen()">🏆 Таблица лидеров</button>
     <button class="btn btn-primary" onclick="tryStart()" style="margin-top:10px;">🚀 Начать</button>
   </div>`;
 
@@ -1709,10 +1770,10 @@ function showDirs(){
   </div>`;
   document.querySelectorAll(".dirbtn").forEach(b=>b.addEventListener("click",()=>start(b.dataset.d)));
 }
-function start(dir){ setAtt(getAtt()-1); newGame(dir); showCard(); }
+function start(dir){ if(!(typeof BK!=="undefined"&&BK.active)) setAtt(getAtt()-1); newGame(dir); showCard(); }
 
 try{const tg=window.Telegram&&window.Telegram.WebApp;if(tg){tg.ready();tg.expand();tg.setHeaderColor&&tg.setHeaderColor("#F5F6F7");tg.setBackgroundColor&&tg.setBackgroundColor("#F5F6F7");}}catch(e){}
-welcome();
+welcome(); backendInit();
 </script>
 </body>
 </html>
