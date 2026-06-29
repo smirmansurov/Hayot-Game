@@ -1068,7 +1068,7 @@ async function _post(path,body){ const r=await fetch(HAYOT_API+path,{method:"POS
 async function backendInit(){
   if(!HAYOT_API || !_initData()) return;
   try{ const d=await _post("/api/auth",{initData:_initData()});
-    if(d&&d.me){ BK.active=true; BK.att=d.me.attempts; BK.best=d.me.best_score; BK.rank=d.me.rank; BK.invited=d.me.invited_count; refreshAtt(); } }
+    if(d&&d.me){ BK.active=true; BK.att=d.me.attempts; BK.best=d.me.best_score; BK.rank=d.me.rank; BK.invited=d.me.invited_count; refreshAtt(); const lb=document.getElementById("lbline"); if(lb&&BK.rank) lb.innerHTML="🏆 Ты #"+BK.rank+" — открыть таблицу"; } }
   catch(e){}
 }
 async function backendSubmit(score, rounds){
@@ -1440,7 +1440,7 @@ function finale(){
   let parts=[], waves=[], clearFx=0, gemsTotal=0, gemsLeft=0;
   if(!S.log.flight) S.log.flight={seed:S.seed, score:0};
 
-  function rp(r){ return { aspeed:Math.min(0.066,0.026+r*0.005), pspeed:Math.min(4.0,1.7+r*0.34), spawn:Math.max(18,60-r*5), spread:(r<3?0:Math.min(0.55,0.18+(r-3)*0.09)), triple:r>=3 }; }
+  function rp(r){ return { aspeed:Math.min(0.044,0.028+r*0.0018), pspeed:Math.min(4.4,1.8+r*0.36), spawn:Math.max(14,58-r*5), spread:(r<3?0:Math.min(0.6,0.18+(r-3)*0.1)), triple:r>=3 }; }
   function spawnRing(r){ const n=Math.min(12,4+r); gemsTotal=n; gemsLeft=n; orbs=[]; const off=Math.random()*TAU; for(let i=0;i<n;i++) orbs.push({ang:off+i*(TAU/n)+(Math.random()-0.5)*0.18,got:false,fx:0}); }
   function angDiff(a,b){ let d=(a-b)%TAU; if(d>Math.PI)d-=TAU; if(d<-Math.PI)d+=TAU; return d; }
   function orbitScore(){ return Math.round(oscore*M); }
@@ -1457,7 +1457,7 @@ function finale(){
     fireFx=1; shake=Math.max(shake,2.2);
   }
   function roundClear(){
-    state="roundclear"; oscore+=100*round; projs=[]; phaseT=100; clearFx=1; shake=Math.max(shake,4);
+    state="roundclear"; oscore+=1000*round; projs=[]; phaseT=100; clearFx=1; shake=Math.max(shake,4);
     waves.push({r:14,a:1}); const COL=["#0F7A7A","#2F9E9B","#F5A05A","#FFD27A","#ffffff"];
     for(let i=0;i<48;i++){ const an=Math.random()*TAU, sp=2.4+Math.random()*4.4; parts.push({x:CX,y:CY,vx:Math.cos(an)*sp,vy:Math.sin(an)*sp-2.4,rot:Math.random()*6,vr:(Math.random()-.5)*0.5,col:COL[i%COL.length],life:1}); }
   }
@@ -1473,6 +1473,7 @@ function finale(){
     spin+=0.05; fireFx*=0.9; shake*=0.86; hitFx*=0.95; clearFx*=0.93; if(shield>0)shield--;
     for(const p of parts){ p.vy+=0.13; p.x+=p.vx; p.y+=p.vy; p.vx*=0.99; p.rot+=p.vr; p.life-=0.013; } parts=parts.filter(p=>p.life>0);
     for(const w of waves){ w.r+=6.2; w.a-=0.028; } waves=waves.filter(w=>w.a>0);
+    for(const o of orbs){ if(o.got && o.fx>0) o.fx-=0.05; } orbs=orbs.filter(o=> !o.got || o.fx>0);
     if(state==="demo"){
       ang+=dir*0.034;
       spawnT--; if(spawnT<=0){ const b=ang+dir*0.6+(Math.random()*2-1)*0.2; projs.push({ang:b,r:40,speed:2.2,scored:false}); fireFx=1; spawnT=70+Math.random()*30; }
@@ -1489,11 +1490,10 @@ function finale(){
       const P=rp(round); t++;
       ang+=dir*P.aspeed;
       spawnT--; if(spawnT<=0){ fire(P); spawnT=P.spawn+Math.random()*14; }
-      for(const p of projs){ p.r+=p.speed; if(!p.scored && p.r>R+16){ p.scored=true; oscore+=2; } }
-      for(const p of projs){ if(shield<=0 && Math.abs(p.r-R)<13 && Math.abs(angDiff(p.ang,ang))<0.17){ onHit(); break; } }
+      for(const p of projs){ p.r+=p.speed; if(!p.scored && p.r>R+16){ p.scored=true; oscore+=5; } }
+      if(shield<=0){ const _rx=CX+R*Math.cos(ang), _ry=CY+R*Math.sin(ang); for(const p of projs){ const dx=(CX+p.r*Math.cos(p.ang))-_rx, dy=(CY+p.r*Math.sin(p.ang))-_ry; if(dx*dx+dy*dy < 18*18){ onHit(); break; } } }
       projs=projs.filter(p=> p.r < Sq*0.62);
-      for(const o of orbs){ if(!o.got && Math.abs(angDiff(o.ang,ang))<0.15){ o.got=true; o.fx=1; oscore+=10; gemsLeft--; if(gemsLeft<=0) roundClear(); } if(o.fx>0)o.fx-=0.05; }
-      orbs=orbs.filter(o=> !o.got || o.fx>0);
+      for(const o of orbs){ if(!o.got && Math.abs(angDiff(o.ang,ang))<0.17){ o.got=true; o.fx=1; oscore+=25; gemsLeft--; if(gemsLeft<=0) roundClear(); } }
     } else if(state==="roundclear"){
       phaseT--; if(phaseT<=0){ round++; spawnRing(round); spawnT=42; shield=Math.max(shield,Math.min(100,50+round*2)); state="play"; }
     }
@@ -1546,7 +1546,7 @@ function finale(){
     if(hitFx>0.02){ ctx.fillStyle="rgba(226,75,74,"+(hitFx*0.35)+")"; ctx.fillRect(0,0,Sq,Sq); }
     ctx.restore();
     hud();
-    if(state==="roundclear") panel("Раунд "+round+" пройден!","+"+(100*round)+" очков","#8BE8E2");
+    if(state==="roundclear") panel("Раунд "+round+" пройден!","+"+(1000*round)+" очков","#8BE8E2");
     if(state==="reviving"){ ctx.save(); ctx.textAlign="center"; ctx.fillStyle="rgba(6,16,20,.5)"; ctx.fillRect(0,Sq-44,Sq,44); ctx.textBaseline="middle"; ctx.fillStyle="#5FD0C9"; ctx.font="800 14px Manrope,Arial"; ctx.fillText("Hayot Group выводит вас на орбиту", CX, Sq-22); ctx.restore(); }
     if(state==="demo"){ ctx.save(); ctx.textAlign="center"; ctx.fillStyle="rgba(6,16,20,.55)"; ctx.fillRect(0,Sq-38,Sq,38); ctx.textBaseline="middle"; ctx.fillStyle="#FFD27A"; ctx.font="800 13px Manrope,Arial"; ctx.fillText("Демо · собирайте бирюзовые, облетайте золотые", CX, Sq-19); ctx.restore(); }
   }
@@ -1678,7 +1678,7 @@ function endGame(reason){
     <button class="btn btn-coral" onclick="shareResult(${final})">📣 Поделиться результатом</button>
     <div class="att" style="margin-top:14px;">🎟 Осталось попыток: <b id="attn">${att}</b></div>
     <button class="invite" onclick="invite()">📤 Пригласить друга (+10 попыток)</button>
-    <button class="invite" onclick="leaderboardScreen()">🏆 Таблица лидеров</button>
+    <div id="lbline" onclick="leaderboardScreen()" style="margin-top:10px;font-size:13px;color:var(--teal);font-weight:800;cursor:pointer;">🏆 Открыть таблицу лидеров</div>
     <div class="att" id="rankl" style="margin-top:6px;"></div>
     <button class="btn btn-primary" onclick="tryStart()" style="margin-top:10px;">Сыграть ещё раз</button>
     <button class="btn btn-coral" onclick="goApply()" style="margin-top:10px;">⬡ Подать заявку в <b>Hayot Ventures</b> →</button>
@@ -1753,7 +1753,7 @@ function welcome(){
 
     <div class="att">🎟 Попыток: <b id="attn">${att}</b></div>
     <button class="invite" onclick="invite()">📤 Пригласить друга (+10 попыток)</button>
-    <button class="invite" onclick="leaderboardScreen()">🏆 Таблица лидеров</button>
+    <div id="lbline" onclick="leaderboardScreen()" style="margin-top:10px;font-size:13px;color:var(--teal);font-weight:800;cursor:pointer;">🏆 Открыть таблицу лидеров</div>
     <button class="btn btn-primary" onclick="tryStart()" style="margin-top:10px;">🚀 Начать</button>
   </div>`;
 
